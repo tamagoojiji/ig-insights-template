@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+  body { font-family: 'Hiragino Sans', system-ui, sans-serif; margin: 0; padding: 24px; color: #222; line-height: 1.7; }
+  h2 { margin: 0 0 12px; font-size: 18px; }
+  .info { background: #f0f8ff; border-left: 4px solid #2575fc; padding: 12px 14px; border-radius: 4px; margin: 12px 0; font-size: 13px; }
+  .warn { background: #fff7e0; border-left: 4px solid #f0c000; padding: 12px 14px; border-radius: 4px; margin: 12px 0; font-size: 13px; }
+  ol { padding-left: 1.4em; margin: 8px 0; font-size: 13px; }
+  ol li { margin-bottom: 4px; }
+  input[type=file] { display: block; margin: 16px 0; }
+  button { background: #d62976; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+  button:disabled { background: #ccc; cursor: not-allowed; }
+  #status { margin-top: 16px; font-size: 13px; color: #555; }
+  #progress { display: none; margin-top: 12px; }
+  .spin { display: inline-block; width: 16px; height: 16px; border: 2px solid #eee; border-top-color: #d62976; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<h2>📦 Meta公式zipアップロード</h2>
+
+<div class="info">
+<strong>事前にMetaから「データのダウンロード」を申請してください</strong>
+<ol>
+  <li>Instagramアプリ／PCで <a href="https://accountscenter.facebook.com/info_and_permissions/dyi" target="_blank">アカウントセンター → 情報をダウンロード</a></li>
+  <li>「JSON形式」を選択・期間を「すべての履歴」</li>
+  <li>申請後、メールで通知 → ダウンロードリンクからzipを保存（数時間〜24時間かかる場合あり）</li>
+  <li>そのzipファイルを下記から選択 → アップロード</li>
+</ol>
+</div>
+
+<div class="warn">
+<strong>⚠️ サイズ上限</strong>: Apps Script の制約上、zipは <strong>50MB以内</strong>を推奨。超える場合はMeta側で期間を分割エクスポートしてください。
+</div>
+
+<input type="file" id="zipfile" accept=".zip" />
+<button id="upload" onclick="upload()" disabled>アップロード開始</button>
+<div id="progress"><span class="spin"></span><span id="progressText">処理中...</span></div>
+<div id="status"></div>
+
+<script>
+const fileInput = document.getElementById('zipfile');
+const uploadBtn = document.getElementById('upload');
+const statusEl = document.getElementById('status');
+const progressEl = document.getElementById('progress');
+const progressText = document.getElementById('progressText');
+
+fileInput.addEventListener('change', () => {
+  uploadBtn.disabled = !fileInput.files.length;
+  if (fileInput.files.length) {
+    const f = fileInput.files[0];
+    const sizeMB = (f.size / 1024 / 1024).toFixed(1);
+    statusEl.textContent = `${f.name} (${sizeMB} MB) を選択中`;
+    if (f.size > 50 * 1024 * 1024) {
+      statusEl.innerHTML += '<br><span style="color:#b91c1c;">⚠️ 50MBを超えています。Apps Scriptの制限でエラーになる可能性があります。</span>';
+    }
+  }
+});
+
+function upload() {
+  const file = fileInput.files[0];
+  if (!file) return;
+  uploadBtn.disabled = true;
+  fileInput.disabled = true;
+  progressEl.style.display = 'block';
+  progressText.textContent = 'ファイルをbase64に変換中...';
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    const base64 = dataUrl.split(',')[1];
+    progressText.textContent = 'サーバに送信中...';
+    google.script.run
+      .withSuccessHandler(onDone)
+      .withFailureHandler(onError)
+      .importMetaZip({ base64, fileName: file.name });
+  };
+  reader.onerror = () => onError(new Error('ファイル読み込み失敗'));
+  reader.readAsDataURL(file);
+}
+
+function onDone(result) {
+  progressEl.style.display = 'none';
+  statusEl.innerHTML = '<span style="color:#16a34a;">✅ 完了</span><br><pre style="white-space:pre-wrap; background:#f7f7fb; padding:10px; border-radius:6px;">' + (result.summary || JSON.stringify(result, null, 2)) + '</pre>';
+}
+
+function onError(err) {
+  progressEl.style.display = 'none';
+  statusEl.innerHTML = '<span style="color:#b91c1c;">❌ エラー: ' + (err && err.message ? err.message : String(err)) + '</span>';
+  uploadBtn.disabled = false;
+  fileInput.disabled = false;
+}
+</script>
+</body>
+</html>

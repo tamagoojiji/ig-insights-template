@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>できる / 条件付き / できない一覧 — IGインサイト保存テンプレート</title>
+<style>
+  body { font-family: 'Hiragino Sans', system-ui, sans-serif; max-width: 920px; margin: 0 auto; padding: 24px; color: #222; line-height: 1.8; }
+  h1 { border-bottom: 4px solid #d62976; padding-bottom: 8px; }
+  h2 { margin-top: 2em; padding-left: 12px; border-left: 6px solid #d62976; }
+  table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+  th, td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; vertical-align: top; }
+  th { background: #fff8f0; }
+  .ok { color: #16a34a; font-weight: 700; }
+  .cond { color: #c65a14; font-weight: 700; }
+  .ng { color: #b91c1c; font-weight: 700; }
+  .note { background: #f0f8ff; border-left: 4px solid #2575fc; padding: 12px 14px; margin: 1em 0; border-radius: 4px; font-size: 0.95em; }
+  .warn { background: #fff7e0; border-left: 4px solid #f0c000; padding: 12px 14px; margin: 1em 0; border-radius: 4px; font-size: 0.95em; }
+  a { color: #d62976; }
+</style>
+</head>
+<body>
+<h1>できる / 条件付きでできる / できない一覧</h1>
+<p>本テンプレートで何が実現できて、何ができないのかを正確に把握してから導入してください。Instagram Graph API（Meta公式）で取得できる範囲に基づいています。</p>
+
+<h2>🟢 できる</h2>
+<table>
+<thead><tr><th>項目</th><th>説明</th></tr></thead>
+<tbody>
+<tr><td><span class="ok">フィード自動収集</span></td><td>views / reach / saved / shares / total_interactions / like_count / comments_count を30分ごとに自動取得・スプシ追記</td></tr>
+<tr><td><span class="ok">リール自動収集</span></td><td>上記 + ig_reels_avg_watch_time（平均視聴時間）</td></tr>
+<tr><td><span class="ok">ストーリーズ自動収集（24h以内）</span></td><td>views / reach / replies / shares / total_interactions / navigation / profile_visits / follows を24時間以内に自動保存</td></tr>
+<tr><td><span class="ok">画像永続化</span></td><td>サムネイルを自分のGoogleドライブに自動保存（feed/reels/stories サブフォルダ自動作成）</td></tr>
+<tr><td><span class="ok">過去全件取り込み（API）</span></td><td>フィード・リールを過去すべて遡って取得可能（5分制限到達時は自動カーソル保存・再開）</td></tr>
+<tr><td><span class="ok">過去ストーリーズの復元（zip経由）</span></td><td>Meta公式「アカウントセンター → 情報をダウンロード」zipのアップロードで、過去のストーリーズも履歴シートに追加</td></tr>
+<tr><td><span class="ok">ダッシュボード自動生成</span></td><td>伸びた投稿ランキング・初速良好判定・曜日×時間帯ヒートマップを自動集計</td></tr>
+<tr><td><span class="ok">ストーリーズOCR（任意）</span></td><td>Gemini Vision APIキーを設定すると、ストーリーズ画像内のテキストを自動抽出</td></tr>
+<tr><td><span class="ok">Discord通知</span></td><td>トークン期限切れ・取得エラー・取り込み完了を利用者の指定Discordチャンネルに通知</td></tr>
+<tr><td><span class="ok">トークン自動更新</span></td><td>60日長期トークンを週次トリガーで自動更新（30日以上スプシを開かない期間が無ければ失効しない）</td></tr>
+</tbody>
+</table>
+
+<h2>🟡 条件付きでできる</h2>
+<table>
+<thead><tr><th>項目</th><th>条件・制約</th></tr></thead>
+<tbody>
+<tr><td><span class="cond">過去のストーリーズ数値の取得</span></td><td>Meta公式zipにはキャプション・画像・タイムスタンプは含まれるが、<strong>過去のリーチ・閲覧数・反応数の数値は含まれない場合がある</strong>。zipに無い数値は空欄として保存。最新24時間のものはAPI経由で取得可</td></tr>
+<tr><td><span class="cond">CAROUSEL（複数枚投稿）</span></td><td>1投稿= 1行で記録。サムネイル画像のみ保存（子要素の個別画像は保存対象外）。インサイトは投稿全体の合計値</td></tr>
+<tr><td><span class="cond">Meta zipアップロード</span></td><td>Apps Script制約上、zipは <strong>50MB以内</strong>を推奨。超える場合はMeta側で期間を分割エクスポート</td></tr>
+<tr><td><span class="cond">過去数年分の遡取得</span></td><td>Graph API のレート制限（200call/h/user）の関係で、数千件の取り込みは数回に分けて実行する必要あり（自動再開機能あり）</td></tr>
+<tr><td><span class="cond">複数アカウント運用</span></td><td>1スプシ = 1IGアカウント。複数アカウントを管理したい場合は、アカウントごとにスプシをコピー</td></tr>
+<tr><td><span class="cond">ストーリーズOCR</span></td><td>Gemini API無料枠で月数百件は処理可能。商用ヘビー利用なら有料枠の従量課金が必要</td></tr>
+<tr><td><span class="cond">トリガー時刻の精度</span></td><td>±5〜15分のズレあり（GAS時間ベーストリガー仕様）</td></tr>
+</tbody>
+</table>
+
+<h2>🔴 できない</h2>
+<table>
+<thead><tr><th>項目</th><th>理由</th></tr></thead>
+<tbody>
+<tr><td><span class="ng">個人アカウントでの利用</span></td><td>Instagram Graph APIは <strong>ビジネス/クリエイターアカウント</strong> のみ対応。個人アカウントは事前にビジネス/クリエイターに切替必須</td></tr>
+<tr><td><span class="ng">ストーリーズのDM返信内容の取得</span></td><td>API仕様で取得不可（プライバシー保護）</td></tr>
+<tr><td><span class="ng">投稿の保存ユーザー一覧</span></td><td>API仕様で取得不可（保存数の数値のみ取得可）</td></tr>
+<tr><td><span class="ng">いいねしたユーザー名の一覧</span></td><td>API仕様で取得不可（いいね数の数値のみ取得可）</td></tr>
+<tr><td><span class="ng">フォロワーの個別属性</span></td><td>API仕様で取得不可（性別・年齢層の集計値のみ・本テンプレートでは未対応）</td></tr>
+<tr><td><span class="ng">過去ストーリーズの完全な数値復元</span></td><td>Meta公式zipにも数値が含まれていない場合があるため、過去データの完全復元は構造的に不可能</td></tr>
+<tr><td><span class="ng">他人のアカウントの非公開データ取得</span></td><td>規約・法令違反のため絶対に行わない</td></tr>
+<tr><td><span class="ng">HTMLスクレイピングによる代替取得</span></td><td>Meta規約違反・不正アクセス禁止法のリスクのため絶対に行わない</td></tr>
+<tr><td><span class="ng">自動投稿・自動コメント・自動DM</span></td><td>本テンプレートは <strong>読み取り専用</strong>。書き込み系は一切実装しない</td></tr>
+</tbody>
+</table>
+
+<div class="note">
+<strong>📚 詳細な法的整理</strong>: 本テンプレートが「どこまで白で、何をやらないか」については <a href="./setup-guide.html#legal">setup-guide.html の Legal セクション</a> も併せて確認してください。
+</div>
+
+<div class="warn">
+<strong>⚠️ アカウントBANリスクへの備え</strong>: Instagram のアカウントが何らかの理由で凍結・削除された場合、Meta側の管理画面・API両方からデータが消えます。本テンプレートで定期的にスプシ・Driveに保存しておくことで、最低限のバックアップにはなりますが、<strong>BAN前に「Meta公式zip」と「API過去全件取り込み」の両方を一度実行しておく</strong>ことを強く推奨します。
+</div>
+
+<p style="margin-top: 3em;"><a href="./index.html">← トップに戻る</a> ｜ <a href="./setup-guide.html">セットアップ手順書</a></p>
+</body>
+</html>

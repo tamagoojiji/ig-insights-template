@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGインサイト保存テンプレート｜Instagram全投稿のインサイトを自分のスプシに永続保存</title>
+<meta name="description" content="Instagram の全投稿（フィード・リール・ストーリーズ）とインサイト数値を、自分のGoogleスプレッドシートに自動蓄積。アカウントBAN対策にも。BYO型・追加サーバー不要。">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; line-height: 1.8; color: #222; }
+  .hero { background: linear-gradient(135deg, #fa7e1e 0%, #d62976 50%, #962fbf 100%); color: white; padding: 80px 20px; text-align: center; }
+  .hero h1 { font-size: 2.5em; margin-bottom: 16px; }
+  .hero p { font-size: 1.2em; opacity: 0.95; }
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  h2 { font-size: 1.8em; margin: 1.5em 0 0.8em; border-left: 6px solid #d62976; padding-left: 14px; }
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin: 2em 0; }
+  .feature { background: #fff8f0; padding: 24px; border-radius: 8px; }
+  .feature-icon { font-size: 2em; margin-bottom: 12px; }
+  .price-box { background: #fff4c4; padding: 24px; border-radius: 8px; margin: 2em 0; border: 2px solid #f0c000; }
+  .notice { background: #ffecec; padding: 16px 20px; border-radius: 6px; margin: 1em 0; }
+  .legal-box { background: #f0fff4; padding: 18px 22px; border-radius: 6px; border-left: 5px solid #16a34a; margin: 1.4em 0; }
+  ul, ol { padding-left: 1.5em; margin: 0.8em 0; }
+  a { color: #d62976; }
+  footer { margin-top: 3em; padding: 24px 20px; background: #222; color: white; text-align: center; font-size: 0.9em; }
+  footer a { color: #ffb0d3; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+<h1>IGインサイト保存テンプレート</h1>
+<p>Instagramの全投稿インサイトを、自分のスプレッドシートに永続保存</p>
+<p style="margin-top:18px; background:rgba(255,255,255,0.18); display:inline-block; padding:8px 18px; border-radius:20px; font-size:0.95em;">💎 <strong>買い切り ¥9,800</strong>（🎁 先着20名様 ¥5,980）</p>
+</div>
+
+<div class="container">
+
+<div style="background:#fff7e0; padding:18px 22px; border-radius:8px; margin:1.4em 0; border-left:5px solid #f0c000;">
+<strong>🎁 先着20名様限定キャンペーン実施中</strong><br>
+通常価格 ¥9,800 → <strong>先着20名様だけ ¥5,980</strong>（39%OFF）。Discord勉強会で同期メンバーと一緒にセットアップ。
+</div>
+
+<h2>こんな方に</h2>
+<ul>
+<li>アカウント凍結・BAN・誤削除で過去のインサイトデータが消えるリスクに備えたい</li>
+<li>Instagram の全投稿（フィード・リール・ストーリーズ）の指標を時系列で蓄積したい</li>
+<li>運用代行で複数クライアントの分析データを自分の手元にも残したい</li>
+<li>海外SaaS（Iconosquare等）を使わず、自分の管理下でデータを運用したい</li>
+<li>過去のストーリーズ画像・閲覧数も含めて、まとめてバックアップしたい</li>
+</ul>
+
+<h2>特徴</h2>
+<div class="features">
+
+<div class="feature">
+<div class="feature-icon">📊</div>
+<h3>全インサイト自動収集</h3>
+<p>views / reach / saved / shares / total_interactions / 視聴時間 / ナビゲーション / プロフィール訪問 / 新規フォロー など、Graph API で取得可能な指標を全部自動で取得。</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">🏠</div>
+<h3>完全個人所有（BYO型）</h3>
+<p>Meta App・アクセストークン・スプシ・Driveフォルダ、すべて利用者ご自身のアカウント配下で運用。配布元はトークンを一切預かりません。</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">📚</div>
+<h3>過去全件取り込み</h3>
+<p>API経由でフィード・リールを過去全件遡って取得。Meta公式「データダウンロード」zipのアップロードで、過去のストーリーズも完全復元。</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">💴</div>
+<h3>ランニングコスト ¥0〜</h3>
+<p>Meta無料、Google Apps Script無料枠内で運用可能。OCRを使わない場合は完全無料、使う場合のみ Gemini API の従量課金（月数十円〜）。</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">📊</div>
+<h3>ダッシュボード自動生成</h3>
+<p>伸びた投稿ランキング・初速良好判定・曜日×時間帯ヒートマップを自動集計。投稿戦略の改善に直結。</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">🔔</div>
+<h3>異常時はDiscord通知</h3>
+<p>トークン期限切れ・取得エラー・取りこぼしを利用者ご自身のDiscordチャンネルに自動通知。</p>
+</div>
+
+</div>
+
+<h2>取得対象</h2>
+<table style="width:100%; border-collapse:collapse; margin: 1em 0;">
+<thead>
+<tr style="background:#fff8f0;">
+<th style="border:1px solid #ddd; padding:12px; text-align:left;">種別</th>
+<th style="border:1px solid #ddd; padding:12px; text-align:left;">取得指標</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid #ddd; padding:12px;"><strong>📸 フィード</strong></td>
+<td style="border:1px solid #ddd; padding:12px;">views / reach / saved / shares / total_interactions / like_count / comments_count + 画像Drive保存</td>
+</tr>
+<tr>
+<td style="border:1px solid #ddd; padding:12px;"><strong>🎬 リール</strong></td>
+<td style="border:1px solid #ddd; padding:12px;">上記 + ig_reels_avg_watch_time（平均視聴時間）+ サムネDrive保存</td>
+</tr>
+<tr>
+<td style="border:1px solid #ddd; padding:12px;"><strong>📖 ストーリーズ</strong></td>
+<td style="border:1px solid #ddd; padding:12px;">views / reach / replies / shares / total_interactions / navigation / profile_visits / follows + 24h以内に自動保存</td>
+</tr>
+</tbody>
+</table>
+
+<h2>料金</h2>
+
+<div class="price-box">
+<h3>💎 通常価格 ¥9,800（買い切り・追加課金なし）</h3>
+<p><strong>Zoom同伴セットアップ</strong>で個別対応:</p>
+<ul>
+<li>ご都合に合わせた日程で、1対1のZoomで90分セットアップ</li>
+<li>個別ペースで進められる安心感</li>
+<li>マスタースプシテンプレート＋GASスクリプト一式</li>
+<li><a href="./setup-guide.html">セットアップ手順書</a>つき</li>
+<li>運用ランニングコスト ¥0〜/月（OCR利用時のみGemini API数十円）</li>
+<li>トークン自動更新・Discord通知すべて込み</li>
+</ul>
+</div>
+
+<div class="price-box" style="margin-top:1.4em; background:#fff7e0; border-color:#f0c000;">
+<h3>🎁 先着20名様限定キャンペーン: ¥5,980（39%OFF）</h3>
+<p>初回ローンチ記念で、先着20名様だけ<strong>特別価格 ¥5,980</strong>。Discord勉強会形式での初回セットアップとなります:</p>
+<ul>
+<li>購入後、直近のDiscord勉強会（120分・複数人同時開催）に招待</li>
+<li>画面共有しながら、参加者みんなで一緒にセットアップ</li>
+<li>同じ画面で同じ箇所を進めるので、一人で詰まる心配なし</li>
+<li><strong>ツール本体・機能は通常価格と完全に同じ</strong></li>
+</ul>
+<p style="font-size:0.9em; color:#666;">21名様以降は通常価格 ¥9,800（Zoom同伴セットアップ）となります。</p>
+</div>
+
+<div class="price-box" style="margin-top:1.4em; background:#f0f8ff; border-color:#2575fc;">
+<h3>🛟 アフターフォロー：月額¥500（任意・いつでも解約OK）</h3>
+<p>両プラン共通の継続サポート:</p>
+<ul>
+<li><strong>Discordコミュニティ</strong>への常時アクセス（スレッズスケジューラーと共通）</li>
+<li>エラー時の問い合わせ受付</li>
+<li>Instagram / Meta側の API 仕様変更への追随サポート</li>
+<li>利用者同士の運用Tips共有</li>
+<li>いつでも解約可能・違約金なし</li>
+</ul>
+<p style="font-size:0.9em; color:#666;">スポット相談（非加入者向け）: 1回 ¥500〜¥2,000（内容により変動）にて承ります。</p>
+</div>
+
+<h2>法的方針（BYO型・スクレイピング不使用）</h2>
+<div class="legal-box">
+<p style="margin-bottom:12px;">本テンプレートは <strong>Meta公式の Instagram Graph API のみ</strong> を使用します。HTMLスクレイピングは行いません。</p>
+<ul>
+<li><strong>BYO型（Bring Your Own credentials）</strong>: Meta App / アクセストークン / Googleアカウント / Gemini APIキー / Discord Webhook はすべて利用者ご自身が用意・管理。配布元のサーバーは介在しません</li>
+<li><strong>取得対象は自分のビジネス/クリエイターアカウントのみ</strong>: 第三者の非公開アカウントデータは取得しません</li>
+<li><strong>過去データの取り込み</strong>: API経由 + Meta公式「アカウントセンター→情報をダウンロード」の正規エクスポートzipのみ使用</li>
+</ul>
+<p style="margin-top:12px; font-size:0.9em; color:#3b4566;">詳細は <a href="./onboarding-expectations.html">できる/条件付き/できない一覧</a> をご確認ください。</p>
+</div>
+
+<h2>重要な注意事項</h2>
+<div class="notice">
+<ul>
+<li><strong>Instagramビジネス/クリエイターアカウント必須</strong>: 個人アカウントでは Graph API のインサイトを取得できません。Facebookページとの連携も必要です</li>
+<li><strong>ストーリーズはAPI上24時間以内のみ取得可</strong>: 過去のストーリーズは Meta公式zipアップロード機能で復元（24時間以上前のデータは数値が一部欠ける場合あり）</li>
+<li><strong>取得タイミング</strong>: 30分ごとの自動取得トリガー（GAS無料枠の制約上、これより短くは原則不可）</li>
+<li><strong>長期トークン60日問題</strong>: 60日ごとに利用者の操作（または週次自動更新の成功）が必要。30日以上スプシを開かない場合はトークン失効リスクがあります</li>
+<li><strong>Meta Developer登録</strong>: 利用者様ご自身のMetaアカウントで開発者アカウント・アプリを作成していただきます（Zoom同伴）</li>
+<li><strong>API仕様変更追随</strong>: Meta側のAPI変更時は本テンプレも追従更新を行いますが、保証はベストエフォートです</li>
+</ul>
+</div>
+
+<h2>ご購入</h2>
+<p>下記リンクよりご購入いただけます。購入後、配布リンク・Discord勉強会への招待をお送りします。</p>
+<p style="text-align:center; margin:1.4em 0;">
+<a id="apply-link" href="#" style="display:inline-block; background:linear-gradient(135deg, #fa7e1e 0%, #d62976 50%, #962fbf 100%); color:white; padding:14px 32px; border-radius:24px; text-decoration:none; font-weight:bold; font-size:1.05em;">🛒 購入ページへ</a>
+</p>
+<p style="font-size:0.9em; color:#666; text-align:center;">※ 先行リリース価格 ¥5,980 は先着20名様限定。残り枠数は購入ページにて確認できます。</p>
+
+<h2>セットアップの全体像</h2>
+<p>導入の流れは <a href="./setup-guide.html">セットアップ手順書</a> をご確認ください（Zoom同伴で約90分・自分で進める場合は60〜120分）。</p>
+
+<h2>関連ドキュメント</h2>
+<ul>
+<li><a href="./setup-guide.html">セットアップ手順書</a></li>
+<li><a href="./onboarding-expectations.html">できる / 条件付きでできる / できない一覧</a></li>
+<li><a href="https://tamagoojiji.github.io/bridgesquare-legal/privacy-policy.html">プライバシーポリシー</a></li>
+<li><a href="https://tamagoojiji.github.io/bridgesquare-legal/terms-of-service.html">利用規約</a></li>
+<li><a href="https://tamagoojiji.github.io/bridgesquare-legal/data-deletion.html">データ削除手順</a></li>
+</ul>
+
+</div>
+
+<footer>
+© 2026 BridgeSquare / @tamago_app. All rights reserved.<br>
+<a href="https://tamagoojiji.github.io/bridgesquare-legal/privacy-policy.html">プライバシーポリシー</a> | <a href="https://tamagoojiji.github.io/bridgesquare-legal/terms-of-service.html">利用規約</a> | <a href="https://tamagoojiji.github.io/bridgesquare-legal/data-deletion.html">データ削除</a>
+</footer>
+
+</body>
+</html>

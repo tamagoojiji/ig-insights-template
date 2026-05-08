@@ -1,0 +1,15 @@
+.DS_Store
+.env
+.env.local
+*.log
+node_modules/
+.vscode/
+.idea/
+
+# Apps Script local artifacts
+gas/.clasp.json
+gas/.clasprc.json
+
+# 配布物に含めない素材
+docs/images/_raw/
+internal/_drafts/

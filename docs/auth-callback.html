@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>認証中... — IGインサイト保存テンプレート</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN',system-ui,sans-serif;
+    background: linear-gradient(135deg,#fff8f0 0%,#fde6d3 100%); color:#0f1733; }
+  .card { background:#fff; border-radius:24px; padding:48px 40px; max-width:420px;
+    box-shadow: 0 24px 60px rgba(15,23,51,.12); text-align:center; width: calc(100% - 32px); }
+  .spin { width:36px; height:36px; border:3px solid #f3e6d6; border-top-color:#e94e3a;
+    border-radius:50%; animation: spin .8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  h1 { font-size:22px; font-weight:800; margin:0 0 8px; }
+  p  { font-size:14px; color:#3b4566; margin:0; line-height:1.7; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="spin"></div>
+    <h1>認証中...</h1>
+    <p>セットアップ手順書へリダイレクトしています</p>
+  </div>
+<script>
+(function () {
+  const STORAGE_KEY = "ig_auth_token";
+  const GUIDE_PATH = "/ig-insights-template/setup-guide.html";
+
+  function getTokenFromHash() {
+    const h = window.location.hash || "";
+    if (!h.startsWith("#")) return null;
+    const params = new URLSearchParams(h.substring(1));
+    return params.get("token");
+  }
+
+  const token = getTokenFromHash();
+  if (token) {
+    localStorage.setItem(STORAGE_KEY, token);
+    history.replaceState(null, "", window.location.pathname);
+  }
+  setTimeout(function(){ window.location.replace(GUIDE_PATH); }, 200);
+})();
+</script>
+</body>
+</html>
