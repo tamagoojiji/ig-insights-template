@@ -357,6 +357,18 @@
       <div class="callout-ng mt-4">
         <p><strong>⚠️ APIキーの取り扱い</strong> — Gemini API キーも Step 4 のアプリシークレットと同じく機密情報です。公開リポジトリにコミット・チャットへの貼付・スクショ共有は厳禁。漏洩した場合は AI Studio から該当キーを即時失効させて再発行してください。</p>
       </div>
+
+      <div class="callout-info mt-4">
+        <p><strong>Gemini API が呼ばれるのはどのメニュー？</strong></p>
+        <table class="text-sm mt-2 border-collapse">
+          <tr class="border-b"><th class="text-left pr-4 py-1">メニュー</th><th class="text-left py-1">Gemini使用</th></tr>
+          <tr class="border-b"><td class="pr-4 py-1">📚 過去全件取り込み（API）</td><td class="py-1">❌ 使わない</td></tr>
+          <tr class="border-b"><td class="pr-4 py-1">📸 フィード+リールのみ取得 / 📖 ストーリーズのみ取得</td><td class="py-1">❌ 取得時は使わない</td></tr>
+          <tr class="border-b"><td class="pr-4 py-1">🔍 ストーリーズOCR一括 / バッチ</td><td class="py-1">✅ 使う</td></tr>
+          <tr><td class="pr-4 py-1">🤖 自動OCR開始</td><td class="py-1">✅ 5分ごと最大100件まで使う</td></tr>
+        </table>
+        <p class="mt-2">過去全件取り込みやインサイト取得では Gemini が呼ばれないので、<strong>無料枠の上限を気にせず大量取り込みできます</strong>。Gemini を使うのは「OCR」と名前のついたメニューを明示的に実行した時だけ。</p>
+      </div>
     </section>
 
     <section id="step-10" class="step-section mb-12">
@@ -423,6 +435,10 @@
 
       <div class="callout-info mt-4">
         <p><strong>所要</strong>: 投稿数1000件で約3〜5回（合計15〜25分）の実行が目安。Meta API のレート制限（200call/h/user）に達すると一時的に遅くなることがあります。</p>
+      </div>
+
+      <div class="callout-info mt-4">
+        <p><strong>💡 Gemini API は使いません</strong> — このメニューはフィード/リールのみ対象で、Gemini は一切呼びません。過去数千件の取り込みでも Gemini 無料枠の上限を気にせず実行できます。OCR は別メニュー（🔍 ストーリーズOCR系）でのみ動作。</p>
       </div>
 
       <div class="callout-warn mt-4">
