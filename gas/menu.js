@@ -19,6 +19,7 @@ function onOpen() {
     .addItem('📚 過去全件取り込み（API）', 'backfillFromAPI')
     .addItem('🔁 取り込みカーソルをリセット', 'resetBackfillCursor')
     .addItem('📦 Meta公式zipアップロード', 'openMetaZipDialog')
+    .addItem('📥 VPSバックフィルJSONをインポート', 'openBackfillJsonDialog')
     .addSeparator()
     .addItem('📊 ダッシュボード更新', 'updateDashboard')
     .addItem('🎨 ストーリーズシート整形', 'beautifyStoriesSheet')

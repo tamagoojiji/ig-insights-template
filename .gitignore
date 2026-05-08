@@ -13,3 +13,4 @@ gas/.clasprc.json
 # 配布物に含めない素材
 docs/images/_raw/
 internal/_drafts/
+scripts/vps-backfill.env
