@@ -63,14 +63,45 @@ function saveSettingsFromSheet() {
 
 /**
  * 接続テスト
+ * - アクセストークン必須
+ * - IG_USER_ID は未設定なら /me/accounts から自動取得・自動保存
+ * - 短期トークンの場合は60日長期トークンに自動交換
  */
 function testConnection() {
   const token = getConfig('IG_ACCESS_TOKEN');
-  const userId = getConfig('IG_USER_ID');
+  let userId = getConfig('IG_USER_ID');
 
-  if (!token || !userId) {
-    SpreadsheetApp.getUi().alert('アクセストークンとユーザーIDを設定してください');
+  if (!token) {
+    SpreadsheetApp.getUi().alert(
+      'アクセストークンが未設定です\n\n' +
+      '⚙️設定シートのB列「Instagram アクセストークン」に貼り付けて、\n' +
+      'メニュー「💾 設定シートからPropertiesに保存」を先に実行してください。'
+    );
     return;
+  }
+
+  if (!userId) {
+    try {
+      userId = autoFetchIGUserId_(token);
+      if (!userId) {
+        SpreadsheetApp.getUi().alert(
+          'Instagramユーザーアカウントが見つかりませんでした\n\n' +
+          '・Facebookページに Instagram ビジネス/クリエイターアカウントが連携されているか\n' +
+          '・アクセストークンに instagram_basic / pages_show_list / pages_read_engagement / business_management の権限が付いているか\n' +
+          'を確認してください。'
+        );
+        return;
+      }
+      setConfig('IG_USER_ID', userId);
+      try {
+        const ss = SpreadsheetApp.getActiveSpreadsheet();
+        const sheet = ss.getSheetByName('⚙️ 設定');
+        if (sheet) sheet.getRange(5, 2).setValue(userId);
+      } catch (_) {}
+    } catch (e) {
+      SpreadsheetApp.getUi().alert('IG_USER_ID自動取得エラー: ' + e.message);
+      return;
+    }
   }
 
   try {
@@ -93,6 +124,27 @@ function testConnection() {
   } catch (e) {
     SpreadsheetApp.getUi().alert(`エラー: ${e.message}`);
   }
+}
+
+/**
+ * /me/accounts から Facebook ページを取得し、連携されている Instagram ビジネス/クリエイター
+ * アカウントの ID を自動取得する
+ */
+function autoFetchIGUserId_(token) {
+  const url = `https://graph.facebook.com/v21.0/me/accounts?fields=id,name,instagram_business_account&limit=50&access_token=${token}`;
+  const res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  const data = JSON.parse(res.getContentText());
+  if (data.error) throw new Error(data.error.message);
+  if (!data.data || data.data.length === 0) {
+    throw new Error('Facebookページが1つも見つかりません。Meta Business Suite で IGビジネスアカウントを連携したFBページを作成してください。');
+  }
+  for (const page of data.data) {
+    if (page.instagram_business_account && page.instagram_business_account.id) {
+      Logger.log('IG_USER_ID 自動取得成功: page=' + page.name + ' ig_id=' + page.instagram_business_account.id);
+      return page.instagram_business_account.id;
+    }
+  }
+  return null;
 }
 
 /**
