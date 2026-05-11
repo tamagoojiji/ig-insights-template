@@ -1,23 +1,83 @@
-/* global React, Copyable, CodeBlock, Callout, Pitfall, StepSection, Section, FaqItem */
+/* global React, Copyable, CodeBlock, Callout, Pitfall, StepSection, Section, FaqItem, LoginCheckGrid */
 
 // Helpers
 const M = ({ children }) => <code>{children}</code>; // menu / inline code
 
 // Step 0
 function Step0({ done, onToggle }) {
+  const loginCards = [
+    {
+      href: "https://accounts.google.com",
+      badge: "G",
+      badgeBg: "linear-gradient(135deg,#ea4335 0%,#fbbc04 50%,#34a853 100%)",
+      title: "Googleアカウント",
+      sub: "スプシ・Drive 用 / 個人・業務どちらでもOK",
+    },
+    {
+      href: "https://www.instagram.com/",
+      badge: "IG",
+      badgeBg: "linear-gradient(135deg,#feda75 0%,#fa7e1e 30%,#d62976 60%,#962fbf 90%,#4f5bd5 100%)",
+      title: "Instagramアカウント",
+      sub: "ビジネス／クリエイター必須(個人アカウント不可)",
+    },
+    {
+      href: "https://www.facebook.com/",
+      badge: "f",
+      badgeBg: "#1877F2",
+      title: "Facebookアカウント",
+      sub: "Meta Developer 登録 + IG ビジネス連携用",
+    },
+    {
+      href: "https://discord.com/login",
+      badge: "D",
+      badgeBg: "#5865F2",
+      title: "Discordアカウント",
+      sub: "個別サポート部屋のログイン確認(サーバー作成不要・こちらで用意)",
+    },
+    {
+      badge: "TEL",
+      badgeBg: "var(--mint, #2ea882)",
+      title: "電話番号(SMS受信可)",
+      sub: "Facebook連携必須・IP電話/050不可",
+    },
+  ];
   return (
-    <StepSection id="step-0" num="00" title="進め方・必要なもの" subtitle="まず全体像とゴールの確認"
-      done={done} onToggleDone={onToggle} completeLabel="読み終わったらチェック">
+    <StepSection id="step-0" num="00" title="進め方・必要なもの" subtitle="まず全体像とゴールの確認・ログイン確認"
+      done={done} onToggleDone={onToggle} completeLabel="準備が整ったらチェック">
       <p>
         本手順書は <strong>Step 1 から順番に進めれば</strong>、Instagram の全投稿インサイトを自分のスプシに自動保存する仕組みが完成します。
         Zoom 同伴セットアップなら約 <strong>90 分</strong>、自分で進める場合は <strong>60〜120 分</strong> が目安です。
       </p>
       <p>
-        途中で詰まったら、購入後に届く Discord サーバーの <strong>あなた専用の相談部屋</strong> でお気軽にご質問ください
+        途中で詰まったら、購入後に届く Discord サーバー「IG Insight Vault」の <strong>あなた専用の相談部屋</strong> でお気軽にご質問ください
         （購入確認後、サーバー入室と同時に個別チャンネルが自動作成されます）。
       </p>
+
+      <h3>ログイン環境の確認</h3>
+      <p>
+        <strong>Google・Instagram・Facebook・Discord</strong> の各アカウントがブラウザにログインできる状態かをまず確認します。
+        下のカードをそれぞれクリックして、自分のアカウントが表示されるかチェックしてください。
+      </p>
+      <p>
+        <strong>ログインしたタブはそのまま閉じずに開いておく</strong>と、後続のステップで切り替えが楽です。
+      </p>
+      <LoginCheckGrid cards={loginCards} />
+
+      <Callout kind="danger">
+        <p>
+          <strong>パスワード・クレジットカード情報は一切お伺いしません。</strong>
+          「教えてください」と言われた場合は当社を装った第三者の可能性があります。即時に運営までご連絡ください。
+        </p>
+      </Callout>
+      <Callout kind="warn">
+        <p>
+          電話番号は <strong>Facebookアカウントと連携している番号</strong> をご用意ください。
+          Step 2 の Meta 開発者登録で、SMS による本人認証がこの番号宛に届く場合があります(IP電話・050番号は不可)。
+        </p>
+      </Callout>
+
       <Callout kind="info">
-        <p><strong>必要なもの</strong></p>
+        <p><strong>必要なもの(一覧)</strong></p>
         <ul>
           <li>Google アカウント（スプシ・Drive 用）</li>
           <li>Instagram ビジネス／クリエイターアカウント（個人アカウントは不可）</li>

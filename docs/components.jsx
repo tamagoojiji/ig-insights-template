@@ -145,6 +145,36 @@ function Section({ id, title, children }) {
   );
 }
 
+// --- Login check card ---
+function LoginCard({ href, badge, badgeBg, title, sub }) {
+  const inner = (
+    <>
+      <span className="lc-badge" style={{ background: badgeBg }}>{badge}</span>
+      <span className="lc-text">
+        <span className="lc-title">{title}</span>
+        <span className="lc-sub">{sub}</span>
+      </span>
+      {href && <span className="lc-arrow" aria-hidden>↗</span>}
+    </>
+  );
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="login-card">
+        {inner}
+      </a>
+    );
+  }
+  return <div className="login-card login-card-static">{inner}</div>;
+}
+
+function LoginCheckGrid({ cards }) {
+  return (
+    <div className="login-grid">
+      {cards.map((c, i) => <LoginCard key={i} {...c} />)}
+    </div>
+  );
+}
+
 // --- FAQ item ---
 function FaqItem({ q, children }) {
   const [open, setOpen] = useState(false);
@@ -160,4 +190,4 @@ function FaqItem({ q, children }) {
   );
 }
 
-Object.assign(window, { Copyable, CodeBlock, Callout, Pitfall, StepSection, Section, FaqItem, Icon });
+Object.assign(window, { Copyable, CodeBlock, Callout, Pitfall, StepSection, Section, FaqItem, Icon, LoginCard, LoginCheckGrid });
