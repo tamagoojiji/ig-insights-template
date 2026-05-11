@@ -160,7 +160,35 @@ function App() {
         </div>
       </div>
 
-      <div className="layout no-toc">
+      <div className="layout">
+        <aside className="toc" aria-label="目次">
+          <p className="toc-title">SETUP STEPS</p>
+          <ul className="toc-list">
+            {TOC.map((item, i) => {
+              if (item.kind === "section") {
+                return <li key={"sec-" + i} className="toc-section-label">{item.label}</li>;
+              }
+              const isStep = item.id && item.id.startsWith("step-");
+              const isDone = isStep && !!done[item.id];
+              const isActive = activeId === item.id;
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    className={"toc-item" + (isActive ? " active" : "") + (isDone ? " done" : "")}
+                    onClick={() => goTo(item.id)}
+                  >
+                    {item.num && <span className="toc-num">{item.num}</span>}
+                    <span className="toc-label">{item.title}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <button type="button" className="reset-link" onClick={resetDone}>
+            進捗チェックをリセット
+          </button>
+        </aside>
         <main>
           <section className="hero">
             <span className="hero-eyebrow">SETUP GUIDE · v1.0</span>

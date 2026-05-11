@@ -12,7 +12,10 @@ function Step0({ done, onToggle }) {
         本手順書は <strong>Step 1 から順番に進めれば</strong>、Instagram の全投稿インサイトを自分のスプシに自動保存する仕組みが完成します。
         Zoom 同伴セットアップなら約 <strong>90 分</strong>、自分で進める場合は <strong>60〜120 分</strong> が目安です。
       </p>
-      <p>途中で詰まったら Discord コミュニティ（アフターフォロー加入者）でご質問ください。</p>
+      <p>
+        途中で詰まったら、購入後に届く Discord サーバーの <strong>あなた専用の相談部屋</strong> でお気軽にご質問ください
+        （購入確認後、サーバー入室と同時に個別チャンネルが自動作成されます）。
+      </p>
       <Callout kind="info">
         <p><strong>必要なもの</strong></p>
         <ul>
@@ -33,8 +36,8 @@ function Step1({ done, onToggle }) {
     <StepSection id="step-1" num="01" title="マスタースプレッドシートをコピー" subtitle="所要 約2分"
       done={done} onToggleDone={onToggle}>
       <ol>
-        <li>購入後にお送りした「マスタースプシ <Copyable>?copy</Copyable> URL」をブラウザで開く</li>
-        <li>「コピーを作成」ボタンをクリック → 自分の Google ドライブに複製される</li>
+        <li><a href="https://docs.google.com/spreadsheets/d/1GLuLebQH6z8hpEzODAucqhOkCzUVKG2OMaZOnA2Uy5c/copy" target="_blank" rel="noreferrer">マスタースプシのコピーURL</a> をブラウザで開く（Google アカウントにログイン済みであること）</li>
+        <li>表示された「コピーを作成」ボタンをクリック → 自分の Google ドライブに複製される</li>
         <li>複製されたスプシを開く（ファイル名はそのままで OK）</li>
         <li>初回のみ「拡張機能 → Apps Script」の権限承認ダイアログが出る場合があります → 「許可」を選択</li>
         <li>スプシのメニューバーに <Copyable>📊 Instagram Insights</Copyable> が表示されていることを確認</li>
@@ -548,7 +551,7 @@ function DailyOps() {
         <li><Copyable>🔗 接続テスト</Copyable> で Graph API が応答するか</li>
         <li><Copyable>📋 トリガー一覧</Copyable> で <code>autoFetch</code> と <code>refreshTokenJob</code> が登録されているか</li>
         <li>Discord 通知で何かエラーが出ていないか</li>
-        <li>解決しない場合は Discord コミュニティで質問（アフターフォロー加入者）</li>
+        <li>解決しない場合は Discord の個別相談部屋で質問（購入後に自動作成されたあなた専用チャンネル）</li>
       </ol>
     </Section>
   );
@@ -618,8 +621,34 @@ function Faq() {
 
 function AfterCare() {
   return (
-    <Section id="aftercare" title="アフターフォロー">
-      <p>月額 ¥500 のアフターフォローで Discord コミュニティ参加・API 変更時の追随サポート対応。詳しくは <a href="./index.html">トップページ</a> を参照。</p>
+    <Section id="aftercare" title="購入後サポート・お問い合わせ">
+      <p>
+        購入確認後、Discord サーバーにご招待します。サーバーに参加すると
+        <strong>あなた専用の個別相談チャンネル</strong>が自動作成され、本人と運営だけが見える非公開部屋でセットアップ・運用の相談ができます。
+      </p>
+      <h3>サポート内容</h3>
+      <ul>
+        <li>セットアップでつまずいた箇所の個別サポート</li>
+        <li>Meta／Instagram API 仕様変更時のテンプレ追随</li>
+        <li>運用 Tips の共有（投稿時間帯分析・初速判定ロジック等）</li>
+        <li>月 1 回の Q&amp;A タイム（不定期開催）</li>
+      </ul>
+      <Callout kind="info">
+        <p><strong>参加手順</strong></p>
+        <ol>
+          <li>購入完了画面または購入確認メールに記載の Discord 招待リンクから参加</li>
+          <li>入室と同時に <Copyable>#相談-あなたのアカウント名</Copyable> 形式のチャンネルが自動作成</li>
+          <li>そのチャンネルに質問を書き込み → 運営から回答</li>
+        </ol>
+      </Callout>
+      <Callout kind="warn">
+        <p><strong>販売開始準備中</strong></p>
+        <p>
+          現在 Stripe 決済の準備中につき、購入リンクは近日公開予定です。先行で詳細を確認したい方は、
+          公式 X（<a href="https://x.com/tamago_app" target="_blank" rel="noreferrer">@tamago_app</a>）の DM か、
+          <a href="./index.html">トップページ</a> のお問い合わせフォームからご連絡ください。
+        </p>
+      </Callout>
     </Section>
   );
 }
