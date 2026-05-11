@@ -6,6 +6,10 @@
  * バックエンドは threadsschedule と共通。Discord「購入者」ロール持ちなら認証通過。
  */
 (function () {
+  // 開発時（localhost / 127.0.0.1）は認証ゲートをスキップ
+  const host = location.hostname;
+  if (host === "localhost" || host === "127.0.0.1" || host === "") return;
+
   const BACKEND = "https://threadsschedule.tamago-ai-world.com";
   const STORAGE_KEY = "ig_auth_token";
   const VERIFY_PATH = "/auth/verify";
