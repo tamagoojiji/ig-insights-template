@@ -3,18 +3,18 @@
  * - 無効/未認証ならログイン画面（オーバーレイ）を表示
  * - 有効ならbodyを表示
  *
- * バックエンドは threadsschedule と共通。Discord「購入者」ロール持ちなら認証通過。
+ * バックエンドは iginsights-auth（独立構成）。Discord「購入者」ロール持ちなら認証通過。
  */
 (function () {
   // 開発時（localhost / 127.0.0.1）は認証ゲートをスキップ
   const host = location.hostname;
   if (host === "localhost" || host === "127.0.0.1" || host === "") return;
 
-  const BACKEND = "https://threadsschedule.tamago-ai-world.com";
+  const BACKEND = "https://iginsights.tamago-ai-world.com";
   const STORAGE_KEY = "ig_auth_token";
   const VERIFY_PATH = "/auth/verify";
   const LOGIN_PATH = "/auth/discord?audience=ig-insights-template";
-  const NOTE_URL = "https://note.com/tamago_app";
+  const CONTACT_URL = "https://x.com/tamago_app";
 
   function injectStyles() {
     const s = document.createElement("style");
@@ -61,10 +61,10 @@
       <div class="card">
         <span class="badge">購入者限定コンテンツ</span>
         <h1>セットアップ手順書を表示するには<br>Discord認証が必要です</h1>
-        <p>note でご購入後、Discordサーバーに参加し、<br>「購入者」ロール付与を受けてからログインしてください。</p>
+        <p>ご購入後、Discordサーバー「IG Insight Vault」に参加し、<br>「購入者」ロール付与を受けてからログインしてください。</p>
         <button class="btn" id="ig-login">Discord でログイン</button>
         <div class="sub">
-          まだご購入でない方は <a href="${NOTE_URL}" target="_blank" rel="noopener">noteで購入</a>
+          販売準備中。先行情報・お問い合わせは <a href="${CONTACT_URL}" target="_blank" rel="noopener">@tamago_app の DM</a>
         </div>
       </div>
     `;
