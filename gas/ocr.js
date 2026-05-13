@@ -129,8 +129,15 @@ function startAutoOcr() {
   const ui = SpreadsheetApp.getUi();
   stopAutoOcrSilent_();
   ScriptApp.newTrigger('autoOcrTick_').timeBased().everyMinutes(5).create();
-  PropertiesService.getScriptProperties().setProperty('OCR_AUTO_BATCH_SIZE', '100');
-  ui.alert('🤖 自動OCRを開始しました\n\n5分おきに100件ずつ処理します。\n完了するか「自動OCR停止」で止まります。');
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('OCR_AUTO_BATCH_SIZE', '100');
+  props.setProperty('OCR_AUTO_STARTED_AT', new Date().toISOString());
+  props.setProperty('OCR_AUTO_TOTAL_PROCESSED', '0');
+  props.setProperty('OCR_AUTO_TOTAL_FAILED', '0');
+  props.deleteProperty('OCR_AUTO_LAST_TICK');
+  props.deleteProperty('OCR_AUTO_LAST_REMAINING');
+  props.deleteProperty('OCR_AUTO_STOPPED_AT');
+  ui.alert('🤖 自動OCRを開始しました\n\n5分おきに100件ずつ処理します。\n完了するか「自動OCR停止」で止まります。\n\n📈 進捗はメニュー「📈 自動OCR進捗」で確認できます。');
   autoOcrTick_();
 }
 
@@ -139,6 +146,7 @@ function startAutoOcr() {
  */
 function stopAutoOcr() {
   stopAutoOcrSilent_();
+  PropertiesService.getScriptProperties().setProperty('OCR_AUTO_STOPPED_AT', new Date().toISOString());
   SpreadsheetApp.getUi().alert('🛑 自動OCRを停止しました');
 }
 
@@ -149,21 +157,103 @@ function stopAutoOcrSilent_() {
 }
 
 /**
+ * 自動OCRの進捗をアラート表示
+ */
+function showOcrProgress() {
+  const ui = SpreadsheetApp.getUi();
+  const props = PropertiesService.getScriptProperties();
+  const triggerActive = ScriptApp.getProjectTriggers().some(t => t.getHandlerFunction() === 'autoOcrTick_');
+
+  const startedAt = props.getProperty('OCR_AUTO_STARTED_AT');
+  const stoppedAt = props.getProperty('OCR_AUTO_STOPPED_AT');
+  const lastTick = props.getProperty('OCR_AUTO_LAST_TICK');
+  const totalProcessed = parseInt(props.getProperty('OCR_AUTO_TOTAL_PROCESSED') || '0', 10);
+  const totalFailed = parseInt(props.getProperty('OCR_AUTO_TOTAL_FAILED') || '0', 10);
+  const lastRemaining = props.getProperty('OCR_AUTO_LAST_REMAINING');
+
+  // 現時点での未処理行を即時カウント（処理本体に近い計算でズレを最小化）
+  let liveRemaining = '(計算不可)';
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('📖 ストーリーズ');
+    if (sheet && sheet.getLastRow() >= 2) {
+      const idCol = findColumn_(sheet, 'メディアID');
+      const ocrCol = findColumn_(sheet, '画像内テキスト');
+      if (idCol > 0 && ocrCol > 0) {
+        const ids = sheet.getRange(2, idCol, sheet.getLastRow() - 1, 1).getValues();
+        const ocrs = sheet.getRange(2, ocrCol, sheet.getLastRow() - 1, 1).getValues();
+        let pending = 0;
+        for (let i = 0; i < ids.length; i++) {
+          if (!ids[i][0]) continue;
+          if (!isOcrDone_(ocrs[i][0])) pending++;
+        }
+        liveRemaining = String(pending);
+      }
+    }
+  } catch (e) {
+    liveRemaining = '(エラー: ' + e.message + ')';
+  }
+
+  const fmt = (iso) => {
+    if (!iso) return '(なし)';
+    try { return Utilities.formatDate(new Date(iso), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm:ss'); }
+    catch (_) { return iso; }
+  };
+
+  const lines = [
+    '📈 自動OCR進捗',
+    '',
+    'トリガー稼働中: ' + (triggerActive ? '✅ ON（5分おき）' : '⏹ OFF'),
+    '',
+    '開始時刻: ' + fmt(startedAt),
+    '最終Tick: ' + fmt(lastTick),
+    '停止時刻: ' + fmt(stoppedAt),
+    '',
+    '累計 処理成功: ' + totalProcessed + '件',
+    '累計 失敗: ' + totalFailed + '件',
+    '前回Tick残: ' + (lastRemaining == null ? '(未実行)' : lastRemaining + '件'),
+    '現在の未処理: ' + liveRemaining + '件',
+    '',
+    triggerActive
+      ? '次のTickまで最大5分。完了すると自動停止します。'
+      : (liveRemaining !== '0' && liveRemaining !== '(計算不可)' && liveRemaining !== '(エラー: ' ? '⚠️ トリガーOFFですが未処理が残っています。再開するには「🤖 自動OCR開始」を押してください。' : '')
+  ];
+  ui.alert(lines.join('\n'));
+}
+
+/**
  * トリガーから呼ばれる本体（UI出さない）
  * 未処理行が無くなったら自動でトリガー削除
  */
 function autoOcrTick_() {
+  const props = PropertiesService.getScriptProperties();
   try {
     getExecutionStart_();
-    const batchSize = parseInt(PropertiesService.getScriptProperties().getProperty('OCR_AUTO_BATCH_SIZE') || '100', 10);
+    const batchSize = parseInt(props.getProperty('OCR_AUTO_BATCH_SIZE') || '100', 10);
     const summary = runStoriesOcrSilent_(batchSize);
     Logger.log(`autoOcrTick_: ${JSON.stringify(summary)}`);
+
+    const totalProcessed = parseInt(props.getProperty('OCR_AUTO_TOTAL_PROCESSED') || '0', 10) + summary.processed;
+    const totalFailed = parseInt(props.getProperty('OCR_AUTO_TOTAL_FAILED') || '0', 10) + summary.failed;
+    props.setProperty('OCR_AUTO_LAST_TICK', new Date().toISOString());
+    props.setProperty('OCR_AUTO_TOTAL_PROCESSED', String(totalProcessed));
+    props.setProperty('OCR_AUTO_TOTAL_FAILED', String(totalFailed));
+    props.setProperty('OCR_AUTO_LAST_REMAINING', String(summary.remaining));
+
     if (summary.remaining === 0) {
       stopAutoOcrSilent_();
+      props.setProperty('OCR_AUTO_STOPPED_AT', new Date().toISOString());
       Logger.log('全件OCR完了 → 自動停止');
+      try {
+        notifyDiscord(
+          `🤖 自動OCR完了\n累計 処理: ${totalProcessed}件 / 失敗: ${totalFailed}件`,
+          { kind: 'ocr_auto_done', bypassCooldown: true }
+        );
+      } catch (_) {}
     }
   } catch (e) {
     Logger.log(`autoOcrTick_ エラー: ${e.message}\n${e.stack}`);
+    props.setProperty('OCR_AUTO_LAST_TICK', new Date().toISOString());
+    props.setProperty('OCR_AUTO_LAST_ERROR', e.message);
   }
 }
 

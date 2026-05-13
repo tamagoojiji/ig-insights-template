@@ -27,6 +27,7 @@ function onOpen() {
     .addItem('🔍 ストーリーズOCR一括', 'runStoriesOcrAll')
     .addItem('🔍 ストーリーズOCRバッチ（件数指定）', 'runStoriesOcrBatch')
     .addItem('🤖 自動OCR開始（5分おきに100件）', 'startAutoOcr')
+    .addItem('📈 自動OCR進捗', 'showOcrProgress')
     .addItem('🛑 自動OCR停止', 'stopAutoOcr')
     .addSeparator()
     .addItem('🔄 トークン手動更新', 'refreshTokenManual')
