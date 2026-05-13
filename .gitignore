@@ -13,3 +13,8 @@ gas/.clasprc.json
 # 配布物に含めない素材
 docs/images/_raw/
 internal/_drafts/
+
+# Service account keys (NEVER commit)
+*-sa.json
+service-account-*.json
+admin/

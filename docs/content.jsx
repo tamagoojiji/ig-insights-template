@@ -1,4 +1,4 @@
-/* global React, Copyable, CodeBlock, Callout, Pitfall, StepSection, Section, FaqItem, LoginCheckGrid */
+/* global React, Copyable, CodeBlock, Callout, Pitfall, StepSection, Section, FaqItem, LoginCheckGrid, StepImage */
 
 // Helpers
 const M = ({ children }) => <code>{children}</code>; // menu / inline code
@@ -44,48 +44,25 @@ function Step0({ done, onToggle }) {
   return (
     <StepSection id="step-0" num="00" title="進め方・必要なもの" subtitle="まず全体像とゴールの確認・ログイン確認"
       done={done} onToggleDone={onToggle} completeLabel="準備が整ったらチェック">
-      <p>
-        本手順書は <strong>Step 1 から順番に進めれば</strong>、Instagram の全投稿インサイトを自分のスプシに自動保存する仕組みが完成します。
-        Zoom 同伴セットアップなら約 <strong>90 分</strong>、自分で進める場合は <strong>60〜120 分</strong> が目安です。
-      </p>
-      <p>
-        途中で詰まったら、購入後に届く Discord サーバー「IG Insight Vault」の <strong>あなた専用の相談部屋</strong> でお気軽にご質問ください
-        （購入確認後、サーバー入室と同時に個別チャンネルが自動作成されます）。
-      </p>
+      <h3>この手順書について</h3>
+      <ul>
+        <li><strong>Step 1 から順番</strong>に進めればOK</li>
+        <li>完了まで <strong>最短30分程度</strong></li>
+        <li>詰まったら購入後の Discord <strong>あなた専用の相談部屋</strong> で質問可能（入室と同時に自動作成）</li>
+      </ul>
 
       <h3>ログイン環境の確認</h3>
-      <p>
-        <strong>Google・Instagram・Facebook・Discord</strong> の各アカウントがブラウザにログインできる状態かをまず確認します。
-        下のカードをそれぞれクリックして、自分のアカウントが表示されるかチェックしてください。
-      </p>
-      <p>
-        <strong>ログインしたタブはそのまま閉じずに開いておく</strong>と、後続のステップで切り替えが楽です。
-      </p>
+      <ul>
+        <li>下のカードをクリックして、各アカウントにログイン済みか確認</li>
+        <li>ログインしたタブは<strong>そのまま開いておく</strong>（後で使う）</li>
+      </ul>
       <LoginCheckGrid cards={loginCards} />
 
-      <Callout kind="danger">
-        <p>
-          <strong>パスワード・クレジットカード情報は一切お伺いしません。</strong>
-          「教えてください」と言われた場合は当社を装った第三者の可能性があります。即時に運営までご連絡ください。
-        </p>
-      </Callout>
       <Callout kind="warn">
         <p>
           電話番号は <strong>Facebookアカウントと連携している番号</strong> をご用意ください。
           Step 2 の Meta 開発者登録で、SMS による本人認証がこの番号宛に届く場合があります(IP電話・050番号は不可)。
         </p>
-      </Callout>
-
-      <Callout kind="info">
-        <p><strong>必要なもの(一覧)</strong></p>
-        <ul>
-          <li>Google アカウント（スプシ・Drive 用）</li>
-          <li>Instagram ビジネス／クリエイターアカウント（個人アカウントは不可）</li>
-          <li>Facebook ページ（IG ビジネスアカウントと連携済みのもの）</li>
-          <li>Meta 開発者アカウント（無料・本手順内で作成）</li>
-          <li>Discord アカウント（通知用 Webhook と購入者認証で使用）</li>
-          <li>（任意）Gemini API キー — ストーリーズ OCR を使う場合のみ</li>
-        </ul>
       </Callout>
     </StepSection>
   );
@@ -96,13 +73,19 @@ function Step1({ done, onToggle }) {
     <StepSection id="step-1" num="01" title="マスタースプレッドシートをコピー" subtitle="所要 約2分"
       done={done} onToggleDone={onToggle}>
       <ol>
-        <li><a href="https://docs.google.com/spreadsheets/d/1GLuLebQH6z8hpEzODAucqhOkCzUVKG2OMaZOnA2Uy5c/copy" target="_blank" rel="noreferrer">マスタースプシのコピーURL</a> をブラウザで開く（Google アカウントにログイン済みであること）</li>
-        <li>表示された「コピーを作成」ボタンをクリック → 自分の Google ドライブに複製される</li>
-        <li>複製されたスプシを開く（ファイル名はそのままで OK）</li>
-        <li>初回のみ「拡張機能 → Apps Script」の権限承認ダイアログが出る場合があります → 「許可」を選択</li>
-        <li>スプシのメニューバーに <Copyable>📊 Instagram Insights</Copyable> が表示されていることを確認</li>
-        <li>メニュー <Copyable>📊 Instagram Insights → 🔧 初回セットアップ（シート作成）</Copyable> を実行 → 全シートが自動生成されます</li>
+        <li><a href="https://docs.google.com/spreadsheets/d/1GLuLebQH6z8hpEzODAucqhOkCzUVKG2OMaZOnA2Uy5c/copy" target="_blank" rel="noreferrer">マスタースプシのコピーURL</a> を開く</li>
+        <li>「コピーを作成」をクリック</li>
       </ol>
+      <StepImage slot="1-A" alt="「コピーを作成」ボタンを赤枠で囲んだスクショ" />
+      <ol start="3">
+        <li>複製されたスプシを開く</li>
+        <li>メニュー <Copyable>📊 Instagram Insights → 🔧 初回セットアップ（シート作成）</Copyable> を実行</li>
+      </ol>
+      <StepImage slot="1-B" alt="スプシ上部メニュー「📊 Instagram Insights → 🔧 初回セットアップ」を展開した状態" />
+      <ol start="5">
+        <li>初回のみ権限承認ダイアログが出る →「許可」</li>
+      </ol>
+      <StepImage slot="1-C" alt="権限承認ダイアログの「許可」ボタンを赤枠で示したスクショ" />
     </StepSection>
   );
 }
@@ -111,24 +94,22 @@ function Step2({ done, onToggle }) {
   return (
     <StepSection id="step-2" num="02" title="Meta Developer 登録 + アプリ作成" subtitle="所要 約10分（SMS認証で +5分）"
       done={done} onToggleDone={onToggle}>
-      <p>
-        Instagram Graph API を使うために、まず Meta（旧 Facebook）の開発者アカウントを作成し、その配下に専用のアプリを 1 つ作ります。
-        ここで作るアプリは「自分専用のデータ取得窓口」であって、世間に公開するものではありません。
-      </p>
-      <h3>手順</h3>
       <ol>
-        <li><a href="https://developers.facebook.com" target="_blank" rel="noreferrer">developers.facebook.com</a> を開いて、自分の Facebook アカウントでログイン</li>
-        <li>右上「マイアプリ」→「アプリを作成」をクリック</li>
-        <li>「アプリの種類」で <strong>「ビジネス」</strong> を選択 →「次へ」
-          <ul><li>※「なし」「消費者」では Instagram Graph API の権限が付けられないので必ず「ビジネス」を選択</li></ul>
-        </li>
-        <li>「アプリ名」（例: <Copyable>ig-insights-自分のアカウント名</Copyable>）と「連絡先メールアドレス」を入力</li>
-        <li>「ビジネスアカウント」欄は、すでに Meta Business Suite を使っているなら該当アカウントを選択。未作成ならその場で新規作成も可能</li>
-        <li>「アプリを作成」→ パスワード再入力 → 場合により電話番号での SMS 認証 → アプリダッシュボードに遷移すれば完了</li>
+        <li><a href="https://developers.facebook.com" target="_blank" rel="noreferrer">developers.facebook.com</a> にFacebookでログイン</li>
+        <li>右上「マイアプリ」→「アプリを作成」</li>
       </ol>
-      <Pitfall>
-        <p>個人 Facebook アカウントだけでも作成できますが、後で別の運用者と共有する可能性があるならビジネスアカウント連携を推奨します。</p>
-        <p>また、Facebook 本体のアカウント自体が新規作成直後だとアプリ作成がブロックされることがあります。その場合は数日アカウントを使い込んでから再挑戦してください。</p>
+      <StepImage slot="2-A" alt="右上「マイアプリ → アプリを作成」を赤枠で示したスクショ" />
+      <ol start="3">
+        <li>アプリ名（例: <Copyable>insights-自分の名前</Copyable>）と連絡先メールを入力 →「次へ」</li>
+        <li>ビジネスアカウントを選択（未作成ならその場で新規作成）</li>
+        <li>「アプリを作成」→ パスワード再入力 →（必要時のみ）SMS認証</li>
+      </ol>
+      <StepImage slot="2-B" alt="アプリ名・連絡先メール入力フォーム" />
+      <Pitfall title="アプリ名で使えない単語">
+        <p>Metaの商標ポリシーで <strong>ig / fb / face / book / insta / gram / rift</strong> などはアプリ名に使えません。例の「insights」や「analytics」のような一般語＋自分の名前で命名してください。</p>
+      </Pitfall>
+      <Pitfall title="新規FBアカウントの場合">
+        <p>作成直後のFacebookアカウントはアプリ作成がブロックされることがあります。数日使い込んでから再挑戦してください。</p>
       </Pitfall>
     </StepSection>
   );
@@ -136,42 +117,53 @@ function Step2({ done, onToggle }) {
 
 function Step3({ done, onToggle }) {
   const perms = [
-    ["instagram_basic", "基本情報・メディア取得"],
-    ["instagram_manage_insights", "インサイト数値取得"],
-    ["pages_read_engagement", "Facebook ページ経由での IG 接続"],
+    ["instagram_business_basic", "基本情報・メディア取得"],
+    ["instagram_business_manage_insights", "インサイト数値取得"],
+    ["pages_read_engagement", "FBページ経由でIG接続"],
     ["pages_show_list", "ページ一覧取得"],
     ["business_management", "ビジネスアカウント管理"],
   ];
   return (
     <StepSection id="step-3" num="03" title="権限追加" subtitle="所要 約5分"
       done={done} onToggleDone={onToggle}>
-      <p>
-        作成したアプリに、Instagram のインサイトを取るために必要な権限（Permission）を追加します。
-        Meta の管理画面では <strong>「ユースケース」</strong> という単位でまとめて追加します。
-      </p>
-      <h3>手順</h3>
+      <h3>3-1. ユースケース選択（Step 2 の続き）</h3>
       <ol>
-        <li>アプリダッシュボード左メニュー「ユースケースを追加」をクリック</li>
-        <li>表示された候補から「<strong>カスタマイズ</strong>」（Customize）を選択 →「カスタマイズ」ボタンで進む</li>
-        <li>左メニュー「権限とアクセスを追加」（Permissions and Features）を開く</li>
-        <li>下記 5 つの権限について、それぞれ右側の「追加」（Add）をクリック</li>
+        <li>ユースケース一覧の<strong>一番下</strong>までスクロール</li>
+        <li>「<strong>他</strong>」<span className="hint">（This option is going away soon と書かれている）</span>を選択 →「次へ」</li>
       </ol>
-      <h3>必要な権限（5 つすべて追加）</h3>
+      <StepImage slot="3-A" alt="ユースケース一覧の最下部「他」（This option is going away soon）を赤枠で示したスクショ" />
+      <Callout kind="warn">
+        <p><strong>「他」を選ぶ理由</strong>：Instagram系のユースケースは別API（Instagram Login API）向けで、本テンプレが使う Graph API には対応しません。「他」だけが必要な権限を個別追加できる旧仕様の画面に進めます。</p>
+      </Callout>
+
+      <h3>3-2. アプリ作成完了 → Instagram製品を追加</h3>
+      <ol>
+        <li>残りのウィザード（ビジネス / 要件 / 概要）を進めてアプリを作成</li>
+        <li>ダッシュボードの「アプリに製品を追加」で <strong>Instagram</strong> カードの「設定」をクリック</li>
+      </ol>
+
+      <h3>3-3. 権限を追加（ここが一番つまずきやすい）</h3>
+      <ol>
+        <li>左メニュー「<strong>アプリレビュー</strong>」→「<strong>アクセス許可と機能</strong>」を開く</li>
+        <li>下記5つの権限を検索 <span className="hint">（クリックでコピー）</span></li>
+      </ol>
       <ul className="plain">
         {perms.map(([k, v]) => (
           <li key={k}><Copyable>{k}</Copyable> — {v}</li>
         ))}
       </ul>
-      <Callout kind="success">
-        <p><strong>アプリ審査は不要です</strong></p>
-        <p>
-          自分の IG アカウントのみを取得対象とする「開発モード（テスター追加）」で運用するため、Meta のアプリ審査（App Review）も本番モードへの切り替えも不要です。
-          「開発モード」のままで本テンプレートの全機能が動作します。第三者のアカウントは取得しません。
-        </p>
+      <Callout kind="danger">
+        <p><strong>⚠️ 検索結果が空でも諦めない</strong>：上部の検索欄に貼っても「結果なし」になることがあります。その場合は<strong>ページを下にスクロール</strong>すると「<strong>あなたのビジネスが技術提供者のサービスを提供している場合…</strong>」というセクションがあり、そこに同じ検索結果が表示されます。</p>
       </Callout>
-      <Pitfall>
-        <p>権限名の右側に「Standard Access」や「Advanced Access」の表示がありますが、開発モード運用なら <strong>Standard Access のままで OK</strong> です。</p>
-        <p>Advanced Access に上げようとするとアプリ審査が必要になり、本テンプレートの想定外になります。</p>
+      <StepImage slot="3-B" alt="ページ下部「技術提供者」セクションにinstagram_business_basicがStandard accessで表示されている画面" />
+      <ol start="3">
+        <li>5つすべてが<strong>「Standard access」</strong>ラベル付きで表示されていれば<strong>追加操作は不要</strong>（そのまま使える状態）</li>
+      </ol>
+      <Callout kind="success">
+        <p><strong>「Standard access」= 開発モードで即使える</strong>。クリックや申請は不要。横の「アドバンスアクセスをリクエスト」ボタンは<strong>絶対に押さない</strong>（押すとMetaの審査が走り想定外）。</p>
+      </Callout>
+      <Pitfall title="権限が見つからない場合">
+        <p>旧名（<code>instagram_basic</code> / <code>instagram_manage_insights</code>）で検索すると出ません。新名（<code>_business_</code> 付き）で検索してください。pagesとbusiness系は旧名のままで OK。</p>
       </Pitfall>
     </StepSection>
   );
@@ -179,33 +171,28 @@ function Step3({ done, onToggle }) {
 
 function Step4({ done, onToggle }) {
   return (
-    <StepSection id="step-4" num="04" title="APP_ID / APP_SECRET 取得 → スプシ登録" subtitle="所要 約3分"
+    <StepSection id="step-4" num="04" title="APP_ID / APP_SECRET 登録" subtitle="所要 約3分"
       done={done} onToggleDone={onToggle}>
-      <p>
-        アプリの「身分証明書」にあたる 2 つの値（アプリ ID と アプリシークレット）を取得し、自分のスプシに登録します。
-        この 2 つは Step 6 で短期トークンを 60 日長期トークンに自動変換するときに必要になります。
-      </p>
-      <h3>手順</h3>
       <ol>
         <li>アプリダッシュボード左メニュー「設定」→「基本設定」を開く</li>
-        <li>画面上部の <strong>「アプリ ID」</strong>（公開値・15〜17 桁の数字）をコピー</li>
-        <li>その下の <strong>「アプリシークレット」</strong> 欄で「表示」ボタンをクリック → Facebook パスワード再入力 → 表示されたシークレットをコピー</li>
-        <li>自分のスプシを開いて「⚙️ 設定」シートを表示</li>
-        <li>「Facebook アプリ ID」の B 列にアプリ ID を貼り付け</li>
-        <li>「Facebook アプリシークレット」の B 列にアプリシークレットを貼り付け</li>
-        <li>スプシのメニュー <Copyable>📊 Instagram Insights → 💾 設定シートからPropertiesに保存</Copyable> を実行</li>
-        <li>「保存しました」アラートが出れば Script Properties への反映完了</li>
+        <li><strong>「アプリID」</strong>（15〜17桁の数字）をコピー</li>
       </ol>
+      <StepImage slot="4-A" alt="基本設定画面で「アプリID」を赤枠で示したスクショ" />
+      <ol start="3">
+        <li>スプシのメニュー <Copyable>📊 Instagram Insights → 🔐 シークレット入力</Copyable> を実行</li>
+        <li>最初のダイアログ「Facebook アプリID」に貼り付け → OK</li>
+        <li>Meta画面に戻り <strong>「アプリシークレット」</strong> 欄の「表示」→ FBパスワード入力 → コピー</li>
+      </ol>
+      <StepImage slot="4-B" alt="「アプリシークレット」の「表示」ボタンを赤枠で示したスクショ" />
+      <ol start="6">
+        <li>次のダイアログ「Facebook アプリシークレット」に貼り付け → OK</li>
+        <li>残り（Instagramトークン・Gemini・Discord）は空のままOKでスキップ</li>
+      </ol>
+      <Callout kind="success">
+        <p><strong>シークレットはScript Propertiesに直接保存</strong>。スプシのセルや履歴には残らず、共有しても漏れません。</p>
+      </Callout>
       <Callout kind="danger">
-        <p><strong>アプリシークレットの取り扱い</strong></p>
-        <p>アプリシークレットは「アプリのパスワード」に相当する機密情報です。以下を厳守してください：</p>
-        <ul>
-          <li>公開リポジトリ（GitHub 等）にコミットしない</li>
-          <li>Discord・Slack・チャット等にそのまま貼り付けない</li>
-          <li>スクリーンショットを SNS にアップしない（特に質問投稿時）</li>
-          <li>スプシを第三者と共有する場合は、設定シートを非表示またはアクセス制限する</li>
-        </ul>
-        <p>万が一漏洩した場合は、Meta のアプリ設定画面から「アプリシークレットをリセット」して即時失効させてください。</p>
+        <p><strong>アプリシークレットは「アプリのパスワード」</strong>。他人に見せない・SNSに貼らない・スクショ投稿しない。漏れたらMetaの設定画面から「アプリシークレットをリセット」で即失効。</p>
       </Callout>
     </StepSection>
   );
@@ -216,34 +203,29 @@ function Step5({ done, onToggle }) {
   return (
     <StepSection id="step-5" num="05" title="短期アクセストークン取得（Graph API Explorer）" subtitle="所要 約5分"
       done={done} onToggleDone={onToggle}>
-      <p>
-        Meta が提供する「Graph API Explorer」というブラウザツールで、まず <strong>1 時間有効の短期アクセストークン</strong> を取得します。
-        次の Step 6 で、このトークンが自動的に 60 日有効の長期トークンに変換されます。
-      </p>
-      <h3>手順</h3>
       <ol>
         <li><a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noreferrer">developers.facebook.com/tools/explorer</a> を開く</li>
-        <li>右上「Meta App」のドロップダウンで、Step 2 で作成した自分のアプリを選択</li>
-        <li>「User or Page」のドロップダウンで「Get User Access Token」をクリック</li>
-        <li>表示された権限選択ダイアログで、以下 5 つの権限を <strong>すべてチェック</strong>：
+        <li>「<strong>Metaアプリ</strong>」のドロップダウンで、Step 2 で作成した自分のアプリを選択</li>
+        <li>「<strong>ユーザーまたはページ</strong>」のドロップダウンを開き、「<strong>ユーザーアクセストークンを取得</strong>」をクリック</li>
+        <li>「アクセス許可」欄の「許可を追加」に <Copyable>insta</Copyable> や <Copyable>pages</Copyable> と<strong>部分入力すると候補が出ます</strong>。下記5つを選択：
           <ul>{perms.map(p => <li key={p}><Copyable>{p}</Copyable></li>)}</ul>
+          <p className="hint" style={{marginTop: 6}}>※ Graph API Explorer では<strong>旧名のまま</strong>表示されます（Step 3 で見た新名 <code>instagram_business_basic</code> 等とは別表記）。これでOK、Meta側で内部的にマッピングされます。</p>
         </li>
-        <li>「Generate Access Token」をクリック → Facebook ログイン承認画面が開く</li>
-        <li>承認画面で「対象の Facebook ページ」と「対象の Instagram ビジネスアカウント」がチェックされていることを確認 →「次へ」→「保存」</li>
-        <li>Graph API Explorer の「Access Token」欄に長い文字列が表示されたらコピー</li>
-        <li>自分のスプシ「⚙️ 設定」シートの「Instagram アクセストークン」B 列に貼り付け</li>
-        <li>メニュー <Copyable>📊 Instagram Insights → 💾 設定シートからPropertiesに保存</Copyable> を実行</li>
+        <li>「<strong>アクセストークンを生成</strong>」をクリック → Facebook承認画面でFBページとIGアカウントが「1件を選択中」になっているか確認 →「保存」</li>
+        <li>「<strong>アクセストークン</strong>」欄に表示される長い文字列をコピー</li>
+      </ol>
+      <StepImage slot="5-A" alt="Graph API Explorer のアクセストークン欄を赤枠で示したスクショ" />
+      <ol start="7">
+        <li>スプシのメニュー <Copyable>📊 Instagram Insights → 🔐 シークレット入力</Copyable> を実行</li>
+        <li>FBアプリID・SECRETは現状維持で空のままOK</li>
+        <li>「Instagram アクセストークン」のダイアログでコピー値を貼り付け → OK</li>
+        <li>残りは空のままOKでスキップ</li>
       </ol>
       <Callout kind="warn">
-        <p><strong>短期トークンは 1 時間で切れます</strong></p>
-        <p>
-          このトークンは取得から 1 時間で失効します。短期トークン貼付後は <strong>すぐに次の Step 6（接続テスト）</strong> に進んで、
-          60 日長期トークンへの自動変換まで一気に終わらせてください。1 時間以内に Step 6 を実行できなかった場合は、
-          Step 5 をやり直して短期トークンを取り直すだけで OK です（やり直しは何度でも無料）。
-        </p>
+        <p><strong>短期トークンは1時間で切れます</strong>。貼付後はすぐにStep 6（接続テスト）へ。失効したらStep 5をやり直すだけでOK。</p>
       </Callout>
       <Pitfall title="権限選択画面が出ない場合">
-        <p>ブラウザの広告ブロッカーやポップアップブロックを一時的に無効化してください。それでも出ない場合はシークレットウィンドウで再試行が確実です。</p>
+        <p>広告ブロッカーやポップアップブロックを一時的に無効化、またはシークレットウィンドウで再試行。</p>
       </Pitfall>
     </StepSection>
   );
@@ -261,7 +243,6 @@ function Step6({ done, onToggle }) {
       <h3>手順</h3>
       <ol>
         <li>スプシのメニュー <Copyable>📊 Instagram Insights → 🔗 接続テスト</Copyable> を実行</li>
-        <li>初回のみ Apps Script の権限承認ダイアログが出る → 「許可」</li>
         <li>処理が走り始めると、内部で以下が自動実行されます：
           <ul>
             <li>① 短期トークンで Graph API 接続 → 自分の IG ユーザー名・投稿数を取得</li>
@@ -282,7 +263,7 @@ function Step6({ done, onToggle }) {
       <Pitfall title="失敗時のチェックポイント">
         <ul>
           <li><strong>「Instagram API Error」</strong> → Step 3 の権限が不足。5 つすべて付いているか、Step 5 で 5 つすべてチェックしたかを確認</li>
-          <li><strong>「長期トークン変換失敗」</strong> → Step 4 の FB_APP_ID / FB_APP_SECRET が未設定または値が間違い。設定シートを再確認 → 💾 で再保存</li>
+          <li><strong>「長期トークン変換失敗」</strong> → Step 4 の FB_APP_ID / FB_APP_SECRET が未設定または値が間違い。<Copyable>🔐 シークレット入力</Copyable> で再登録</li>
           <li><strong>「IG_USER_ID が取れない」</strong> → IG アカウントが Facebook ページと連携されていない可能性。Meta Business Suite で連携状態を確認</li>
           <li><strong>「アクセストークン期限切れ」</strong> → 短期トークン取得から 1 時間以上経過。Step 5 をやり直し → 即 Step 6 を再実行</li>
         </ul>
@@ -332,7 +313,6 @@ function Step8({ done, onToggle }) {
       <h3>手順</h3>
       <ol>
         <li>スプシのメニュー <Copyable>📊 Instagram Insights → 📁 Drive画像保存フォルダを準備</Copyable> を実行</li>
-        <li>初回のみ Drive 関連の権限承認ダイアログ → 「許可」</li>
         <li>処理が走ると以下が自動実行されます：
           <ul>
             <li>① 自分の Google Drive 直下に「<strong>IG インサイト画像保存</strong>」フォルダを新規作成</li>
@@ -350,10 +330,7 @@ function Step8({ done, onToggle }) {
   └── stories/   ← ストーリーズの画像`}</pre>
       <Callout kind="info">
         <p><strong>容量の目安</strong></p>
-        <p>
-          1 投稿あたり画像 1〜2MB、月 30 投稿なら年間で約 1GB 程度。Google Drive の無料枠（15GB）でも数年分は収まります。
-          容量が気になる場合は、設定シートの「画像保存をスキップ」フラグを ON にすれば URL のみ記録モードに切り替えられます。
-        </p>
+        <p>1投稿あたり画像 1〜2MB、月30投稿で年間 約1GB。Google Drive の無料枠（15GB）でも数年分は収まります。</p>
       </Callout>
       <Pitfall>
         <p>
@@ -370,56 +347,32 @@ function Step9({ done, onToggle }) {
     <StepSection id="step-9" num="09" title="Gemini API キー（OCR用・任意）" subtitle="任意 — 所要 約5分"
       done={done} onToggleDone={onToggle}>
       <p>
-        ストーリーズに焼き込まれたテキスト（手書き風キャプション・スタンプ文字・スクショ内の文字など）を、
-        Google の Gemini Vision で自動 OCR してスプシに記録する機能のセットアップです。
-        <strong>OCR が不要なら Step 9 はまるごとスキップして OK</strong> です（テンプレート本体の動作に影響なし）。
+        Gemini を登録すると、<strong>新着ストーリーズ取得時に画像内のテキストを自動OCR</strong>します（1日数件レベルなので無料枠で十分）。過去分はStep 11のCSVインポートで「説明」列をそのまま使うのでOCR不要。
       </p>
       <h3>手順</h3>
       <ol>
-        <li><a href="https://aistudio.google.com" target="_blank" rel="noreferrer">aistudio.google.com</a> を開いて Google アカウントでログイン</li>
-        <li>左サイドバー「Get API key」をクリック</li>
-        <li>「Create API key」ボタンをクリック</li>
-        <li>「Select Google Cloud project」で既存プロジェクトを選ぶか、「Create API key in new project」で新規作成</li>
-        <li>発行された API キー（<Copyable>AIza...</Copyable> で始まる文字列）をコピー</li>
-        <li>自分のスプシ「⚙️ 設定」シートを開く</li>
-        <li>「Gemini API キー」B 列に貼り付け</li>
-        <li>メニュー <Copyable>📊 Instagram Insights → 💾 設定シートからPropertiesに保存</Copyable> を実行</li>
+        <li><a href="https://aistudio.google.com" target="_blank" rel="noreferrer">aistudio.google.com</a> にGoogleアカウントでログイン</li>
+        <li>左サイドバー「Get API key」→「Create API key」</li>
+        <li>「Create API key in new project」で新規作成</li>
+        <li>発行された <Copyable>AIza...</Copyable> で始まる文字列をコピー</li>
+        <li>スプシのメニュー <Copyable>📊 Instagram Insights → 🔐 シークレット入力</Copyable> を実行</li>
+        <li>「Gemini APIキー」のダイアログまで進み貼り付け → OK</li>
       </ol>
       <Callout kind="info">
-        <p><strong>月額試算</strong></p>
-        <p>ストーリーズ 100 件／月の OCR で <strong>約 $0.05（≒ 7 円）</strong>。Gemini API の無料枠でほぼカバーできるレンジなので、個人運用なら実質ゼロ円で運用可能です。</p>
+        <p><strong>OCRが走るタイミング</strong>：30分ごとの自動取得で「新規ストーリーズ」を検出した時だけ。過去分のバッチOCRはありません。</p>
+      </Callout>
+      <Callout kind="info">
+        <p><strong>動画ストーリーのサムネ</strong>：Auto-fetchは Instagram Graph API の <code>thumbnail_url</code>（公式自動生成静止画）を使うので、動画でもキレイにサムネが入ります。OCRも同サムネに対して実行されます。</p>
+      </Callout>
+      <Callout kind="info">
+        <p><strong>月額試算</strong>：新着 月100件 OCR でも約 <strong>$0.05（≒7円）</strong>。Gemini無料枠（1,500回/日）に余裕で収まります。</p>
       </Callout>
       <Callout kind="warn">
-        <p><strong>OCR 不要な場合</strong></p>
-        <p>
-          ストーリーズ画像内のテキスト抽出を行わなくても、画像実体は Step 8 の Drive フォルダに保存され、
-          ストーリーズの基本数値（リーチ・閲覧数・反応数等）も問題なく取得できます。
-          OCR は「あとで検索したい」「テキスト分析したい」場合の <strong>追加機能</strong> という位置付けです。
-        </p>
+        <p><strong>OCR 不要なら Step 9 スキップでOK</strong>。基本数値（リーチ・閲覧数・反応数）は Gemini なしでも問題なく取得・記録されます。</p>
       </Callout>
       <Callout kind="danger">
-        <p><strong>API キーの取り扱い</strong></p>
-        <p>
-          Gemini API キーも Step 4 のアプリシークレットと同じく機密情報です。公開リポジトリにコミット・チャットへの貼付・スクショ共有は厳禁。
-          漏洩した場合は AI Studio から該当キーを即時失効させて再発行してください。
-        </p>
+        <p><strong>APIキーの取り扱い</strong>：Step 4 のシークレットと同じく機密情報。公開リポジトリ・SNS・スクショ共有は厳禁。漏洩したら AI Studio から即時失効＆再発行。</p>
       </Callout>
-      <h3>Gemini API が呼ばれるのはどのメニュー？</h3>
-      <table>
-        <thead>
-          <tr><th>メニュー</th><th>Gemini 使用</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>📚 過去全件取り込み（API）</td><td>❌ 使わない</td></tr>
-          <tr><td>📸 フィード+リールのみ取得 / 📖 ストーリーズのみ取得</td><td>❌ 取得時は使わない</td></tr>
-          <tr><td>🔍 ストーリーズ OCR 一括 / バッチ</td><td>✅ 使う</td></tr>
-          <tr><td>🤖 自動 OCR 開始</td><td>✅ 5 分ごと最大 100 件まで使う</td></tr>
-        </tbody>
-      </table>
-      <p>
-        過去全件取り込みやインサイト取得では Gemini が呼ばれないので、<strong>無料枠の上限を気にせず大量取り込みできます</strong>。
-        Gemini を使うのは「OCR」と名前のついたメニューを明示的に実行した時だけ。
-      </p>
     </StepSection>
   );
 }
@@ -435,15 +388,12 @@ function Step10({ done, onToggle }) {
       </p>
       <h3>手順</h3>
       <ol>
-        <li>自分の Discord サーバーを開く（ない場合は Discord アプリ左下「+」で新規作成）</li>
+        <li>自分のDiscordサーバーを開く（ない場合は左下「+」で新規作成）</li>
         <li>通知用チャンネルを作成（例: <Copyable>#ig-insights-通知</Copyable>）</li>
-        <li>チャンネル名の右にある歯車アイコン → チャンネル設定を開く</li>
-        <li>左メニュー「連携サービス」→「ウェブフック」→「ウェブフックを作成」</li>
-        <li>名前を設定（例: <Copyable>IG Insights Bot</Copyable>）→ アイコンも任意で設定</li>
-        <li>「ウェブフック URL をコピー」ボタンをクリック</li>
-        <li>自分のスプシ「⚙️ 設定」シートを開く</li>
-        <li>「Discord Webhook URL」B 列に貼り付け</li>
-        <li>メニュー <Copyable>📊 Instagram Insights → 💾 設定シートからPropertiesに保存</Copyable> を実行</li>
+        <li>チャンネル名の右の歯車アイコン → 「連携サービス」→「ウェブフック」→「ウェブフックを作成」</li>
+        <li>「ウェブフックURLをコピー」をクリック</li>
+        <li>スプシのメニュー <Copyable>📊 Instagram Insights → 🔐 シークレット入力</Copyable> を実行</li>
+        <li>「Discord Webhook URL」のダイアログまで進み貼り付け → OK</li>
       </ol>
       <Callout kind="info">
         <p><strong>受信される通知の種類</strong></p>
@@ -515,49 +465,244 @@ function Step11({ done, onToggle }) {
 
 function Step12({ done, onToggle }) {
   return (
-    <StepSection id="step-12" num="12" title="Meta 公式 zip アップロード（過去ストーリーズ用）" subtitle="ダウンロード待ちで数時間〜24時間"
+    <StepSection id="step-12" num="12" title="過去ストーリーズの取り込み（zip × CSV コラボ）" subtitle="初回＋毎月運用"
       done={done} onToggleDone={onToggle}>
       <p>
-        Instagram の過去ストーリーズは Graph API では取得できません。Meta 公式の「アカウントセンター → 情報をダウンロード」機能で取得した正規エクスポート zip をアップロードして、過去のストーリーズを履歴シートに復元します。
+        Instagram の過去ストーリーズは Graph API では取れません。<strong>Meta公式zip</strong>と<strong>Business Suite CSV</strong>を組み合わせて、画像とメトリクスの両方を揃えます。
       </p>
-      <h3>12-1. Meta から zip をダウンロード（24 時間〜数日かかります）</h3>
+
+      <Callout kind="info">
+        <p><strong>コラボの仕組み</strong>：投稿日時で自動マッチングして1行にマージします。zipが画像・キャプション、CSVがメトリクス（リーチ・視聴数等）を提供。先にどっちをアップしてもOK。</p>
+      </Callout>
+
+      <Callout kind="warn">
+        <p><strong>動画ストーリーの扱い</strong></p>
+        <ul>
+          <li>サムネは<strong>静止画(先頭フレーム)として保存</strong>（動画再生は不可）</li>
+          <li><strong>新規ストーリー</strong>（取得時にAuto-fetch）→ Instagram公式の動画サムネを自動取得（綺麗）</li>
+          <li><strong>過去ストーリー</strong>（Meta zip）→ zipには .mp4 しか含まれず、Apps Scriptでは静止画抽出不可。<strong>運営側で変換代行</strong>するため別途依頼してください（Discord個別チャンネルで案内）</li>
+          <li><strong>本文（キャプション）</strong>は Business Suite CSVの「説明」列が情報源 → CSV取得範囲（直近3ヶ月）の動画のみ本文が入ります</li>
+        </ul>
+      </Callout>
+
+      <Callout kind="danger">
+        <p><strong>ストーリーズのzip取得範囲は「アーカイブ保存」設定に依存</strong></p>
+        <ul>
+          <li><strong>ON</strong> → 過去のストーリーが全てアカウントに残り、zipにも入る（年単位で復元可）</li>
+          <li><strong>OFF</strong> → 24時間で消え、zipにも入らない（過去復元は不可）</li>
+        </ul>
+        <p>フィード投稿・リールは設定に関わらず全期間zipに入ります。</p>
+      </Callout>
+
+      <h3>12-0. ストーリーズ アーカイブ保存をONにする（最初の1回）</h3>
+      <p>過去のストーリーズをzipで取れるようにするため、Instagram側の「アーカイブに保存」をONにしておきます。OFFのまま運用すると、今後ストーリーズを投稿してもzipには残らないので注意。</p>
+
+      <h4>アプリ（iPhone / Android）から設定</h4>
       <ol>
-        <li>ブラウザで <a href="https://accountscenter.facebook.com/info_and_permissions/dyi" target="_blank" rel="noreferrer">アカウントセンター → 情報をダウンロード</a> を開く（要ログイン）</li>
-        <li>「情報をダウンロード」を選択</li>
-        <li>対象アカウントとして該当の Instagram アカウントをチェック</li>
-        <li>「情報の種類」: 「すべて」または「コンテンツ」（投稿・ストーリー・リール・メディア）</li>
-        <li>「形式」: <strong>JSON</strong> を選択（HTML では取り込めません）</li>
-        <li>「期間」: <strong>すべて</strong></li>
-        <li>「品質」: 推奨設定のまま</li>
-        <li>「リクエストを送信」 → メールで通知 → 数時間〜24 時間後にダウンロードリンクが届く</li>
-        <li>リンクから zip ファイルを PC に保存</li>
+        <li>Instagramアプリ → プロフィール画面右上の<strong>「☰」</strong>メニュー</li>
+        <li>「<strong>設定とアクティビティ</strong>」</li>
+        <li>「<strong>アーカイブ</strong>」または「ストーリーズコントロール」（バージョンにより名称異なる）</li>
+        <li>「<strong>ストーリーズをアーカイブに保存</strong>」を<strong>ON</strong>にする</li>
       </ol>
-      <Pitfall title="サイズが大きい場合">
-        <p>zip が 50MB を超える場合は、Apps Script の制約上アップロードできません。Meta 側で「期間」を半年単位で分割してエクスポートし、複数回アップロードしてください。</p>
-      </Pitfall>
-      <h3>12-2. スプシにアップロード</h3>
+
+      <h4>Webブラウザから設定（PC）</h4>
       <ol>
-        <li>メニュー <Copyable>📊 Instagram Insights → 📦 Meta公式zipアップロード</Copyable> を実行</li>
-        <li>ダイアログで zip ファイルを選択 → 「アップロード開始」</li>
-        <li>処理が完了すると以下のサマリが表示されます：
+        <li><a href="https://www.instagram.com/accounts/edit/" target="_blank" rel="noreferrer">instagram.com</a> にログイン</li>
+        <li>左サイドバー「設定とアクティビティ」</li>
+        <li>「シェアと再シェア」→「ストーリー」</li>
+        <li>「ストーリーをアーカイブに保存」をON</li>
+      </ol>
+
+      <Callout kind="warn">
+        <p>ON にした<strong>以降の</strong>ストーリーがzipに残ります。それ以前のストーリーは設定変更しても復元できません（Meta側で消えています）。</p>
+      </Callout>
+
+      <h3>12-1. Meta公式zip（初回1回・過去全期間のストーリーズを復元）</h3>
+      <p>
+        Meta のアカウントセンターから自分のInstagramデータを zip ダウンロードします。申請から DL リンク到着まで<strong>数時間〜24時間</strong>、DL有効期限は<strong>4日間</strong>。
+      </p>
+
+      <h4>① アカウントセンターを開く</h4>
+      <ol>
+        <li><a href="https://accountscenter.facebook.com/info_and_permissions/dyi" target="_blank" rel="noreferrer">アカウントセンター → あなたの情報とアクセス許可</a> を開く（Facebookログイン必須）</li>
+        <li>右側の「<strong>あなたの情報をエクスポート</strong>」をクリック</li>
+      </ol>
+      <StepImage slot="12-1-1-account-center" alt="アカウントセンター > あなたの情報とアクセス許可" />
+
+      <h4>② エクスポートを作成</h4>
+      <ol>
+        <li>青ボタン「<strong>エクスポートを作成</strong>」をクリック</li>
+      </ol>
+      <StepImage slot="12-1-2-export-create" alt="エクスポートを作成画面" />
+
+      <h4>③ プロフィール選択：Instagram</h4>
+      <ol>
+        <li><strong>Instagram</strong> のプロフィール（@... アイコンが付いている方）を選択</li>
+      </ol>
+      <StepImage slot="12-1-3-select-profile" alt="プロフィール選択（Instagram）" />
+      <Pitfall>
+        <p>Facebookと両方表示されることがあります。必ず<strong>Instagram</strong>側を選んでください。Facebookを選ぶとIGのデータが入りません。</p>
+      </Pitfall>
+
+      <h4>④ エクスポート先：デバイスにエクスポート</h4>
+      <ol>
+        <li>「<strong>デバイスにエクスポート</strong>」を選択（zipダウンロード用）</li>
+      </ol>
+      <StepImage slot="12-1-4-export-destination" alt="エクスポート先選択" />
+
+      <h4>⑤ 4つの設定を変更</h4>
+      <p>確認画面が開きます。<strong>デフォルトのままだと取り込めません</strong>。下記4項目をすべて変更してください。</p>
+
+      <p><strong>5-1. 情報をカスタマイズ</strong></p>
+      <ol>
+        <li>「情報をカスタマイズ」をタップ</li>
+        <li>カテゴリごとに「<strong>すべてをクリア</strong>」を押してチェックを全解除</li>
+        <li>以下3つだけチェックを入れる：
           <ul>
-            <li>📸 フィード追加: ◯件</li>
-            <li>🎬 リール追加: ◯件</li>
-            <li>📖 ストーリーズ追加: ◯件</li>
-            <li>🖼 画像保存: ◯件</li>
-            <li>⏭ 既存スキップ: ◯件</li>
+            <li><strong>メディア</strong>（投稿・ストーリーズ・リールの画像本体 — 必須）</li>
+            <li><strong>ストーリーズでのインタラクション</strong>（リアクション・返信ログ）</li>
+            <li><strong>過去のInstagramインサイト</strong>（過去メトリクスデータ）</li>
           </ul>
         </li>
-        <li>「📖 ストーリーズ履歴」シートに <Copyable>source = meta_zip</Copyable> として行が追加されているか確認</li>
+        <li>「保存」</li>
+      </ol>
+      <StepImage slot="12-1-5-customize-types" alt="3つのカテゴリだけチェック" />
+
+      <p><strong>5-2. 期間 → 全期間</strong></p>
+      <ol>
+        <li>「期間」をタップ → 「<strong>全期間</strong>」を選択 → 「保存」</li>
+      </ol>
+      <StepImage slot="12-1-6-period" alt="期間：全期間" />
+
+      <p><strong>5-3. フォーマット → JSON</strong></p>
+      <ol>
+        <li>「フォーマット」をタップ → 「<strong>JSON</strong>」を選択 → 「保存」</li>
+      </ol>
+      <StepImage slot="12-1-7-format-json" alt="フォーマット：JSON" />
+      <Pitfall title="HTMLだと取り込めません">
+        <p>デフォルトはHTMLですが、必ず<strong>JSON</strong>に変更してください。HTMLだとスクリプトが読み込めません。</p>
+      </Pitfall>
+
+      <p><strong>5-4. メディアの画質 → 高画質</strong></p>
+      <ol>
+        <li>「メディアの画質」をタップ → 「<strong>高画質</strong>」を選択 → 「保存」</li>
+      </ol>
+      <StepImage slot="12-1-8-quality" alt="メディアの画質：高画質" />
+
+      <h4>⑥ 最終確認 → エクスポート開始</h4>
+      <p>確認画面に戻ったら、すべて設定済みになっているか確認：</p>
+      <ul>
+        <li>情報をカスタマイズ：<strong>ストーリーズでのインタラクション、メディア、過去のInstagramインサイト</strong></li>
+        <li>期間：<strong>全期間</strong></li>
+        <li>フォーマット：<strong>JSON</strong></li>
+        <li>メディアの画質：<strong>高画質</strong></li>
+      </ul>
+      <StepImage slot="12-1-9-final-config" alt="最終確認画面（設定済み）" />
+      <ol>
+        <li>下にスクロール → 青ボタン「<strong>エクスポートを開始</strong>」をタップ</li>
+        <li>申請完了 → 通知先メールアドレスに数時間〜24時間後にDLリンクが届く</li>
+      </ol>
+
+      <h4>⑦ DL案内メールが届く（数時間〜24時間後）</h4>
+      <p>Metaプライバシーチームから「Meta情報ファイルをダウンロードする準備ができました」というメールが届きます。</p>
+      <StepImage slot="12-1-10-download-mail" alt="Meta情報ファイルDL案内メール" />
+      <Pitfall title="DLリンクの有効期限は4日間">
+        <p>メールが届いてから<strong>4日以内</strong>にDLしないとリンクが失効します。失効した場合は最初からやり直し（再申請＋数時間〜24h待ち）になるので、届いたら早めにDLしてください。</p>
+      </Pitfall>
+
+      <h4>⑧ zipをダウンロード</h4>
+      <ol>
+        <li>メール本文の「<strong>export your information</strong>」リンクをクリック → Instagramの「あなたの情報をエクスポート」ページに飛ぶ</li>
+        <li>「利用可能なダウンロード」の該当ファイル（対象期間・アカウント名・有効期限を確認）の「<strong>ダウンロード</strong>」ボタンを押す</li>
+      </ol>
+      <StepImage slot="12-1-11-export-page" alt="あなたの情報をエクスポート（DL画面）" />
+      <ol start="3">
+        <li>「ファイルをダウンロード」画面に進む → 各ファイルの「<strong>Download</strong>」を押して全部 <Copyable>~/Downloads/</Copyable> に保存</li>
+      </ol>
+      <StepImage slot="12-1-12-multi-files" alt="ファイルをダウンロード（複数ファイル分割）" />
+      <Callout kind="info">
+        <p><strong>データが大きいと複数ファイルに自動分割されます</strong>（例：ファイル1/3, 2/3, 3/3）。気にせず<strong>全部DLしてください</strong>。あとは運営側で必要なものだけ取り出して処理します。</p>
+      </Callout>
+
+      <h4>⑨ 運営サービスアカウントをスプシ／Driveに共有（初回1回）</h4>
+      <Callout kind="info">
+        <p>運営側で取り込み代行するため、運営の<strong>サービスアカウント</strong>に書き込み権限を渡す必要があります。<strong>初回1回だけ</strong>の作業です。</p>
+      </Callout>
+      <ol>
+        <li>スプシ（ig-insights-template）を開く → 右上「<strong>共有</strong>」</li>
+        <li>運営から伝えられたサービスアカウントのメアド（例: <Copyable>ig-insights-bot@xxx.iam.gserviceaccount.com</Copyable>）を入力</li>
+        <li>権限を「<strong>編集者</strong>」に → 「通知を送信しない」にチェック → 共有</li>
+        <li>同じ手順で、Drive上の<strong>画像保存フォルダ</strong>（設定時に作ったフォルダ）にも同じメアドを<strong>編集者</strong>で共有</li>
       </ol>
       <Callout kind="warn">
-        <p><strong>注意</strong></p>
-        <p>
-          Meta zip にはストーリーズの画像・キャプション・タイムスタンプが含まれますが、
-          <strong>過去のリーチ・閲覧数・反応数の数値は欠落している場合があります</strong>。
-          zip に無い数値は空欄として保存されます。これは Meta 側の仕様であり、本テンプレートで補完することはできません。
-        </p>
+        <p>サービスアカウントのメアドはDiscord個別チャンネルでお伝えします。表示されていない場合は「サービスアカウント教えてください」と一言ください。</p>
       </Callout>
+
+      <h4>⑩ DiscordでzipをDLリンクごと運営に送る</h4>
+      <Callout kind="info">
+        <p>過去ストーリーズの取り込みは、Apps Scriptの制約（ファイルサイズ・処理時間）の関係で<strong>運営側で代行</strong>します。利用者は<strong>DL→運営に送る</strong>だけでOKです。</p>
+      </Callout>
+      <ol>
+        <li>DLしたzip（複数ある場合は全部）を <a href="https://gigafile.nu/" target="_blank" rel="noreferrer">ギガファイル便</a> にアップロード
+          <ul>
+            <li>サイズ無制限・無料・登録不要</li>
+            <li>保持期間は最大100日でOK</li>
+            <li>パスワード保護を推奨（「ダウンロードキー」欄に4桁数字を設定）</li>
+          </ul>
+        </li>
+        <li>アップ完了後、表示される<strong>DLリンクURL</strong>とパスワードをコピー</li>
+        <li>Discordの個別サポートチャンネルに以下を貼り付けて送信：
+          <CodeBlock>{`【過去ストーリーズ取り込み依頼】
+ギガファイル便URL: https://xxxxxxxx.gigafile.nu/xxxxxxxxx
+パスワード: 1234
+インスタアカウント名: @your_account_name
+スプシURL: https://docs.google.com/spreadsheets/d/xxxxx/
+Drive画像フォルダURL: https://drive.google.com/drive/folders/xxxxx
+※ 上記2つに運営サービスアカウントを「編集者」で共有済み`}</CodeBlock>
+        </li>
+      </ol>
+
+      <h4>⑪ 反映完了通知を待つ（数日以内）</h4>
+      <ol>
+        <li>運営側で受け取ったzipを処理し、スプシに過去ストーリーズを反映します</li>
+        <li>反映完了次第、Discordの同チャンネルで通知が届きます</li>
+        <li>通知後、スプシを開いて <Copyable>📖 ストーリーズ</Copyable> シートに過去分が並んでいることを確認してください</li>
+      </ol>
+
+      <Callout kind="success">
+        <p><strong>1回送れば全期間分が反映されます</strong>。以降の月次運用は12-2のCSVインポート（軽量・自分で実行可）で進めてください。</p>
+      </Callout>
+
+      <Pitfall title="送る前に確認">
+        <p>zipの中身は個人情報（DM・連絡先など）も含まれます。送信前に必ず<strong>パスワード保護</strong>をかけてください。運営側は処理完了後にzipを速やかに削除します。</p>
+      </Pitfall>
+
+      <h3>12-2. Business Suite CSV（毎月運用・直近3ヶ月のメトリクス）</h3>
+      <ol>
+        <li><a href="https://business.facebook.com/latest/posts/active_stories" target="_blank" rel="noreferrer">Meta Business Suite → 投稿管理 → ストーリーズ</a> を開く</li>
+        <li>期間選択で取得したい期間を指定（<strong>最大3ヶ月</strong>）</li>
+        <li>「エクスポート」→ CSVが <Copyable>~/Downloads/</Copyable> に保存される</li>
+        <li>スプシのメニュー <Copyable>📤 Business Suite CSVインポート（ストーリーズ/フィード/リール自動判定）</Copyable> を実行 → ファイル選択 → 開始</li>
+        <li>サマリで以下を確認：
+          <ul>
+            <li>📖 新規追加: ◯件</li>
+            <li>🔗 Meta zip行とマージ: ◯件 ← zipアップ済みのストーリーにメトリクスが追加された数</li>
+            <li>⏭ 既存スキップ: ◯件</li>
+            <li>💬 キャプション補完: ◯件</li>
+          </ul>
+        </li>
+      </ol>
+
+      <Callout kind="success">
+        <p><strong>同じ期間を複数回アップしてOK</strong> — 投稿IDで重複検出、投稿日時でMeta zip行とマージします。</p>
+      </Callout>
+
+      <h3>12-3. 月次運用</h3>
+      <ol>
+        <li>Step 13 でトリガー設置すると、<strong>毎月1日に Discord で「CSVインポートしてね」通知</strong>が届く</li>
+        <li>30日経過するとスプシを開いた時にもトーストでリマインド</li>
+        <li>通知が来たら 12-2 のCSV取込を実行（毎月3分の手間）</li>
+      </ol>
     </StepSection>
   );
 }
@@ -566,17 +711,17 @@ function Step13({ done, onToggle }) {
   return (
     <StepSection id="step-13" num="13" title="トリガー設置（自動取得開始）" subtitle="所要 約30秒・最後の仕上げ"
       done={done} onToggleDone={onToggle}>
-      <p>30 分ごとの自動インサイト取得 + 週次の長期トークン自動更新トリガーを設置します。</p>
+      <p>30分ごとの自動インサイト取得 + 週次の長期トークン更新 + 月次のCSVリマインダー、を一括設置します。</p>
       <ol>
         <li>メニュー <Copyable>📊 Instagram Insights → ⏰ トリガーをインストール</Copyable> を実行</li>
-        <li>初回のみ Apps Script の権限承認ダイアログが出る → 「許可」</li>
         <li>「トリガーをインストールしました」アラートが表示されたら設置完了
           <ul>
-            <li><Copyable>autoFetch</Copyable>: 30 分ごと（インサイト自動取得）</li>
-            <li><Copyable>refreshTokenJob</Copyable>: 毎週日曜 9 時（トークン更新）</li>
+            <li><Copyable>autoFetch</Copyable>: 30分ごと（インサイト自動取得）</li>
+            <li><Copyable>refreshTokenJob</Copyable>: 毎週日曜9時（トークン更新）</li>
+            <li><Copyable>csvReminderJob</Copyable>: 毎月1日9時（ストーリーズCSV取込リマインダー）</li>
           </ul>
         </li>
-        <li>30 分後にスプシを開いて、フィード・リール・ストーリーズの行が自動更新されているか確認</li>
+        <li>30分後にスプシを開いて、フィード・リール・ストーリーズの行が自動更新されているか確認</li>
       </ol>
       <h3>トリガーの管理</h3>
       <ul>
@@ -603,7 +748,7 @@ function DailyOps() {
         <li>セットアップ後は基本「触らない運用」で OK。30 分ごとに自動でデータが追記されます</li>
         <li>週 1 回、ダッシュボードシートで「伸びた投稿」「初速良好」「曜日 × 時間帯ヒートマップ」を確認 → 投稿戦略にフィードバック</li>
         <li>月 1 回はスプシを開く（30 日以上開かないとトークン失効リスク）</li>
-        <li>2〜3 ヶ月に 1 回、Meta 公式 zip を再エクスポート → アップロード（過去ストーリーズの追加分を取り込み）</li>
+        <li>月1回（毎月1日にDiscord通知）Meta Business Suite からストーリーズCSVをDL →「📤 ストーリーズCSVインポート」</li>
       </ul>
       <h3>トラブル時のセルフチェック</h3>
       <ol>
@@ -667,7 +812,7 @@ function Faq() {
         <p>Apps Script の制約で 50MB 以内推奨です。Meta 側で「期間」を半年単位などで分割エクスポートし、複数回アップロードで対応してください。</p>
       </FaqItem>
       <FaqItem q="OCR が動かない">
-        <p>GEMINI_API_KEY が未設定の場合は OCR がスキップされます。<a href="https://aistudio.google.com" target="_blank" rel="noreferrer">AI Studio</a> で発行・設定シートに貼付してください。無料枠で月数百件は処理可能です。</p>
+        <p>GEMINI_API_KEY が未設定の場合は OCR がスキップされます。<a href="https://aistudio.google.com" target="_blank" rel="noreferrer">AI Studio</a> で発行後、メニュー <Copyable>🔐 シークレット入力</Copyable> で登録してください。無料枠で月数百件は処理可能です。</p>
       </FaqItem>
       <FaqItem q="取得したデータを再販してもいい？">
         <p>自分のアカウントの統計データを <strong>自分のサービス内で使う</strong>のは問題ありません。データを <strong>第三者に再販</strong>する場合は Meta 規約・個人情報保護法の確認が別途必要です（クライアントワーク等）。</p>
