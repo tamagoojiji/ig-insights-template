@@ -80,7 +80,10 @@ function fetchAndWriteStories() {
       sheet.getRange(existingRow, 4, 1, 6).setValues([[reach, views, replies, shares, navigation, profileVisits]]);
       updateCount++;
     } else {
-      const imageUrl = story.media_url;
+      // 動画は thumbnail_url（Instagram側で自動生成された静止画）を優先
+      const imageUrl = (story.media_type === 'VIDEO' && story.thumbnail_url)
+        ? story.thumbnail_url
+        : story.media_url;
       let driveUrl = '';
       if (imageUrl && !isTimeUp_()) {
         driveUrl = saveImageToDrive(imageUrl, story.id, story.timestamp, 'stories') || '';

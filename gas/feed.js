@@ -137,7 +137,10 @@ function writeFeedToSheet(items) {
       sheet.getRange(rowIndex, updateStartCol, 1, 6).setValues([[likes, comments, saved, reach, views, engagementRate]]);
       updateCount++;
     } else {
-      const imageUrl = item.media_url || item.thumbnail_url;
+      // 動画は thumbnail_url（自動生成静止画）を優先
+      const imageUrl = (item.media_type === 'VIDEO' && item.thumbnail_url)
+        ? item.thumbnail_url
+        : (item.media_url || item.thumbnail_url);
       let driveUrl = '';
       if (imageUrl && !isTimeUp_()) {
         driveUrl = saveImageToDrive(imageUrl, item.id, item.timestamp, 'feed') || '';

@@ -2,7 +2,7 @@
 // 時間トリガーのインストール・アンインストール
 // ==========
 
-const TRIGGER_HANDLERS = ['autoFetch', 'refreshTokenJob', 'autoOcrTick_'];
+const TRIGGER_HANDLERS = ['autoFetch', 'refreshTokenJob', 'autoOcrTick_', 'csvReminderJob'];
 
 /**
  * 自動取得（30分ごと）+ トークン更新（毎週日曜9時）のトリガーをインストール
@@ -29,10 +29,17 @@ function installTriggers() {
     .atHour(9)
     .create();
 
+  ScriptApp.newTrigger('csvReminderJob')
+    .timeBased()
+    .onMonthDay(1)
+    .atHour(9)
+    .create();
+
   SpreadsheetApp.getUi().alert(
     'トリガーをインストールしました\n\n' +
     '・autoFetch: 30分ごと（インサイト自動取得）\n' +
-    '・refreshTokenJob: 毎週日曜 9時（トークン更新）'
+    '・refreshTokenJob: 毎週日曜 9時（トークン更新）\n' +
+    '・csvReminderJob: 毎月1日 9時（ストーリーズCSV取込みリマインダー）'
   );
 }
 

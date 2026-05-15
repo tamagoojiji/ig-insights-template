@@ -11,7 +11,8 @@ const CONFIG_KEYS = [
   'FB_APP_SECRET',
   'GEMINI_API_KEY',
   'WEBHOOK_URL',
-  'BACKFILL_CURSOR'
+  'BACKFILL_CURSOR',
+  'LAST_CSV_IMPORT_DATE'
 ];
 
 function getConfig(key) {
@@ -31,34 +32,78 @@ function getAllConfig() {
 }
 
 /**
- * 設定シートからScript Propertiesに保存
+ * 値をマスク表示用に変換
  */
-function saveSettingsFromSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName('⚙️ 設定');
-  if (!sheet) {
-    SpreadsheetApp.getUi().alert('「⚙️ 設定」シートが見つかりません');
-    return;
-  }
+function maskValue_(v) {
+  if (!v) return '(未設定)';
+  if (v.length <= 8) return '****';
+  return v.slice(0, 4) + '****' + v.slice(-4);
+}
 
-  const mapping = [
-    { row: 3, key: 'IG_ACCESS_TOKEN' },
-    { row: 5, key: 'IG_USER_ID' },
-    { row: 7, key: 'FB_APP_ID' },
-    { row: 9, key: 'FB_APP_SECRET' },
-    { row: 11, key: 'DRIVE_FOLDER_ID' },
-    { row: 13, key: 'GEMINI_API_KEY' },
-    { row: 15, key: 'WEBHOOK_URL' }
+function formatCsvImportStatus_(dateStr) {
+  if (!dateStr) return '⚠️ 未インポート';
+  const last = new Date(dateStr);
+  const days = Math.floor((Date.now() - last.getTime()) / 86400000);
+  if (days >= 30) return '⚠️ ' + dateStr + ' (' + days + '日前) — 取り込み推奨';
+  return dateStr + ' (' + days + '日前)';
+}
+
+/**
+ * シークレットをダイアログで入力 → Script Properties に直接保存
+ * スプシのセルを経由しないので、シート履歴・共有経路に残らない
+ */
+function promptAndSaveSecrets() {
+  const ui = SpreadsheetApp.getUi();
+  const items = [
+    { key: 'FB_APP_ID', label: 'Facebook アプリID',
+      desc: 'Meta開発者ダッシュボード「設定 → 基本設定」のアプリID（15〜17桁の数字）' },
+    { key: 'FB_APP_SECRET', label: 'Facebook アプリシークレット',
+      desc: '同画面の「アプリシークレット」（「表示」ボタン → FBパスワード入力で見える）' },
+    { key: 'IG_ACCESS_TOKEN', label: 'Instagram アクセストークン',
+      desc: 'Graph API Explorer で取得した短期/長期トークン' },
+    { key: 'GEMINI_API_KEY', label: 'Gemini APIキー（任意）',
+      desc: 'aistudio.google.com で発行（OCR を使わないなら空のままOK）' },
+    { key: 'WEBHOOK_URL', label: 'Discord Webhook URL（任意）',
+      desc: 'Discord チャンネル設定 → 連携サービス → ウェブフック（不要なら空のままOK）' }
   ];
 
-  const props = {};
-  mapping.forEach(m => {
-    const val = sheet.getRange(m.row, 2).getValue();
-    if (val) props[m.key] = String(val).trim();
-  });
+  let savedCount = 0;
+  for (const item of items) {
+    const current = getConfig(item.key);
+    const res = ui.prompt(
+      `🔐 ${item.label}`,
+      `${item.desc}\n\n現在: ${maskValue_(current)}\n\n新しい値を貼り付けて「OK」。変更しない場合は空のまま「OK」。`,
+      ui.ButtonSet.OK_CANCEL
+    );
+    const btn = res.getSelectedButton();
+    if (btn === ui.Button.CANCEL || btn === ui.Button.CLOSE) break;
+    const newVal = (res.getResponseText() || '').trim();
+    if (newVal) {
+      setConfig(item.key, newVal);
+      savedCount++;
+    }
+  }
 
-  PropertiesService.getScriptProperties().setProperties(props);
-  SpreadsheetApp.getUi().alert('設定を保存しました');
+  // 設定シートのマスク表示を更新（既にあれば）
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss.getSheetByName('⚙️ 設定')) setupSettingsSheet();
+  } catch (_) {}
+
+  ui.alert(savedCount > 0 ? `✅ ${savedCount}件のシークレットを保存しました` : '変更はありませんでした');
+}
+
+/**
+ * 旧フロー（互換用）：設定シートに値が貼られていた場合のみ Script Properties へ転送
+ * 新フローでは promptAndSaveSecrets() を使用
+ */
+function saveSettingsFromSheet() {
+  const ui = SpreadsheetApp.getUi();
+  ui.alert(
+    '⚠️ このメニューは廃止されました\n\n' +
+    'シークレットは「🔐 シークレット入力」メニューから入力してください。\n' +
+    'スプシのセルを経由しないため、シート履歴や共有時の漏洩リスクがなくなります。'
+  );
 }
 
 /**
@@ -74,8 +119,7 @@ function testConnection() {
   if (!token) {
     SpreadsheetApp.getUi().alert(
       'アクセストークンが未設定です\n\n' +
-      '⚙️設定シートのB列「Instagram アクセストークン」に貼り付けて、\n' +
-      'メニュー「💾 設定シートからPropertiesに保存」を先に実行してください。'
+      'メニュー「🔐 シークレット入力」を実行してトークンを登録してください。'
     );
     return;
   }
@@ -188,7 +232,8 @@ function exchangeToLongLivedToken() {
 }
 
 /**
- * 設定シートを初期化
+ * 設定シートを初期化（表示専用・シークレットはマスク表示）
+ * 値はすべて Script Properties に保存され、シートには貼り付けない
  */
 function setupSettingsSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -197,52 +242,44 @@ function setupSettingsSheet() {
     sheet = ss.insertSheet('⚙️ 設定');
   }
 
-  // clear 前に Script Properties から既存値を取得して復元用に保持
   const config = getAllConfig();
 
   sheet.clear();
-  sheet.setColumnWidth(1, 250);
-  sheet.setColumnWidth(2, 500);
+  sheet.setColumnWidth(1, 280);
+  sheet.setColumnWidth(2, 480);
 
   const labels = [
-    ['📌 IGインサイト保存テンプレート 設定', ''],
+    ['📌 IGインサイト保存テンプレート 設定（表示専用）', ''],
     ['', ''],
-    ['Instagram アクセストークン（短期/長期）', config.IG_ACCESS_TOKEN || ''],
+    ['🔐 シークレット（メニュー「🔐 シークレット入力」から登録）', ''],
+    ['Facebook アプリID', config.FB_APP_ID || '(未設定)'],
+    ['Facebook アプリシークレット', maskValue_(config.FB_APP_SECRET)],
+    ['Instagram アクセストークン', maskValue_(config.IG_ACCESS_TOKEN)],
+    ['Gemini APIキー（任意）', maskValue_(config.GEMINI_API_KEY)],
+    ['Discord Webhook URL（任意）', maskValue_(config.WEBHOOK_URL)],
     ['', ''],
-    ['Instagram ユーザーID（接続テストで自動取得）', config.IG_USER_ID || ''],
+    ['📦 自動設定される値', ''],
+    ['Instagram ユーザーID', config.IG_USER_ID || '(接続テストで自動取得)'],
+    ['Googleドライブ フォルダID', config.DRIVE_FOLDER_ID || '(📁 Driveフォルダ準備で自動作成)'],
+    ['トークン有効期限', config.TOKEN_EXPIRY || '(接続テストで自動設定)'],
+    ['ストーリーズCSV最終インポート', formatCsvImportStatus_(config.LAST_CSV_IMPORT_DATE)],
     ['', ''],
-    ['Facebook アプリID', config.FB_APP_ID || ''],
-    ['', ''],
-    ['Facebook アプリシークレット', config.FB_APP_SECRET || ''],
-    ['', ''],
-    ['Googleドライブ フォルダID（自動作成可）', config.DRIVE_FOLDER_ID || ''],
-    ['', ''],
-    ['Gemini APIキー（OCR用・任意）', config.GEMINI_API_KEY || ''],
-    ['', ''],
-    ['Discord Webhook URL（通知用・任意）', config.WEBHOOK_URL || ''],
-    ['', ''],
-    ['⚠️ トークン有効期限', config.TOKEN_EXPIRY || '（接続テストで自動設定されます）'],
-    ['', ''],
-    ['📋 使い方', ''],
-    ['1. 上記の項目を入力（B列に貼り付け）', ''],
-    ['2. メニュー → 📊 Instagram Insights → 💾 設定を保存', ''],
-    ['3. メニュー → 🔗 接続テスト（→ 長期トークン化＋USER_ID自動取得）', ''],
-    ['4. メニュー → 📁 Driveフォルダ準備', ''],
-    ['5. メニュー → 📚 過去全件取り込み（API）', ''],
-    ['6. メニュー → 📦 Meta公式zipアップロード（過去ストーリーズ用）', ''],
-    ['7. メニュー → ⏰ トリガーをインストール', ''],
+    ['📋 セットアップの流れ', ''],
+    ['1. 🔐 シークレット入力（FBアプリID/SECRET、IGトークンなど）', ''],
+    ['2. 🔗 接続テスト（→ 長期トークン化＋USER_ID自動取得）', ''],
+    ['3. 📁 Drive画像保存フォルダを準備', ''],
+    ['4. 📚 過去全件取り込み（API）', ''],
+    ['5. 📦 Meta公式zipアップロード（過去ストーリーズ用）', ''],
+    ['6. ⏰ トリガーをインストール', ''],
     ['', ''],
     ['📖 詳しい手順', 'https://tamagoojiji.github.io/ig-insights-template/setup-guide.html']
   ];
 
   sheet.getRange(1, 1, labels.length, 2).setValues(labels);
   sheet.getRange(1, 1).setFontSize(14).setFontWeight('bold');
-  sheet.getRange(19, 1).setFontWeight('bold');
-
-  // 入力セルの背景色
-  [3, 5, 7, 9, 11, 13, 15].forEach(row => {
-    sheet.getRange(row, 2).setBackground('#FFF9C4');
-  });
+  sheet.getRange(3, 1).setFontWeight('bold').setBackground('#FFF3E0');
+  sheet.getRange(10, 1).setFontWeight('bold').setBackground('#E3F2FD');
+  sheet.getRange(15, 1).setFontWeight('bold');
 }
 
 /**
@@ -255,8 +292,7 @@ function assertConfigured() {
   if (missing.length > 0) {
     throw new Error(
       '必須設定が未登録: ' + missing.join(', ') + '\n\n' +
-      '⚙️ 設定シートにすべての項目を入力してから、\n' +
-      '「💾 設定シートからPropertiesに保存」を実行してください。'
+      'メニュー「🔐 シークレット入力」を実行して登録してください。'
     );
   }
 }

@@ -175,7 +175,61 @@ function insertMetaItem_(ss, category, item, mediaMap, summary) {
 
   if (category === 'feed') summary.feed_added++;
   else if (category === 'reel') summary.reels_added++;
-  else summary.stories_added++;
+  else {
+    summary.stories_added++;
+    // 📖 ストーリーズ メインシートにも反映（既存はスキップ）
+    insertMetaStoryToMainSheet_(ss, tsDate, fakeId, caption, savedImageUrl, mediaArr[0]);
+  }
+}
+
+/**
+ * Meta zip由来のストーリーをメインシート「📖 ストーリーズ」にも書き込む
+ * 既存のメディアID一致 or 投稿日時一致（90秒以内）はスキップ
+ */
+function insertMetaStoryToMainSheet_(ss, tsDate, fakeId, caption, imageUrl, firstMedia) {
+  let sheet = ss.getSheetByName('📖 ストーリーズ');
+  if (!sheet) {
+    sheet = ss.insertSheet('📖 ストーリーズ');
+    setupStoriesHeader(sheet);
+  }
+  if (sheet.getLastRow() === 0) setupStoriesHeader(sheet);
+
+  // 既存検出（ID or 投稿日時）
+  let existingRow = 0;
+  if (sheet.getLastRow() >= 2) {
+    const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 10).getValues();
+    const tsMs = tsDate instanceof Date ? tsDate.getTime() : null;
+    for (let i = 0; i < data.length; i++) {
+      const rowId = String(data[i][9] || '');
+      const rowTs = data[i][0];
+      if (rowId === fakeId) { existingRow = i + 2; break; }
+      if (tsMs && rowTs instanceof Date && Math.abs(rowTs.getTime() - tsMs) < 90000) {
+        existingRow = i + 2; break;
+      }
+    }
+  }
+  if (existingRow) return; // 既存スキップ
+
+  const uri = (firstMedia && firstMedia.uri) || '';
+  const isVideo = /\.(mp4|mov)$/i.test(uri);
+  const mediaType = isVideo ? 'VIDEO' : 'IMAGE';
+  const thumbFormula = imageUrl ? '=IMAGE("' + imageUrl.replace(/"/g, '') + '")' : '';
+
+  const newRow = [
+    tsDate, thumbFormula, mediaType,
+    '', '', '', '', '', '', // メトリクス空欄（CSVで後埋め）
+    fakeId
+  ];
+  const r = sheet.getLastRow() + 1;
+  sheet.getRange(r, 1, 1, 10).setValues([newRow]);
+
+  // キャプション → OCR列
+  if (caption) {
+    try {
+      const ocrCol = ensureStoriesOcrColumn_(sheet);
+      if (ocrCol > 0) sheet.getRange(r, ocrCol).setValue(caption);
+    } catch (_) {}
+  }
 }
 
 function saveBlobToDriveSubfolder_(folderId, subfolderName, fileBaseName, blob) {
@@ -188,13 +242,16 @@ function saveBlobToDriveSubfolder_(folderId, subfolderName, fileBaseName, blob) 
   const ext = (blob.getContentType() && blob.getContentType().indexOf('video') >= 0) ? 'mp4' : 'jpg';
   const fileName = fileBaseName + '.' + ext;
 
-  // 既存ファイルがあれば再利用
+  // 既存ファイルがあれば再利用（=IMAGE()用のサムネURLを返す）
   const existing = sub.getFilesByName(fileName);
+  let file;
   if (existing.hasNext()) {
-    return existing.next().getUrl();
+    file = existing.next();
+  } else {
+    file = sub.createFile(blob.setName(fileName));
   }
-  const file = sub.createFile(blob.setName(fileName));
-  return file.getUrl();
+  try { file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); } catch (_) {}
+  return 'https://drive.google.com/thumbnail?id=' + file.getId() + '&sz=w400';
 }
 
 /**

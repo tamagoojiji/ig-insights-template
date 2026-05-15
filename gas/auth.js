@@ -73,17 +73,10 @@ function checkAndRefreshToken() {
 }
 
 /**
- * リフレッシュエラー通知（メール + シート警告）
+ * リフレッシュエラー通知（メールのみ）
  */
 function notifyRefreshError(errorMessage) {
-  // スプレッドシートに警告
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName('⚙️ 設定');
-  if (sheet) {
-    sheet.getRange(15, 2).setValue(`⚠️ エラー: ${errorMessage}`).setFontColor('#D32F2F');
-  }
-
-  // メール通知
   try {
     const email = Session.getEffectiveUser().getEmail();
     if (email) {
@@ -99,13 +92,11 @@ function notifyRefreshError(errorMessage) {
 }
 
 /**
- * 設定シートの有効期限を更新
+ * 設定シートの有効期限表示を更新（シート全体を再描画）
  */
-function updateExpiryOnSheet(expiryDate) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName('⚙️ 設定');
-  if (sheet) {
-    const formatted = Utilities.formatDate(expiryDate, 'Asia/Tokyo', 'yyyy/MM/dd');
-    sheet.getRange(15, 2).setValue(`✅ ${formatted} まで有効`).setFontColor('#388E3C');
-  }
+function updateExpiryOnSheet(_expiryDate) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss.getSheetByName('⚙️ 設定')) setupSettingsSheet();
+  } catch (_) {}
 }

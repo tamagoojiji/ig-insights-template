@@ -91,7 +91,7 @@ function fetchStories() {
   const userId = getConfig('IG_USER_ID');
   if (!userId) throw new Error('ユーザーIDが未設定です');
 
-  const fields = 'id,media_type,media_url,timestamp';
+  const fields = 'id,media_type,media_url,thumbnail_url,timestamp';
   const data = igFetch(`/${userId}/stories`, { fields: fields });
   return data.data || [];
 }

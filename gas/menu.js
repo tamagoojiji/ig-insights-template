@@ -6,8 +6,8 @@
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('📊 Instagram Insights')
     .addItem('🔧 初回セットアップ（シート作成）', 'initializeAllSheets')
+    .addItem('🔐 シークレット入力', 'promptAndSaveSecrets')
     .addItem('🔍 設定状況を確認', 'checkConfig')
-    .addItem('💾 設定シートからPropertiesに保存', 'saveSettingsFromSheet')
     .addSeparator()
     .addItem('🔗 接続テスト（→長期トークン化＋USER_ID取得）', 'testConnection')
     .addItem('📁 Drive画像保存フォルダを準備', 'ensureDriveFolder')
@@ -18,22 +18,20 @@ function onOpen() {
     .addSeparator()
     .addItem('📚 過去全件取り込み（API）', 'backfillFromAPI')
     .addItem('🔁 取り込みカーソルをリセット', 'resetBackfillCursor')
-    .addItem('📦 Meta公式zipアップロード', 'openMetaZipDialog')
+    .addItem('📦 Meta公式zipアップロード（全期間・画像+キャプション）', 'openMetaZipDialog')
+    .addItem('📤 Business Suite CSVインポート（ストーリーズ/フィード/リール自動判定）', 'openStoriesCsvDialog')
     .addSeparator()
     .addItem('📊 ダッシュボード更新', 'updateDashboard')
     .addItem('🎨 ストーリーズシート整形', 'beautifyStoriesSheet')
     .addItem('📝 既存キャプションを全文化', 'backfillFullCaptions')
-    .addSeparator()
-    .addItem('🔍 ストーリーズOCR一括', 'runStoriesOcrAll')
-    .addItem('🔍 ストーリーズOCRバッチ（件数指定）', 'runStoriesOcrBatch')
-    .addItem('🤖 自動OCR開始（5分おきに100件）', 'startAutoOcr')
-    .addItem('🛑 自動OCR停止', 'stopAutoOcr')
     .addSeparator()
     .addItem('🔄 トークン手動更新', 'refreshTokenManual')
     .addItem('⏰ トリガーをインストール', 'installTriggers')
     .addItem('📋 トリガー一覧', 'listTriggers')
     .addItem('🗑 トリガーを削除', 'uninstallTriggers')
     .addToUi();
+
+  try { checkCsvReminderOnOpen_(); } catch (_) {}
 }
 
 /**

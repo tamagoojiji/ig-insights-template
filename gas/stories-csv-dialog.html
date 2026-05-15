@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+  body { font-family: 'Hiragino Sans', system-ui, sans-serif; margin: 0; padding: 24px; color: #222; line-height: 1.7; }
+  h2 { margin: 0 0 12px; font-size: 18px; }
+  .info { background: #f0f8ff; border-left: 4px solid #2575fc; padding: 12px 14px; border-radius: 4px; margin: 12px 0; font-size: 13px; }
+  .warn { background: #fff7e0; border-left: 4px solid #f0c000; padding: 12px 14px; border-radius: 4px; margin: 12px 0; font-size: 13px; }
+  ol { padding-left: 1.4em; margin: 8px 0; font-size: 13px; }
+  ol li { margin-bottom: 4px; }
+  input[type=file] { display: block; margin: 16px 0; }
+  button { background: #d62976; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+  button:disabled { background: #ccc; cursor: not-allowed; }
+  #status { margin-top: 16px; font-size: 13px; color: #555; }
+  #progress { display: none; margin-top: 12px; }
+  .spin { display: inline-block; width: 16px; height: 16px; border: 2px solid #eee; border-top-color: #d62976; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<h2>📤 Business Suite CSVインポート</h2>
+
+<div class="info">
+<strong>ストーリーズ / フィード / リール のCSVを自動振り分け</strong>
+<ol>
+  <li><a href="https://business.facebook.com/latest/posts/" target="_blank">Meta Business Suite → 投稿管理</a> で対象タブ（ストーリーズ / 投稿 / リール）を開く</li>
+  <li>期間を選択（最大3ヶ月）→「エクスポート」でCSVをDL</li>
+  <li>下記から保存したCSVを選択 → アップロード</li>
+  <li>CSVの「投稿タイプ」列から自動的にストーリーズ / フィード / リールを判定して該当シートに反映します</li>
+</ol>
+</div>
+
+<div class="warn">
+<strong>同じ期間を複数回アップしてOK</strong>：投稿IDで重複検出 + 投稿日時でMeta zip行とマージします。
+</div>
+
+<input type="file" id="csvfile" accept=".csv" />
+<button id="upload" onclick="upload()" disabled>アップロード開始</button>
+<div id="progress"><span class="spin"></span><span id="progressText">処理中...</span></div>
+<div id="status"></div>
+
+<script>
+const fileInput = document.getElementById('csvfile');
+const uploadBtn = document.getElementById('upload');
+const statusEl = document.getElementById('status');
+const progressEl = document.getElementById('progress');
+const progressText = document.getElementById('progressText');
+
+fileInput.addEventListener('change', () => {
+  uploadBtn.disabled = !fileInput.files.length;
+  if (fileInput.files.length) {
+    const f = fileInput.files[0];
+    const sizeKB = (f.size / 1024).toFixed(0);
+    statusEl.textContent = `${f.name} (${sizeKB} KB) を選択中`;
+  }
+});
+
+function upload() {
+  const file = fileInput.files[0];
+  if (!file) return;
+  uploadBtn.disabled = true;
+  fileInput.disabled = true;
+  progressEl.style.display = 'block';
+  progressText.textContent = 'ファイル読み込み中...';
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const text = e.target.result;
+    progressText.textContent = 'サーバに送信中...';
+    google.script.run
+      .withSuccessHandler(onDone)
+      .withFailureHandler(onError)
+      .importStoriesFromCsvText({ csvText: text, fileName: file.name });
+  };
+  reader.onerror = () => onError(new Error('ファイル読み込み失敗'));
+  reader.readAsText(file, 'utf-8');
+}
+
+function onDone(result) {
+  progressEl.style.display = 'none';
+  statusEl.innerHTML = '<span style="color:#16a34a;">✅ 完了</span><br><pre style="white-space:pre-wrap; background:#f7f7fb; padding:10px; border-radius:6px;">' + (result.summary || JSON.stringify(result, null, 2)) + '</pre>';
+}
+
+function onError(err) {
+  progressEl.style.display = 'none';
+  statusEl.innerHTML = '<span style="color:#b91c1c;">❌ エラー: ' + (err && err.message ? err.message : String(err)) + '</span>';
+  uploadBtn.disabled = false;
+  fileInput.disabled = false;
+}
+</script>
+</body>
+</html>
