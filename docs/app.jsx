@@ -47,10 +47,22 @@ function App() {
   });
   const [activeId, setActiveId] = useState("step-0");
   const [scrollPct, setScrollPct] = useState(0);
+  const [tocOpen, setTocOpen] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") setTocOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = tocOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [tocOpen]);
 
   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
     "mood": "kinako",
-    "type": "maru",
+    "type": "gothic",
     "weight": "bold",
     "density": "loose"
   }/*EDITMODE-END*/;
@@ -135,12 +147,17 @@ function App() {
       const top = el.getBoundingClientRect().top + window.scrollY - 84;
       window.scrollTo({ top, behavior: "smooth" });
     }
+    setTocOpen(false);
   };
 
   return (
     <>
       <div className="topbar">
         <div className="topbar-row">
+          <button className="hamburger" onClick={() => setTocOpen(true)}
+            aria-label="目次を開く" title="目次">
+            <Icon.Menu/>
+          </button>
           <div className="topbar-brand">
             <span className="brand-mark">📊</span>
             <span>IG Insights セットアップ手順書</span>
@@ -160,9 +177,15 @@ function App() {
         </div>
       </div>
 
-      <div className="layout">
-        <aside className="toc" aria-label="目次">
-          <p className="toc-title">SETUP STEPS</p>
+      <div className="layout layout-wide">
+        {tocOpen && <div className="toc-backdrop" onClick={() => setTocOpen(false)} aria-hidden/>}
+        <aside className={"toc toc-drawer" + (tocOpen ? " open" : "")} aria-label="目次" aria-hidden={!tocOpen}>
+          <div className="toc-drawer-header">
+            <p className="toc-title">SETUP STEPS</p>
+            <button className="toc-close" onClick={() => setTocOpen(false)} aria-label="目次を閉じる">
+              <Icon.Close/>
+            </button>
+          </div>
           <ul className="toc-list">
             {TOC.map((item, i) => {
               if (item.kind === "section") {

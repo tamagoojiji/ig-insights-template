@@ -33,6 +33,19 @@ const Icon = {
       <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
     </svg>
   ),
+  Menu: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="4" y1="7" x2="20" y2="7"/>
+      <line x1="4" y1="12" x2="20" y2="12"/>
+      <line x1="4" y1="17" x2="20" y2="17"/>
+    </svg>
+  ),
+  Close: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="6" y1="6" x2="18" y2="18"/>
+      <line x1="6" y1="18" x2="18" y2="6"/>
+    </svg>
+  ),
 };
 
 // --- Copyable inline value ---
@@ -88,16 +101,14 @@ function Callout({ kind = "info", icon, children }) {
   );
 }
 
-// --- Pitfall (collapsible) ---
-function Pitfall({ title = "つまずきポイント", children, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
+// --- Pitfall (always open) ---
+function Pitfall({ title = "つまずきポイント", children }) {
   return (
-    <div className={"pitfall" + (open ? " open" : "")}>
-      <button type="button" className="pitfall-header" onClick={() => setOpen(o => !o)} aria-expanded={open}>
+    <div className="pitfall open">
+      <div className="pitfall-header pitfall-header-static">
         <span className="ico">⚠️</span>
         <span className="label">{title}</span>
-        <Icon.Chev/>
-      </button>
+      </div>
       <div className="pitfall-body">{children}</div>
     </div>
   );
@@ -175,6 +186,28 @@ function LoginCheckGrid({ cards }) {
   );
 }
 
+// --- Step image (with placeholder when src missing) ---
+function StepImage({ src, alt, caption, slot }) {
+  if (!src) {
+    return (
+      <figure className="step-image step-image-placeholder">
+        <div className="placeholder-box">
+          <span className="ph-icon">📷</span>
+          <span className="ph-slot">{slot || "画像"}</span>
+          {alt && <span className="ph-alt">{alt}</span>}
+        </div>
+        {caption && <figcaption>{caption}</figcaption>}
+      </figure>
+    );
+  }
+  return (
+    <figure className="step-image">
+      <img src={src} alt={alt || ""} loading="lazy" />
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+  );
+}
+
 // --- FAQ item ---
 function FaqItem({ q, children }) {
   const [open, setOpen] = useState(false);
@@ -190,4 +223,4 @@ function FaqItem({ q, children }) {
   );
 }
 
-Object.assign(window, { Copyable, CodeBlock, Callout, Pitfall, StepSection, Section, FaqItem, Icon, LoginCard, LoginCheckGrid });
+Object.assign(window, { Copyable, CodeBlock, Callout, Pitfall, StepSection, Section, FaqItem, Icon, LoginCard, LoginCheckGrid, StepImage });
