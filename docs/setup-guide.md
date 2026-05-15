@@ -61,15 +61,53 @@ Instagram Graph APIで全投稿のインサイトを、自分のスプシに永�
 
 Instagram Graph API を使うために、まず Meta（旧 Facebook）の開発者アカウントを作成し、その配下に専用のアプリを1つ作ります。ここで作るアプリは「自分専用のデータ取得窓口」であって、世間に公開するものではありません。
 
-### 手順
+### 2-A. Meta for Developers 初回登録（はじめての方のみ）
 
-1. [developers.facebook.com](https://developers.facebook.com) を開いて、自分の Facebook アカウントでログイン
-2. 右上「マイアプリ」→「アプリを作成」をクリック
-3. 「アプリの種類」で **「ビジネス」** を選択 →「次へ」
+すでに [developers.facebook.com](https://developers.facebook.com) でアプリ作成画面に入れる場合は **2-A はスキップして 2-B へ** 進んでください。`developers.facebook.com/apps/` を開いて「アプリはまだありません」または既存アプリ一覧が表示されたら登録済みです。
+
+#### 手順
+
+1. ブラウザで [developers.facebook.com](https://developers.facebook.com) を開く
+
+   ![Meta for Developers トップページ](images/setup-guide/meta-developers-signup/01-developers-top.png)
+
+2. 右上「**開始する**」をクリック → 自分の Facebook アカウントでログイン
+3. 「**Meta for Developersアカウントを作成**」ダイアログが開き、「ようこそ」画面で内容を確認 → 右下「**次へ**」をクリック
+
+   ![アカウント作成ダイアログのRegisterステップ](images/setup-guide/meta-developers-signup/02-register-welcome.png)
+
+4. **Contact info（連絡先）** ステップに進む。Primary email に Facebook 登録メールが自動入力される → 「**メールアドレスを認証**」をクリック → 受信ボックスで認証メールを開いてリンクをクリック
+
+   ![Contact info / メールアドレス確認画面](images/setup-guide/meta-developers-signup/03-contact-info.png)
+
+   > 💡 別のメールに変えたい場合は「メールアドレスを変更」から差し替え可能。認証用リンクは数分以内に届きます（届かない場合は迷惑メールフォルダを確認）。
+
+5. **About you（役割選択）** ステップに進む。最も近い役割を1つ選択 → 「**登録完了**」をクリック
+
+   ![About you / 役割選択画面](images/setup-guide/meta-developers-signup/04-about-you.png)
+
+   > 💡 個人運用なら「**経営者/創設者**」または「**マーケター**」が無難。役割選択はアプリ機能には影響しないので、近いものを選べばOK。
+
+6. 登録完了するとマイアプリ画面（`developers.facebook.com/apps/`）に遷移し、「**アプリはまだありません**」と表示されます。これで初回登録は完了です。
+
+   ![マイアプリ画面（アプリ未作成状態）](images/setup-guide/meta-developers-signup/05-myapps-empty.png)
+
+> 💡 **所要**: 約5分（メール認証の待ち時間込み）
+
+> ⚠️ **登録がブロックされる場合**: Facebook 本体のアカウントが新規作成直後・利用実績がほぼ無い場合、開発者登録が「アカウントの確認が必要」とブロックされることがあります。その場合は数日 Facebook を通常利用してから再挑戦してください。
+
+---
+
+### 2-B. アプリを作成
+
+#### 手順
+
+1. マイアプリ画面（`https://developers.facebook.com/apps/`）右上の「**アプリを作成**」または中央の緑ボタンをクリック
+2. 「アプリの種類」で **「ビジネス」** を選択 →「次へ」
    - ※「なし」「消費者」では Instagram Graph API の権限が付けられないので必ず **「ビジネス」** を選んでください
-4. 「アプリ名」（例: `ig-insights-自分のアカウント名`）と「連絡先メールアドレス」を入力
-5. 「ビジネスアカウント」欄は、すでに Meta Business Suite を使っているなら該当アカウントを選択。未作成ならその場で新規作成も可能
-6. 「アプリを作成」→ パスワード再入力 → 場合により電話番号での SMS 認証 → アプリダッシュボードに遷移すれば完了
+3. 「アプリ名」（例: `ig-insights-自分のアカウント名`）と「連絡先メールアドレス」を入力
+4. 「ビジネスアカウント」欄は、すでに Meta Business Suite を使っているなら該当アカウントを選択。未作成ならその場で新規作成も可能
+5. 「アプリを作成」→ パスワード再入力 → 場合により電話番号での SMS 認証 → アプリダッシュボードに遷移すれば完了
 
 > 💡 **所要**: 約10分（SMS認証が入る場合は+5分）
 
