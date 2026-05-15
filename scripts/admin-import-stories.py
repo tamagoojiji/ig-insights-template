@@ -3,7 +3,9 @@
 過去ストーリーズ取り込み代行スクリプト（運営側）
 
 利用者から受け取ったMeta公式zipを処理し、利用者のスプシ＋Drive画像フォルダに
-サービスアカウントで直接書き込む。
+運営の個人Googleアカウント（ADC）で書き込む。
+
+利用者は事前にスプシ・Drive画像フォルダを運営のGoogleアカウントに「編集者」で共有する。
 
 GAS側 `gas/meta-zip-import.js` の振る舞いを移植：
   - メディアID: meta_<timestamp>_<simpleHash-base36>
@@ -13,17 +15,23 @@ GAS側 `gas/meta-zip-import.js` の振る舞いを移植：
   - 履歴シート＋メインシート両方に書き込み
   - 画像URL: https://drive.google.com/thumbnail?id=<id>&sz=w400
 
+事前準備（初回1回）:
+    gcloud auth application-default login \\
+        --scopes=https://www.googleapis.com/auth/spreadsheets,\\
+https://www.googleapis.com/auth/drive,\\
+https://www.googleapis.com/auth/cloud-platform
+
 使い方:
     python3 scripts/admin-import-stories.py \\
         --zips ~/Downloads/instagram-xxx-1.zip ~/Downloads/instagram-xxx-2.zip \\
         --sheet-url https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit \\
         --drive-folder-url https://drive.google.com/drive/folders/FOLDER_ID \\
-        [--auth ~/admin/ig-insights-sa.json] \\
         [--dry-run]
 
 要件:
-    pip3 install google-api-python-client google-auth-httplib2 google-auth-oauthlib
+    pip3 install google-api-python-client google-auth google-auth-httplib2
     ffmpeg（brew install ffmpeg）
+    gcloud CLI（brew install --cask google-cloud-sdk）
 """
 
 import argparse
@@ -39,13 +47,14 @@ import zipfile
 from pathlib import Path
 
 try:
-    from google.oauth2 import service_account
+    import google.auth
+    from google.auth.exceptions import DefaultCredentialsError
     from googleapiclient.discovery import build
     from googleapiclient.errors import HttpError
     from googleapiclient.http import MediaFileUpload
 except ImportError:
     print("google-api-python-client がインストールされていません。", file=sys.stderr)
-    print("pip3 install google-api-python-client google-auth-httplib2 google-auth-oauthlib", file=sys.stderr)
+    print("pip3 install google-api-python-client google-auth google-auth-httplib2", file=sys.stderr)
     sys.exit(1)
 
 
@@ -53,7 +62,6 @@ SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive',
 ]
-DEFAULT_AUTH = Path.home() / 'admin' / 'ig-insights-sa.json'
 STORIES_SHEET = '📖 ストーリーズ'
 STORIES_HISTORY_SHEET = '📖 ストーリーズ履歴'
 
@@ -202,20 +210,21 @@ def main():
     ap.add_argument('--zips', nargs='+', required=True, help='Meta公式zipのパス（複数可）')
     ap.add_argument('--sheet-url', required=True, help='利用者スプシURL')
     ap.add_argument('--drive-folder-url', required=True, help='Drive画像フォルダURL')
-    ap.add_argument('--auth', default=str(DEFAULT_AUTH), help='サービスアカウント鍵JSONパス')
     ap.add_argument('--dry-run', action='store_true', help='書き込まずシミュレーション')
     args = ap.parse_args()
 
-    auth_path = Path(args.auth).expanduser()
-    if not auth_path.exists():
-        log(f"認証JSONが見つかりません: {auth_path}")
+    try:
+        creds, _ = google.auth.default(scopes=SCOPES)
+    except DefaultCredentialsError:
+        log("ADC認証情報が見つかりません。以下を一度実行してください:")
+        log("  gcloud auth application-default login \\")
+        log("    --scopes=https://www.googleapis.com/auth/spreadsheets,"
+            "https://www.googleapis.com/auth/drive,"
+            "https://www.googleapis.com/auth/cloud-platform")
         return 1
-    creds = service_account.Credentials.from_service_account_file(
-        str(auth_path), scopes=SCOPES
-    )
     sheets = build('sheets', 'v4', credentials=creds, cache_discovery=False)
     drive = build('drive', 'v3', credentials=creds, cache_discovery=False)
-    log(f"認証OK: {creds.service_account_email}")
+    log("認証OK（ADC）")
 
     spreadsheet_id = parse_id_from_url(args.sheet_url, 'スプシ')
     folder_id = parse_id_from_url(args.drive_folder_url, 'Driveフォルダ')

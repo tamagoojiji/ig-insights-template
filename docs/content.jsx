@@ -624,18 +624,18 @@ function Step12({ done, onToggle }) {
         <p><strong>データが大きいと複数ファイルに自動分割されます</strong>（例：ファイル1/3, 2/3, 3/3）。気にせず<strong>全部DLしてください</strong>。あとは運営側で必要なものだけ取り出して処理します。</p>
       </Callout>
 
-      <h4>⑨ 運営サービスアカウントをスプシ／Driveに共有（初回1回）</h4>
+      <h4>⑨ 運営のGoogleアカウントをスプシ／Driveに共有（初回1回）</h4>
       <Callout kind="info">
-        <p>運営側で取り込み代行するため、運営の<strong>サービスアカウント</strong>に書き込み権限を渡す必要があります。<strong>初回1回だけ</strong>の作業です。</p>
+        <p>運営側で取り込み代行や継続的なメンテナンスを行うため、運営のGoogleアカウントに編集権限を渡してください。<strong>初回1回だけ</strong>の作業です。</p>
       </Callout>
       <ol>
         <li>スプシ（ig-insights-template）を開く → 右上「<strong>共有</strong>」</li>
-        <li>運営から伝えられたサービスアカウントのメアド（例: <Copyable>ig-insights-bot@xxx.iam.gserviceaccount.com</Copyable>）を入力</li>
+        <li>運営のメアド <Copyable>tamagoojiji@gmail.com</Copyable> を入力</li>
         <li>権限を「<strong>編集者</strong>」に → 「通知を送信しない」にチェック → 共有</li>
         <li>同じ手順で、Drive上の<strong>画像保存フォルダ</strong>（設定時に作ったフォルダ）にも同じメアドを<strong>編集者</strong>で共有</li>
       </ol>
       <Callout kind="warn">
-        <p>サービスアカウントのメアドはDiscord個別チャンネルでお伝えします。表示されていない場合は「サービスアカウント教えてください」と一言ください。</p>
+        <p>運営側で取り込み代行・修正・トラブル対応を続けるため、共有は外さないでください。卒業する場合は事前にDiscordで一声ください。</p>
       </Callout>
 
       <h4>⑩ DiscordでzipをDLリンクごと運営に送る</h4>
@@ -658,7 +658,7 @@ function Step12({ done, onToggle }) {
 インスタアカウント名: @your_account_name
 スプシURL: https://docs.google.com/spreadsheets/d/xxxxx/
 Drive画像フォルダURL: https://drive.google.com/drive/folders/xxxxx
-※ 上記2つに運営サービスアカウントを「編集者」で共有済み`}</CodeBlock>
+※ 上記2つに運営アカウント(tamagoojiji@gmail.com)を「編集者」で共有済み`}</CodeBlock>
         </li>
       </ol>
 

@@ -1,94 +1,85 @@
-# 運営向け：GCPプロジェクト＆サービスアカウント セットアップ
+# 運営向け：過去ストーリーズ取り込み代行 セットアップ
 
-過去ストーリーズ取り込み代行スクリプト（`scripts/admin-import-stories.py`）を動かすために必要な Google Cloud の初期設定。**運営側で初回1回だけ実施**する。
+過去ストーリーズ取り込み代行スクリプト（`scripts/admin-import-stories.py`）を動かすために、運営の個人Googleアカウントで認証する設定。**運営側で初回1回だけ実施**する。
 
-## ゴール
+## 方針
 
-- GCP プロジェクト作成
-- Google Sheets API / Google Drive API を有効化
-- サービスアカウント（プログラム用Googleアカウント）を作成
-- 鍵JSONをローカルに保存して認証可能にする
+サービスアカウント方式はやめて、運営の個人Googleアカウント（例: `tamagoojiji@gmail.com`）の認証を使う。
 
-## 所要時間：10〜15分
+- 利用者は運営の個人アカウントにスプシ・Driveを「編集者」共有
+- スクリプトは ADC（Application Default Credentials）で運営アカウントの権限を借りる
+- GCPプロジェクト作成・APIライブラリ有効化・サービスアカウント・鍵JSON、全部不要
 
-## Step 1：GCPプロジェクト作成
+利用者のスプシは継続的に運用するので、運営側がアクセス権を持ち続ける前提（変更・修正・トラブル対応のため）。
 
-1. https://console.cloud.google.com/ にアクセス（運営Googleアカウントでログイン）
-2. 上部のプロジェクト選択メニュー → 「**新しいプロジェクト**」
-3. プロジェクト名：`ig-insights-admin`（好きな名前でOK）
-4. 「作成」をクリック → 数十秒待つ
-5. 作成完了したら、上部メニューでそのプロジェクトを選択
+## ⚠️ 本格運用前に必須：自前OAuthクライアントID作成
 
-## Step 2：APIを2つ有効化
+2026年5月時点で、`gcloud auth application-default login` のデフォルトクライアントIDから
+`drive` / `spreadsheets` スコープへのアクセスが警告→今後ブロック予定。
 
-1. 左メニュー → 「**APIとサービス**」→「ライブラリ」
-2. 検索ボックスに「**Google Sheets API**」と入力 → 表示された結果をクリック → 「**有効にする**」
-3. もう一度ライブラリに戻り、「**Google Drive API**」を検索 → 「有効にする」
+実際にスクリプトを動かすには **自前のOAuthクライアントID** が必要：
 
-## Step 3：サービスアカウント作成
+1. GCPプロジェクト（例: `ig-insights-personal` または新規）を選択
+2. APIs & Services → OAuth同意画面を構成（外部 / 自分のGmailをテストユーザーに追加）
+3. APIs & Services → 認証情報 → 「OAuthクライアントIDを作成」→ アプリケーションの種類「**デスクトップアプリ**」
+4. JSON をDL → `~/admin/oauth-client.json` 等に保存
+5. Step 3 のコマンドに `--client-id-file=~/admin/oauth-client.json` を追加
 
-1. 左メニュー →「**IAMと管理**」→「**サービスアカウント**」
-2. 上部「**+ サービスアカウントを作成**」
-3. 名前：`ig-insights-bot`（好きな名前でOK）
-4. 「作成して続行」→ 役割は何も付与せず「続行」→「完了」
-5. 一覧に追加されたサービスアカウントのメアド（例：`ig-insights-bot@ig-insights-admin.iam.gserviceaccount.com`）を**コピーしてメモ**
-   - これを利用者にDiscordで伝える
+参考: https://docs.cloud.google.com/docs/authentication/troubleshoot-adc#access_blocked_when_using_scopes
 
-## Step 4：鍵JSONを作成・DL
+このセットアップは **最初のお客さんが来たタイミング** で実施でOK。タマゴさん自身の過去ストーリーズは
+既存の GAS「📦 Meta公式zipアップロード」フロー（`scripts/process-ig-zip.py` で前処理）で取り込める。
 
-1. 一覧でサービスアカウント名（`ig-insights-bot@...`）をクリック
-2. 上部タブ「**鍵**」→「**鍵を追加**」→「**新しい鍵を作成**」
-3. 「**JSON**」を選択 → 「作成」
-4. JSONファイルが自動でダウンロードされる
-5. ローカルの安全な場所に保存：
-   ```bash
-   mkdir -p ~/admin
-   mv ~/Downloads/ig-insights-admin-*.json ~/admin/ig-insights-sa.json
-   chmod 600 ~/admin/ig-insights-sa.json
-   ```
+---
 
-## Step 5：.gitignore に追加（必須）
+## 所要時間：5分（OAuthクライアントID作成済み前提）
 
-リポジトリ直下の `.gitignore` に以下を追記：
-
-```
-# Service account keys (NEVER commit)
-*-sa.json
-service-account-*.json
-admin/
-```
-
-リポジトリ内に鍵を置く運用なら絶対に必要。今回は `~/admin/` に置いたので影響なしだが、念のため追加しておく。
-
-## Step 6：Pythonクライアントライブラリのインストール
+## Step 1：gcloud CLIをインストール
 
 ```bash
-pip3 install google-api-python-client google-auth-httplib2 google-auth-oauthlib
+brew install --cask google-cloud-sdk
 ```
 
-または `requirements.txt` に追加しておく：
+すでに入っていればスキップ。確認：
 
-```
-google-api-python-client>=2.0.0
-google-auth-httplib2>=0.1.0
-google-auth-oauthlib>=1.0.0
+```bash
+gcloud --version
 ```
 
-## Step 7：動作テスト
+## Step 2：Pythonクライアントライブラリのインストール
+
+```bash
+pip3 install google-api-python-client google-auth google-auth-httplib2
+```
+
+## Step 3：ADCで個人アカウント認証（初回1回）
+
+```bash
+gcloud auth application-default login \
+  --client-id-file=~/admin/oauth-client.json \
+  --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/cloud-platform
+```
+
+ブラウザが開く → 運営のGoogleアカウント（例: `tamagoojiji@gmail.com`）でログイン → 権限を許可。
+
+完了すると `~/.config/gcloud/application_default_credentials.json` に保存される。
+
+## Step 4：動作テスト
 
 ```bash
 python3 -c "
-from google.oauth2 import service_account
+import google.auth
 from googleapiclient.discovery import build
-creds = service_account.Credentials.from_service_account_file(
-    '$HOME/admin/ig-insights-sa.json',
-    scopes=['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-)
-print('OK:', creds.service_account_email)
+creds, _ = google.auth.default(scopes=[
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive',
+])
+sheets = build('sheets', 'v4', credentials=creds, cache_discovery=False)
+print('OK')
 "
 ```
 
-`OK: ig-insights-bot@...` と出れば成功。
+`OK` と出れば成功。
 
 ## 利用者への案内テンプレ（Discord）
 
@@ -97,7 +88,7 @@ print('OK:', creds.service_account_email)
 
 1. スプシ(ig-insights-template)を開く → 右上「共有」
 2. 以下のメアドを入力 → 「編集者」権限 → 「通知を送信しない」をチェック → 送信
-   ig-insights-bot@ig-insights-admin.iam.gserviceaccount.com
+   tamagoojiji@gmail.com
 
 3. Drive上の画像保存フォルダにも同じメアドを「編集者」で共有
 4. 完了したら、ギガファイル便URL+パスワード+スプシURL+DriveフォルダURLを送ってください
@@ -105,7 +96,7 @@ print('OK:', creds.service_account_email)
 
 ## 注意事項
 
-- 鍵JSONは**運営しか持たない**。GitHubにpushしない・Slack等に貼らない
-- 利用者には**メアドだけ**を伝える（鍵は絶対渡さない）
-- サービスアカウントは「利用者のスプシ／Driveに編集者として招待される」という発想
-- サービスアカウントの上限：1プロジェクトあたり100個まで（運営1個で全利用者をカバーできるので問題なし）
+- 運営の個人Googleアカウントが利用者のスプシ・Driveに編集者としてアクセスし続ける運用
+- 個人アカウントの2段階認証は必須
+- ADCトークンの保存先（`~/.config/gcloud/application_default_credentials.json`）は外部に漏らさない
+- 認証をやり直したい場合：`gcloud auth application-default revoke` → Step 3を再実行
