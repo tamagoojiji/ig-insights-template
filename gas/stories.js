@@ -101,12 +101,15 @@ function fetchAndWriteStories() {
       copyCustomFormulasToNewRow_(sheet, startRow);
 
       const ocrCol = ensureStoriesOcrColumn_(sheet);
-      if (driveUrl && !isTimeUp_()) {
+      if (!driveUrl) {
+        sheet.getRange(startRow, ocrCol).setValue('[画像なし]');
+      } else if (!isTimeUp_()) {
         try {
           const text = ocrImage_(driveUrl);
-          sheet.getRange(startRow, ocrCol).setValue(text);
+          sheet.getRange(startRow, ocrCol).setValue(text || OCR_EMPTY_SENTINEL);
         } catch (e) {
           Logger.log(`OCRエラー (${story.id}): ${e.message}`);
+          sheet.getRange(startRow, ocrCol).setValue(`[エラー] ${e.message}`);
         }
       }
       newCount++;
