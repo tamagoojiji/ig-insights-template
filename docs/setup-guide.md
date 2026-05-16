@@ -173,22 +173,65 @@ Instagram Graph API を使うために、まず Meta（旧 Facebook）の開発�
 
 Meta が提供する「Graph API Explorer」というブラウザツールで、まず **1時間有効の短期アクセストークン** を取得します。次の Step 6 で、このトークンが自動的に60日有効の長期トークンに変換されます。
 
-### 手順
+### 5-A. 事前確認：アプリが「未公開（開発モード）」になっていることを確認
+
+短期トークン取得の前提として、Step 2 で作ったアプリが **開発モード（未公開）** で動いている必要があります。本テンプレートは開発モードのまま運用するので、未公開のままでOKです。
+
+1. アプリダッシュボード（`https://developers.facebook.com/apps/`）から対象アプリを開く
+2. 左メニューに「**公開**」項目があり、ステータスが「**未公開**」になっていることを確認
+
+   ![アプリ左メニュー（公開ステータス：未公開）](images/setup-guide/graph-api-explorer/01-app-menu-sidebar.png)
+
+> 💡 「未公開」=「開発モード」と同じ意味。Standard Access の権限なら未公開のまま本テンプレ機能が全て動作します。
+
+### 5-B. Graph API Explorer を開いて準備
 
 1. [developers.facebook.com/tools/explorer](https://developers.facebook.com/tools/explorer) を開く
-2. 右上「Meta App」のドロップダウンで、Step 2 で作成した自分のアプリを選択
-3. 「User or Page」のドロップダウンで「Get User Access Token」をクリック
-4. 表示された権限選択ダイアログで、以下5つの権限を **すべてチェック**:
-   - `instagram_basic`
-   - `instagram_manage_insights`
-   - `pages_read_engagement`
-   - `pages_show_list`
-   - `business_management`
-5. 「Generate Access Token」をクリック → Facebook ログイン承認画面が開く
-6. 承認画面で「対象の Facebook ページ」と「対象の Instagram ビジネスアカウント」がチェックされていることを確認 →「次へ」→「保存」
-7. Graph API Explorer の「Access Token」欄に長い文字列が表示されたらコピー
-8. 自分のスプシ「⚙️ 設定」シートの「Instagram アクセストークン」B 列に貼り付け
-9. メニュー「📊 Instagram Insights → 💾 設定シートからPropertiesに保存」を実行
+2. 右側パネル「**Metaアプリ**」のドロップダウンで、Step 2 で作成した自分のアプリを選択
+3. 「**ユーザーまたはページ**」のドロップダウンで「**トークンを取得**」を選択
+4. 「**アクセス許可**」セクションに初期状態の `public_profile` が表示されているのを確認
+
+   ![Graph API Explorer 初期状態（Metaアプリ選択直後）](images/setup-guide/graph-api-explorer/02-explorer-initial.png)
+
+### 5-C. アクセス許可を5つ追加
+
+「**許可を追加**」のドロップダウンから、以下の5つを **1つずつクリックして追加** します（チェックリスト形式ではなく、選択するたびにリスト上部に追加されていきます）。
+
+追加する5つ:
+
+- `instagram_basic`
+- `instagram_manage_insights`
+- `pages_read_engagement`
+- `pages_show_list`
+- `business_management`
+
+#### 操作の流れ
+
+1. 「**許可を追加**」ドロップダウンをクリック → カテゴリ一覧が表示される（**Events Groups Pages** / **Other** など）
+
+   ![許可を追加ドロップダウンのカテゴリ一覧](images/setup-guide/graph-api-explorer/04-permission-categories.png)
+
+2. **Other** カテゴリを開く → `instagram_basic` をクリックして選択。「アクセス許可」セクションに追加される
+
+   ![instagram_basic 追加直後](images/setup-guide/graph-api-explorer/03-instagram-basic-added.png)
+
+3. 同じ手順で残り4つ（`instagram_manage_insights` / `pages_read_engagement` / `pages_show_list` / `business_management`）も順次追加。ドロップダウンの **Other** や **Events Groups Pages** から検索/選択
+
+   ![権限を複数追加中（オプション2件選択済み状態）](images/setup-guide/graph-api-explorer/05-adding-permissions.png)
+
+4. 5つすべて追加し終わると、「アクセス許可」セクションに5件が `×permission_name` の形で並びます
+
+   ![5つの権限すべて追加完了](images/setup-guide/graph-api-explorer/06-all-permissions-added.png)
+
+> 💡 **権限が見つからない場合**: ドロップダウン上部の検索ボックスに `instagram_basic` のように直接打ち込めばフィルタできます。
+
+### 5-D. トークンを生成してスプシに貼付
+
+1. 右側上部の **「Generate Access Token」** ボタンをクリック
+2. Facebook ログイン承認画面が開く → 「対象の Facebook ページ」「対象の Instagram ビジネスアカウント」にチェックが入っていることを確認 →「次へ」→「保存」
+3. Graph API Explorer の「**アクセストークン**」欄に長い文字列が表示されたらコピー
+4. 自分のスプシ「⚙️ 設定」シートの「Instagram アクセストークン」B 列に貼り付け
+5. メニュー「📊 Instagram Insights → 💾 設定シートからPropertiesに保存」を実行
 
 > 💡 **所要**: 約5分
 
