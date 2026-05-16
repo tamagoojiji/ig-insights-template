@@ -94,15 +94,17 @@ function Step2({ done, onToggle }) {
   return (
     <StepSection id="step-2" num="02" title="Meta Developer 登録 + アプリ作成" subtitle="所要 約10分（SMS認証で +5分）"
       done={done} onToggleDone={onToggle}>
+      <Callout kind="info">
+        <p><strong>5ステップ構成のウィザード</strong>：アプリの詳細 → ユースケース → ビジネス → 要件 → 概要 と進みます。ユースケースの選び方は Step 3 で詳説するので、ここではアプリ作成のスタート部分まで進めます。</p>
+      </Callout>
       <ol>
         <li><a href="https://developers.facebook.com" target="_blank" rel="noreferrer">developers.facebook.com</a> にFacebookでログイン</li>
         <li>右上「マイアプリ」→「アプリを作成」</li>
       </ol>
       <StepImage slot="2-A" alt="右上「マイアプリ → アプリを作成」を赤枠で示したスクショ" />
       <ol start="3">
-        <li>アプリ名（例: <Copyable>insights-自分の名前</Copyable>）と連絡先メールを入力 →「次へ」</li>
-        <li>ビジネスアカウントを選択（未作成ならその場で新規作成）</li>
-        <li>「アプリを作成」→ パスワード再入力 →（必要時のみ）SMS認証</li>
+        <li>ステップ1「<strong>アプリの詳細</strong>」：アプリ名（例: <Copyable>insights-自分の名前</Copyable>）と連絡先メールを入力 →「次へ」</li>
+        <li>ステップ2「<strong>ユースケース</strong>」が出てきたら一旦 Step 3 へ進んでください（次のステップで詳しく説明）</li>
       </ol>
       <StepImage slot="2-B" alt="アプリ名・連絡先メール入力フォーム" />
       <Pitfall title="アプリ名で使えない単語">
@@ -110,6 +112,9 @@ function Step2({ done, onToggle }) {
       </Pitfall>
       <Pitfall title="新規FBアカウントの場合">
         <p>作成直後のFacebookアカウントはアプリ作成がブロックされることがあります。数日使い込んでから再挑戦してください。</p>
+      </Pitfall>
+      <Pitfall title="developers.facebook.com 初回ログイン時に Meta for Developers 登録を求められた場合">
+        <p>「Meta for Developersへようこそ」ダイアログが出たら、Register → Contact info（メール認証）→ About you（役割選択：<strong>「開発者」</strong>がおすすめ）→ 登録完了、の順に進めてください。マイアプリ画面（<code>developers.facebook.com/apps/</code>）に遷移すれば登録完了です。</p>
       </Pitfall>
     </StepSection>
   );
@@ -203,6 +208,15 @@ function Step5({ done, onToggle }) {
   return (
     <StepSection id="step-5" num="05" title="短期アクセストークン取得（Graph API Explorer）" subtitle="所要 約5分"
       done={done} onToggleDone={onToggle}>
+      <Callout kind="warn">
+        <p><strong>⚠️ Step 3 と Step 5 の違い（同じ権限名が出てきますが別作業です）</strong></p>
+        <p>Step 3 と Step 5 は <strong>同じ5つの権限名</strong>（<code>instagram_basic</code> 等）を扱うため「同じ作業を2回している？」と感じやすいですが、<strong>別の作業</strong>です。両方完了して初めて API を呼べる状態になります。</p>
+        <ul>
+          <li><strong>Step 3</strong>（アプリ管理画面）：アプリが「この権限を使います」と<strong>宣言</strong> — 求人票に「Excel使います」と書くイメージ</li>
+          <li><strong>Step 5</strong>（Graph API Explorer）：自分のアカウントから「この権限を<strong>渡す</strong>」と承認してトークンを発行 — Excelのライセンス鍵を実際に受け取るイメージ</li>
+        </ul>
+        <p>Step 3 だけだとトークンが無く API を呼べない／Step 5 だけだと Step 3 で宣言してない権限はドロップダウンに出ない、という関係です。</p>
+      </Callout>
       <ol>
         <li><a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noreferrer">developers.facebook.com/tools/explorer</a> を開く</li>
         <li>「<strong>Metaアプリ</strong>」のドロップダウンで、Step 2 で作成した自分のアプリを選択</li>
