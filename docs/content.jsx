@@ -104,14 +104,13 @@ function Step2({ done, onToggle }) {
         <li><a href="https://developers.facebook.com" target="_blank" rel="noreferrer">developers.facebook.com</a> にFacebookでログイン</li>
         <li>右上「マイアプリ」→「アプリを作成」</li>
       </ol>
-      <StepImage slot="2-A" alt="右上「マイアプリ → アプリを作成」を赤枠で示したスクショ" />
+      <StepImage slot="2-A" src="images/setup-guide/meta-developers-signup/05-myapps-empty.png" alt="マイアプリ画面（初回はアプリ未作成状態）" />
 
       <h3>2-1. アプリの詳細（ステップ1）</h3>
       <ol>
         <li>アプリ名（例: <Copyable>insights-自分の名前</Copyable>）と連絡先メールを入力</li>
         <li>「次へ」</li>
       </ol>
-      <StepImage slot="2-B" alt="アプリ名・連絡先メール入力フォーム" />
 
       <h3>2-2. ユースケース選択（ステップ2）</h3>
       <ol>
@@ -119,7 +118,8 @@ function Step2({ done, onToggle }) {
         <li>一番下までスクロール</li>
         <li>「<strong>他</strong>」<span className="hint">（This option is going away soon と表示）</span>を選択 →「次へ」</li>
       </ol>
-      <StepImage slot="3-A" alt="ユースケース一覧の最下部「他」（This option is going away soon）を赤枠で示したスクショ" />
+      <StepImage slot="2-B" src="images/setup-guide/app-permissions/02-creation-step2-usecase.png" alt="ユースケース選択画面（5ステップ中の2）" />
+      <StepImage slot="3-A" src="images/setup-guide/app-permissions/03-creation-other-tab.png" alt="「その他」フィルター → 一番下の「ユースケースなしでアプリを作成」/「他」（going away soon）を赤枠で示したスクショ" />
       <Callout kind="warn">
         <p><strong>「他」を選ぶ理由</strong>：Instagram系の他のユースケースは別API（Instagram Login API）向けで、本テンプレが使う Graph API には対応しません。「他」だけが必要な権限を個別追加できる旧仕様の画面に進めます。</p>
       </Callout>
@@ -129,6 +129,7 @@ function Step2({ done, onToggle }) {
         <li>「ビジネス」「要件」「概要」の各画面を確認して「次へ」で進める</li>
         <li>「アプリを作成」→ パスワード再入力 →（必要時のみ）SMS認証 → ダッシュボードに遷移</li>
       </ol>
+      <StepImage slot="2-C" src="images/setup-guide/app-permissions/04-post-creation-dashboard.png" alt="アプリ作成完了直後のダッシュボード" />
 
       <Pitfall title="アプリ名で使えない単語">
         <p>Metaの商標ポリシーで <strong>ig / fb / face / book / insta / gram / rift</strong> などはアプリ名に使えません。例の「insights」や「analytics」のような一般語＋自分の名前で命名してください。</p>
@@ -239,14 +240,24 @@ function Step5({ done, onToggle }) {
         <li><a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noreferrer">developers.facebook.com/tools/explorer</a> を開く</li>
         <li>「<strong>Metaアプリ</strong>」のドロップダウンで、Step 2 で作成した自分のアプリを選択</li>
         <li>「<strong>ユーザーまたはページ</strong>」のドロップダウンを開き、「<strong>ユーザーアクセストークンを取得</strong>」をクリック</li>
-        <li>「アクセス許可」欄の「許可を追加」に <Copyable>insta</Copyable> や <Copyable>pages</Copyable> と<strong>部分入力すると候補が出ます</strong>。下記5つを選択：
+      </ol>
+      <StepImage slot="5-A" src="images/setup-guide/graph-api-explorer/02-explorer-initial.png" alt="Graph API Explorer 初期状態（Metaアプリ選択直後）" />
+      <ol start="4">
+        <li>「アクセス許可」欄の「許可を追加」をクリック → カテゴリ（Events Groups Pages / Other など）が表示される</li>
+      </ol>
+      <StepImage slot="5-B" src="images/setup-guide/graph-api-explorer/04-permission-categories.png" alt="許可を追加ドロップダウンのカテゴリ一覧" />
+      <ol start="5">
+        <li><Copyable>insta</Copyable> や <Copyable>pages</Copyable> と<strong>部分入力すると候補が絞られます</strong>。下記5つをそれぞれクリックして追加：
           <ul>{perms.map(p => <li key={p}><Copyable>{p}</Copyable></li>)}</ul>
           <p className="hint" style={{marginTop: 6}}>※ Graph API Explorer では<strong>旧名のまま</strong>表示されます（Step 3 で見た新名 <code>instagram_business_basic</code> 等とは別表記）。これでOK、Meta側で内部的にマッピングされます。</p>
         </li>
+      </ol>
+      <StepImage slot="5-C" src="images/setup-guide/graph-api-explorer/05-adding-permissions.png" alt="権限を複数追加中の状態" />
+      <StepImage slot="5-D" src="images/setup-guide/graph-api-explorer/06-all-permissions-added.png" alt="5つの権限すべて追加完了" />
+      <ol start="6">
         <li>「<strong>Generate Access Token</strong>」（アクセストークンを生成）をクリック → Facebook承認画面でFBページとIGアカウントが「1件を選択中」になっているか確認 →「保存」</li>
         <li>「<strong>Access Token</strong>」（アクセストークン）欄に表示される長い文字列をコピー</li>
       </ol>
-      <StepImage slot="5-A" alt="Graph API Explorer のアクセストークン欄を赤枠で示したスクショ" />
       <ol start="7">
         <li>スプシのメニュー <Copyable>📊 Instagram Insights → 🔐 シークレット入力</Copyable> を実行</li>
         <li>FBアプリID・SECRETは現状維持で空のままOK</li>
