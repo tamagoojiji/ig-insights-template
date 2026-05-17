@@ -114,14 +114,18 @@ function Step2({ done, onToggle }) {
 
       <h3>2-2. ユースケース選択（ステップ2）</h3>
       <ol>
-        <li>ユースケース一覧の左フィルターで「<strong>その他</strong>」を選択</li>
-        <li>一番下までスクロール</li>
-        <li>「<strong>他</strong>」<span className="hint">（This option is going away soon と表示）</span>を選択 →「次へ」</li>
+        <li>左フィルターで「<strong>コンテンツ管理 (5)</strong>」を選択</li>
+        <li>「<strong>Instagramでメッセージとコンテンツを管理</strong>」にチェック</li>
+        <li>右下「<strong>次へ</strong>」をクリック</li>
       </ol>
-      <StepImage slot="3-A" src="images/setup-guide/app-permissions/03-creation-other-tab.png" alt="「その他」フィルター → 一番下の「ユースケースなしでアプリを作成」/「他」（going away soon）を赤枠で示したスクショ" />
-      <Callout kind="warn">
-        <p><strong>「他」を選ぶ理由</strong>：Instagram系の他のユースケースは別API（Instagram Login API）向けで、本テンプレが使う Graph API には対応しません。「他」だけが必要な権限を個別追加できる旧仕様の画面に進めます。</p>
+      <StepImage slot="2-D" src="images/setup-guide/app-permissions/05-content-mgmt-instagram-selected.png" alt="コンテンツ管理タブで「Instagramでメッセージとコンテンツを管理」をチェック済みの状態" />
+      <Callout kind="info">
+        <p><strong>このユースケースで入る権限</strong>：<code>instagram_basic</code> / <code>instagram_manage_insights</code> 等の Instagram 系。残る <code>pages_read_engagement</code> / <code>pages_show_list</code> / <code>business_management</code> は Step 3 で追加します。</p>
       </Callout>
+      <Pitfall title="別ルート：「その他」→「他」（going away soon）を選ぶ古い方法">
+        <p>UIによっては「その他」フィルター最下部の「<strong>他</strong>」（This option is going away soon）を選んで、空のアプリを作成後にアプリレビュー画面で個別追加する旧仕様も使えます。ただし将来廃止予定のため、上記の「コンテンツ管理」経路が推奨です。</p>
+        <StepImage slot="3-A" src="images/setup-guide/app-permissions/03-creation-other-tab.png" alt="「その他」フィルター最下部の「他」（going away soon）" />
+      </Pitfall>
 
       <h3>2-3. ビジネス・要件・概要（ステップ3〜5）</h3>
       <ol>

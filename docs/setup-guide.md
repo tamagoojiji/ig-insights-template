@@ -114,10 +114,12 @@ Instagram Graph API を使うために、まず Meta（旧 Facebook）の開発�
 3. **ステップ2：ユースケース** ← ここで本テンプレに必要な権限を一気に追加
 
    - 左フィルターを **「コンテンツ管理」** に切り替え
-   - 表示される候補から以下 **2つにチェック**：
-     - ✅ **「Instagramでメッセージとコンテンツを管理」** ← `instagram_basic` / `instagram_manage_insights` 等が入る
-     - ✅ **「ページのすべてを管理」** ← `pages_read_engagement` / `pages_show_list` が入る
+   - **「Instagramでメッセージとコンテンツを管理」** にチェック
    - 右下「**次へ**」をクリック
+
+   ![コンテンツ管理タブで Instagram を選択した状態](images/setup-guide/app-permissions/05-content-mgmt-instagram-selected.png)
+
+   > 💡 **このユースケースで入る権限**：`instagram_basic` / `instagram_manage_insights` 等の Instagram 系。残る `pages_read_engagement` / `pages_show_list` / `business_management` は Step 3 で追加します。
 
    > 💡 **この2つで5権限中4つがカバー**されます。残る `business_management` は Step 3 で追加します。
 
