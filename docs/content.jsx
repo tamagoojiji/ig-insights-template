@@ -57,6 +57,9 @@ function Step0({ done, onToggle }) {
         <li>ログインしたタブは<strong>そのまま開いておく</strong>（後で使う）</li>
       </ul>
       <LoginCheckGrid cards={loginCards} />
+      <Callout kind="info">
+        <p><strong>新しいタブが開かない場合（Windows・特定ブラウザ）</strong>：カードをクリックしても新タブが開かないことがあります。その場合は<strong>右クリック→「新しいタブで開く」</strong>か、URLバーに直接URLを貼り付けてください。Googleでログイン中にInstagramカードを押した時に特に発生しやすいです。</p>
+      </Callout>
 
       <Callout kind="warn">
         <p>
@@ -92,21 +95,41 @@ function Step1({ done, onToggle }) {
 
 function Step2({ done, onToggle }) {
   return (
-    <StepSection id="step-2" num="02" title="Meta Developer 登録 + アプリ作成" subtitle="所要 約10分（SMS認証で +5分）"
+    <StepSection id="step-2" num="02" title="Meta Developer 登録 + アプリ作成（ユースケース含む）" subtitle="所要 約10分（SMS認証で +5分）"
       done={done} onToggleDone={onToggle}>
       <Callout kind="info">
-        <p><strong>5ステップ構成のウィザード</strong>：アプリの詳細 → ユースケース → ビジネス → 要件 → 概要 と進みます。ユースケースの選び方は Step 3 で詳説するので、ここではアプリ作成のスタート部分まで進めます。</p>
+        <p><strong>5ステップウィザード</strong>：アプリの詳細 → ユースケース → ビジネス → 要件 → 概要。本Stepで全部を通しで完了させます。</p>
       </Callout>
       <ol>
         <li><a href="https://developers.facebook.com" target="_blank" rel="noreferrer">developers.facebook.com</a> にFacebookでログイン</li>
         <li>右上「マイアプリ」→「アプリを作成」</li>
       </ol>
       <StepImage slot="2-A" alt="右上「マイアプリ → アプリを作成」を赤枠で示したスクショ" />
-      <ol start="3">
-        <li>ステップ1「<strong>アプリの詳細</strong>」：アプリ名（例: <Copyable>insights-自分の名前</Copyable>）と連絡先メールを入力 →「次へ」</li>
-        <li>ステップ2「<strong>ユースケース</strong>」が出てきたら一旦 Step 3 へ進んでください（次のステップで詳しく説明）</li>
+
+      <h3>2-1. アプリの詳細（ステップ1）</h3>
+      <ol>
+        <li>アプリ名（例: <Copyable>insights-自分の名前</Copyable>）と連絡先メールを入力</li>
+        <li>「次へ」</li>
       </ol>
       <StepImage slot="2-B" alt="アプリ名・連絡先メール入力フォーム" />
+
+      <h3>2-2. ユースケース選択（ステップ2）</h3>
+      <ol>
+        <li>ユースケース一覧の左フィルターで「<strong>その他</strong>」を選択</li>
+        <li>一番下までスクロール</li>
+        <li>「<strong>他</strong>」<span className="hint">（This option is going away soon と表示）</span>を選択 →「次へ」</li>
+      </ol>
+      <StepImage slot="3-A" alt="ユースケース一覧の最下部「他」（This option is going away soon）を赤枠で示したスクショ" />
+      <Callout kind="warn">
+        <p><strong>「他」を選ぶ理由</strong>：Instagram系の他のユースケースは別API（Instagram Login API）向けで、本テンプレが使う Graph API には対応しません。「他」だけが必要な権限を個別追加できる旧仕様の画面に進めます。</p>
+      </Callout>
+
+      <h3>2-3. ビジネス・要件・概要（ステップ3〜5）</h3>
+      <ol>
+        <li>「ビジネス」「要件」「概要」の各画面を確認して「次へ」で進める</li>
+        <li>「アプリを作成」→ パスワード再入力 →（必要時のみ）SMS認証 → ダッシュボードに遷移</li>
+      </ol>
+
       <Pitfall title="アプリ名で使えない単語">
         <p>Metaの商標ポリシーで <strong>ig / fb / face / book / insta / gram / rift</strong> などはアプリ名に使えません。例の「insights」や「analytics」のような一般語＋自分の名前で命名してください。</p>
       </Pitfall>
@@ -115,6 +138,9 @@ function Step2({ done, onToggle }) {
       </Pitfall>
       <Pitfall title="developers.facebook.com 初回ログイン時に Meta for Developers 登録を求められた場合">
         <p>「Meta for Developersへようこそ」ダイアログが出たら、Register → Contact info（メール認証）→ About you（役割選択：<strong>「開発者」</strong>がおすすめ）→ 登録完了、の順に進めてください。マイアプリ画面（<code>developers.facebook.com/apps/</code>）に遷移すれば登録完了です。</p>
+      </Pitfall>
+      <Pitfall title="同名のアプリを複数作ってしまった場合">
+        <p>マイアプリ画面に同じ名前のアプリが2つ以上あると、Step 4・Step 5 で <strong>違うアプリのID/SECRETを混ぜてしまい長期トークン変換が失敗</strong>します。<strong>不要な方は削除</strong>するか、Step 4以降では<strong>アプリIDを必ず確認</strong>してから操作してください。</p>
       </Pitfall>
     </StepSection>
   );
@@ -129,46 +155,38 @@ function Step3({ done, onToggle }) {
     ["business_management", "ビジネスアカウント管理"],
   ];
   return (
-    <StepSection id="step-3" num="03" title="権限追加" subtitle="所要 約5分"
+    <StepSection id="step-3" num="03" title="Instagram製品追加 + 権限確認" subtitle="所要 約3分"
       done={done} onToggleDone={onToggle}>
-      <h3>3-1. ユースケース選択（Step 2 の続き）</h3>
-      <ol>
-        <li>ユースケース一覧の<strong>一番下</strong>までスクロール</li>
-        <li>「<strong>他</strong>」<span className="hint">（This option is going away soon と書かれている）</span>を選択 →「次へ」</li>
-      </ol>
-      <StepImage slot="3-A" alt="ユースケース一覧の最下部「他」（This option is going away soon）を赤枠で示したスクショ" />
-      <Callout kind="warn">
-        <p><strong>「他」を選ぶ理由</strong>：Instagram系のユースケースは別API（Instagram Login API）向けで、本テンプレが使う Graph API には対応しません。「他」だけが必要な権限を個別追加できる旧仕様の画面に進めます。</p>
-      </Callout>
+      <p>Step 2 でアプリを作成した直後のダッシュボード画面から、Instagram 製品を追加して 5 権限が揃っているか確認します。</p>
 
-      <h3>3-2. アプリ作成完了 → Instagram製品を追加</h3>
+      <h3>3-1. Instagram製品を追加</h3>
       <ol>
-        <li>残りのウィザード（ビジネス / 要件 / 概要）を進めてアプリを作成</li>
-        <li>ダッシュボードの「アプリに製品を追加」で <strong>Instagram</strong> カードの「設定」をクリック</li>
+        <li>アプリダッシュボード本文の「<strong>アプリに製品を追加</strong>」セクションまでスクロール</li>
+        <li><strong>Instagram</strong> カードの「<strong>設定</strong>」をクリック → 左メニューに <strong>「Instagram グラフ API」</strong> が追加される</li>
       </ol>
 
-      <h3>3-3. 権限を追加（ここが一番つまずきやすい）</h3>
+      <h3>3-2. 権限が揃っているか確認</h3>
+      <p>「他（going away soon）」ユースケースで作ったアプリは、必要な権限が <strong>自動でStandard accessとして付与されている</strong>ため、追加操作は基本不要です。</p>
       <ol>
-        <li>左メニュー「<strong>アプリレビュー</strong>」→「<strong>アクセス許可と機能</strong>」を開く</li>
-        <li>下記5つの権限を検索 <span className="hint">（クリックでコピー）</span></li>
+        <li>左メニューの「<strong>Instagram グラフ API</strong>」を開く（または商品ページ）</li>
+        <li>関連する権限一覧で、下記5つが <strong>Standard access</strong> として表示されているか確認 <span className="hint">（クリックでコピー）</span></li>
       </ol>
       <ul className="plain">
         {perms.map(([k, v]) => (
           <li key={k}><Copyable>{k}</Copyable> — {v}</li>
         ))}
       </ul>
-      <Callout kind="danger">
-        <p><strong>⚠️ 検索結果が空でも諦めない</strong>：上部の検索欄に貼っても「結果なし」になることがあります。その場合は<strong>ページを下にスクロール</strong>すると「<strong>あなたのビジネスが技術提供者のサービスを提供している場合…</strong>」というセクションがあり、そこに同じ検索結果が表示されます。</p>
-      </Callout>
-      <StepImage slot="3-B" alt="ページ下部「技術提供者」セクションにinstagram_business_basicがStandard accessで表示されている画面" />
-      <ol start="3">
-        <li>5つすべてが<strong>「Standard access」</strong>ラベル付きで表示されていれば<strong>追加操作は不要</strong>（そのまま使える状態）</li>
-      </ol>
       <Callout kind="success">
         <p><strong>「Standard access」= 開発モードで即使える</strong>。クリックや申請は不要。横の「アドバンスアクセスをリクエスト」ボタンは<strong>絶対に押さない</strong>（押すとMetaの審査が走り想定外）。</p>
       </Callout>
+      <Callout kind="info">
+        <p><strong>5権限が画面上に出ていなくてもOK</strong>：実際の動作確認は Step 6 の接続テストで行います。Step 5 で短期トークンが取得できれば権限は問題なく付いています。</p>
+      </Callout>
       <Pitfall title="権限が見つからない場合">
         <p>旧名（<code>instagram_basic</code> / <code>instagram_manage_insights</code>）で検索すると出ません。新名（<code>_business_</code> 付き）で検索してください。pagesとbusiness系は旧名のままで OK。</p>
+      </Pitfall>
+      <Pitfall title="UI構成がドキュメントと違う場合">
+        <p>Metaのダッシュボードは頻繁にUI変更されます。表示が違っても <strong>左メニューに「Instagramグラフ API」「アプリレビュー」のいずれか</strong> が存在し、そこから関連権限の状態が見られればOKです。最終確認は Step 6 の接続テスト結果で判断してください。</p>
       </Pitfall>
     </StepSection>
   );
@@ -225,8 +243,8 @@ function Step5({ done, onToggle }) {
           <ul>{perms.map(p => <li key={p}><Copyable>{p}</Copyable></li>)}</ul>
           <p className="hint" style={{marginTop: 6}}>※ Graph API Explorer では<strong>旧名のまま</strong>表示されます（Step 3 で見た新名 <code>instagram_business_basic</code> 等とは別表記）。これでOK、Meta側で内部的にマッピングされます。</p>
         </li>
-        <li>「<strong>アクセストークンを生成</strong>」をクリック → Facebook承認画面でFBページとIGアカウントが「1件を選択中」になっているか確認 →「保存」</li>
-        <li>「<strong>アクセストークン</strong>」欄に表示される長い文字列をコピー</li>
+        <li>「<strong>Generate Access Token</strong>」（アクセストークンを生成）をクリック → Facebook承認画面でFBページとIGアカウントが「1件を選択中」になっているか確認 →「保存」</li>
+        <li>「<strong>Access Token</strong>」（アクセストークン）欄に表示される長い文字列をコピー</li>
       </ol>
       <StepImage slot="5-A" alt="Graph API Explorer のアクセストークン欄を赤枠で示したスクショ" />
       <ol start="7">
@@ -288,29 +306,17 @@ function Step6({ done, onToggle }) {
 
 function Step7({ done, onToggle }) {
   return (
-    <StepSection id="step-7" num="07" title="IG_USER_ID 自動取得・自動保存" subtitle="所要 約30秒（確認のみ）"
+    <StepSection id="step-7" num="07" title="IG_USER_ID 確認（任意）" subtitle="所要 約30秒・スキップ可"
       done={done} onToggleDone={onToggle}>
-      <p>
-        IG_USER_ID は Instagram ビジネスアカウントを Graph API 上で識別するための数字 15〜17 桁の ID です。
-        本テンプレートでは <strong>Step 6 の接続テストの中で自動取得・自動保存される</strong> ため、
-        このステップで利用者が手動操作することは基本ありません。
-      </p>
       <Callout kind="info">
-        <p><strong>このステップは「確認のみ」</strong></p>
-        <p>Step 6 を実行済みであれば、すでに IG_USER_ID は Script Properties と設定シートの両方に書き込まれています。新しく操作することは何もありません。</p>
+        <p><strong>このステップはオプションです</strong>。Step 6 の接続テストが成功していれば IG_USER_ID は自動保存済みなので、<strong>スキップしてStep 8へ進んでOK</strong>です。心配な人だけ下記の確認手順を実施してください。</p>
       </Callout>
-      <h3>確認手順</h3>
+      <h3>確認手順（任意）</h3>
       <ol>
-        <li>スプシ「⚙️ 設定」シートを開く</li>
+        <li>スプシ下部のタブ「<strong>⚙️ 設定</strong>」をクリックして開く</li>
         <li>「Instagram ユーザー ID」欄の B 列に <strong>15〜17 桁の長い数字</strong> が入っていることを確認（例: <Copyable>17841401234567890</Copyable>）</li>
-        <li>もし空欄のままなら Step 6 の接続テストが正常に完了していない可能性 → Step 6 をもう一度実行</li>
+        <li>空欄のままなら Step 6 の接続テストが正常完了していない → Step 6 を再実行</li>
       </ol>
-      <Pitfall>
-        <p>
-          IG_USER_ID は Instagram の表示用ユーザー名（<code>@your_account</code>）とは <strong>別物</strong> です。
-          長い数字列が入っていれば正常。アルファベット混じりの場合や桁数が極端に少ない場合は、別の値が誤って入っている可能性があるので Step 6 から再実行してください。
-        </p>
-      </Pitfall>
     </StepSection>
   );
 }
@@ -367,7 +373,7 @@ function Step9({ done, onToggle }) {
       <ol>
         <li><a href="https://aistudio.google.com" target="_blank" rel="noreferrer">aistudio.google.com</a> にGoogleアカウントでログイン</li>
         <li>左サイドバー「Get API key」→「Create API key」</li>
-        <li>「Create API key in new project」で新規作成</li>
+        <li>「Create API key in new project」で新規作成。プロジェクト名を聞かれたら例: <Copyable>ig-insights-gemini</Copyable> など分かりやすい名前を入れる</li>
         <li>発行された <Copyable>AIza...</Copyable> で始まる文字列をコピー</li>
         <li>スプシのメニュー <Copyable>📊 Instagram Insights → 🔐 シークレット入力</Copyable> を実行</li>
         <li>「Gemini APIキー」のダイアログまで進み貼り付け → OK</li>
