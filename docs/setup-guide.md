@@ -113,8 +113,6 @@ Instagram Graph API を使うために、まず Meta（旧 Facebook）の開発�
    - ※「なし」「消費者」では Instagram Graph API の権限が付けられないので必ず **「ビジネス」** を選んでください
 3. **ステップ2：ユースケース** ← ここで本テンプレに必要な権限を一気に追加
 
-   ![ユースケース選択画面（5ステップ中の2）](images/setup-guide/app-permissions/02-creation-step2-usecase.png)
-
    - 左フィルターを **「コンテンツ管理」** に切り替え
    - 表示される候補から以下 **2つにチェック**：
      - ✅ **「Instagramでメッセージとコンテンツを管理」** ← `instagram_basic` / `instagram_manage_insights` 等が入る

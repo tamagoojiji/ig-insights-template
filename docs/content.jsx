@@ -118,7 +118,6 @@ function Step2({ done, onToggle }) {
         <li>一番下までスクロール</li>
         <li>「<strong>他</strong>」<span className="hint">（This option is going away soon と表示）</span>を選択 →「次へ」</li>
       </ol>
-      <StepImage slot="2-B" src="images/setup-guide/app-permissions/02-creation-step2-usecase.png" alt="ユースケース選択画面（5ステップ中の2）" />
       <StepImage slot="3-A" src="images/setup-guide/app-permissions/03-creation-other-tab.png" alt="「その他」フィルター → 一番下の「ユースケースなしでアプリを作成」/「他」（going away soon）を赤枠で示したスクショ" />
       <Callout kind="warn">
         <p><strong>「他」を選ぶ理由</strong>：Instagram系の他のユースケースは別API（Instagram Login API）向けで、本テンプレが使う Graph API には対応しません。「他」だけが必要な権限を個別追加できる旧仕様の画面に進めます。</p>
