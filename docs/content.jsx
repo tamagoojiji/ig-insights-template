@@ -82,13 +82,17 @@ function Step1({ done, onToggle }) {
       <StepImage slot="1-A" src="images/setup-guide/spreadsheet-setup/01-copy-document.png" alt="Google Sheetsのドキュメントのコピー画面（「コピーを作成」ボタン）" />
       <ol start="3">
         <li>複製されたスプシを開く</li>
+        <li>「アクセスを許可」をクリック</li>
+      </ol>
+      <StepImage slot="1-B" src="images/setup-guide/spreadsheet-setup/02-grant-access.png" alt="複製直後のスプシで表示される「アクセスを許可」ダイアログ" />
+      <ol start="5">
         <li>メニュー <Copyable>📊 Instagram Insights → 🔧 初回セットアップ（シート作成）</Copyable> を実行</li>
       </ol>
-      <StepImage slot="1-B" alt="スプシ上部メニュー「📊 Instagram Insights → 🔧 初回セットアップ」を展開した状態" />
-      <ol start="5">
+      <StepImage slot="1-C" alt="スプシ上部メニュー「📊 Instagram Insights → 🔧 初回セットアップ」を展開した状態" />
+      <ol start="6">
         <li>初回のみ権限承認ダイアログが出る →「許可」</li>
       </ol>
-      <StepImage slot="1-C" alt="権限承認ダイアログの「許可」ボタンを赤枠で示したスクショ" />
+      <StepImage slot="1-D" alt="権限承認ダイアログの「許可」ボタンを赤枠で示したスクショ" />
     </StepSection>
   );
 }
