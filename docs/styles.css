@@ -531,6 +531,16 @@ h1, h2, h3, h4 {
   font-weight: var(--weight-body, 500);
 }
 .body ol { counter-reset: stepct; }
+/* Honor start="N" so split <ol>s continue numbering (1,2 -> 3,4 etc.) */
+.body ol[start="2"]  { counter-reset: stepct 1; }
+.body ol[start="3"]  { counter-reset: stepct 2; }
+.body ol[start="4"]  { counter-reset: stepct 3; }
+.body ol[start="5"]  { counter-reset: stepct 4; }
+.body ol[start="6"]  { counter-reset: stepct 5; }
+.body ol[start="7"]  { counter-reset: stepct 6; }
+.body ol[start="8"]  { counter-reset: stepct 7; }
+.body ol[start="9"]  { counter-reset: stepct 8; }
+.body ol[start="10"] { counter-reset: stepct 9; }
 .body ol > li {
   counter-increment: stepct;
 }
