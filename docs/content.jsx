@@ -79,7 +79,7 @@ function Step1({ done, onToggle }) {
         <li><a href="https://docs.google.com/spreadsheets/d/1GLuLebQH6z8hpEzODAucqhOkCzUVKG2OMaZOnA2Uy5c/copy" target="_blank" rel="noreferrer">マスタースプシのコピーURL</a> を開く</li>
         <li>「コピーを作成」をクリック</li>
       </ol>
-      <StepImage slot="1-A" alt="「コピーを作成」ボタンを赤枠で囲んだスクショ" />
+      <StepImage slot="1-A" src="images/setup-guide/spreadsheet-setup/01-copy-document.png" alt="Google Sheetsのドキュメントのコピー画面（「コピーを作成」ボタン）" />
       <ol start="3">
         <li>複製されたスプシを開く</li>
         <li>メニュー <Copyable>📊 Instagram Insights → 🔧 初回セットアップ（シート作成）</Copyable> を実行</li>
