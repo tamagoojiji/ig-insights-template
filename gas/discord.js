@@ -15,10 +15,13 @@ const NOTIFY_PROP_PAUSE_UNTIL = 'NOTIFY_PAUSE_UNTIL';
  * @param {object} [opts]
  * @param {string} [opts.kind] - 通知種別（クールダウン管理用）。同種は5分に1回のみ
  * @param {boolean} [opts.bypassCooldown=false] - true でクールダウンを無視
+ * @param {boolean} [opts.toError=false] - true でエラー通知用Webhook（ERROR_WEBHOOK_URL）へ送信。未設定なら WEBHOOK_URL にフォールバック
  */
 function notifyDiscord(message, opts) {
   opts = opts || {};
-  const webhookUrl = getConfig('WEBHOOK_URL');
+  const webhookUrl = opts.toError
+    ? (getConfig('ERROR_WEBHOOK_URL') || getConfig('WEBHOOK_URL'))
+    : getConfig('WEBHOOK_URL');
   if (!webhookUrl) {
     console.log('Discord Webhook 未設定（通知スキップ）');
     return;

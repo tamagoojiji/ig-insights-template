@@ -29,6 +29,7 @@ function onOpen() {
     .addItem('⏰ トリガーをインストール', 'installTriggers')
     .addItem('📋 トリガー一覧', 'listTriggers')
     .addItem('🗑 トリガーを削除', 'uninstallTriggers')
+    .addItem('🩺 ヘルスチェック手動実行', 'healthCheckManual')
     .addToUi();
 
   try { checkCsvReminderOnOpen_(); } catch (_) {}

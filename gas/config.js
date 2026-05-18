@@ -11,8 +11,10 @@ const CONFIG_KEYS = [
   'FB_APP_SECRET',
   'GEMINI_API_KEY',
   'WEBHOOK_URL',
+  'ERROR_WEBHOOK_URL',
   'BACKFILL_CURSOR',
-  'LAST_CSV_IMPORT_DATE'
+  'LAST_CSV_IMPORT_DATE',
+  'LAST_AUTOFETCH_SUCCESS'
 ];
 
 function getConfig(key) {
@@ -64,7 +66,9 @@ function promptAndSaveSecrets() {
     { key: 'GEMINI_API_KEY', label: 'Gemini APIキー（任意）',
       desc: 'aistudio.google.com で発行（OCR を使わないなら空のままOK）' },
     { key: 'WEBHOOK_URL', label: 'Discord Webhook URL（任意）',
-      desc: 'Discord チャンネル設定 → 連携サービス → ウェブフック（不要なら空のままOK）' }
+      desc: 'Discord チャンネル設定 → 連携サービス → ウェブフック（不要なら空のままOK）' },
+    { key: 'ERROR_WEBHOOK_URL', label: 'Discord エラー通知用 Webhook URL（任意）',
+      desc: 'ヘルスチェック異常時の通知先（管理者専用チャンネル推奨）。未設定なら通常Webhookに送信' }
   ];
 
   let savedCount = 0;
@@ -257,6 +261,7 @@ function setupSettingsSheet() {
     ['Instagram アクセストークン', maskValue_(config.IG_ACCESS_TOKEN)],
     ['Gemini APIキー（任意）', maskValue_(config.GEMINI_API_KEY)],
     ['Discord Webhook URL（任意）', maskValue_(config.WEBHOOK_URL)],
+    ['Discord エラー通知用 Webhook URL（任意）', maskValue_(config.ERROR_WEBHOOK_URL)],
     ['', ''],
     ['📦 自動設定される値', ''],
     ['Instagram ユーザーID', config.IG_USER_ID || '(接続テストで自動取得)'],
@@ -278,8 +283,8 @@ function setupSettingsSheet() {
   sheet.getRange(1, 1, labels.length, 2).setValues(labels);
   sheet.getRange(1, 1).setFontSize(14).setFontWeight('bold');
   sheet.getRange(3, 1).setFontWeight('bold').setBackground('#FFF3E0');
-  sheet.getRange(10, 1).setFontWeight('bold').setBackground('#E3F2FD');
-  sheet.getRange(15, 1).setFontWeight('bold');
+  sheet.getRange(11, 1).setFontWeight('bold').setBackground('#E3F2FD');
+  sheet.getRange(16, 1).setFontWeight('bold');
 }
 
 /**

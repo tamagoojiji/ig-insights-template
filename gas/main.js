@@ -90,6 +90,7 @@ function autoFetch() {
       updateDashboard();
     }
 
+    setConfig('LAST_AUTOFETCH_SUCCESS', String(Date.now()));
     Logger.log('自動取得完了' + (isTimeUp_() ? '（時間制限で一部スキップ）' : ''));
   } catch (e) {
     Logger.log(`autoFetch エラー: ${e.message}\n${e.stack}`);

@@ -2,7 +2,7 @@
 // 時間トリガーのインストール・アンインストール
 // ==========
 
-const TRIGGER_HANDLERS = ['autoFetch', 'refreshTokenJob', 'autoOcrTick_', 'csvReminderJob'];
+const TRIGGER_HANDLERS = ['autoFetch', 'refreshTokenJob', 'autoOcrTick_', 'csvReminderJob', 'healthCheck'];
 
 /**
  * 自動取得（30分ごと）+ トークン更新（毎週日曜9時）のトリガーをインストール
@@ -35,11 +35,18 @@ function installTriggers() {
     .atHour(9)
     .create();
 
+  ScriptApp.newTrigger('healthCheck')
+    .timeBased()
+    .everyDays(1)
+    .atHour(9)
+    .create();
+
   SpreadsheetApp.getUi().alert(
     'トリガーをインストールしました\n\n' +
     '・autoFetch: 30分ごと（インサイト自動取得）\n' +
     '・refreshTokenJob: 毎週日曜 9時（トークン更新）\n' +
-    '・csvReminderJob: 毎月1日 9時（ストーリーズCSV取込みリマインダー）'
+    '・csvReminderJob: 毎月1日 9時（ストーリーズCSV取込みリマインダー）\n' +
+    '・healthCheck: 毎日 9時（トリガー消失・取得停止の検知→エラー用Discord通知）'
   );
 }
 
