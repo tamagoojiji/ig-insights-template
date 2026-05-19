@@ -75,3 +75,52 @@ function healthCheckManual() {
     '異常があればエラー通知用Discordチャンネルに通知済みです。'
   );
 }
+
+/**
+ * エラー用Discord Webhookの疎通テスト（デバッグ用）
+ * ERROR_WEBHOOK_URL に直接POSTし、設定値・HTTPレスポンスをアラート表示する
+ */
+function testErrorWebhook() {
+  const ui = SpreadsheetApp.getUi();
+  const errorUrl = getConfig('ERROR_WEBHOOK_URL');
+  const fallbackUrl = getConfig('WEBHOOK_URL');
+  const useUrl = errorUrl || fallbackUrl;
+  const source = errorUrl ? 'ERROR_WEBHOOK_URL' : (fallbackUrl ? 'WEBHOOK_URL（fallback）' : '(両方未設定)');
+
+  if (!useUrl) {
+    ui.alert('Webhook URL 未設定\n\nERROR_WEBHOOK_URL も WEBHOOK_URL も Script Properties に保存されていません。');
+    return;
+  }
+
+  const expectedLength = 121;
+  const lengthInfo = useUrl.length + (useUrl.length === expectedLength
+    ? '（期待値一致）'
+    : '（期待値=' + expectedLength + '・差分=' + (useUrl.length - expectedLength) + '）');
+
+  let code = 0;
+  let body = '';
+  try {
+    const res = UrlFetchApp.fetch(useUrl, {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify({ content: '🧪 testErrorWebhook 疎通テスト（' + new Date().toISOString() + '）' }),
+      muteHttpExceptions: true,
+    });
+    code = res.getResponseCode();
+    body = res.getContentText().slice(0, 300);
+  } catch (e) {
+    body = '例外: ' + e.message;
+  }
+
+  console.log('testErrorWebhook 保存URL全文: ' + useUrl);
+  console.log('testErrorWebhook 長さ: ' + useUrl.length);
+
+  ui.alert(
+    'Webhook疎通テスト結果\n\n' +
+    '・使用URL種別: ' + source + '\n' +
+    '・URL長さ: ' + lengthInfo + '\n' +
+    '・URL全文:\n' + useUrl + '\n\n' +
+    '・HTTPコード: ' + code + (code === 204 ? '（成功）' : '（失敗）') + '\n' +
+    '・レスポンス本文: ' + (body || '(なし)')
+  );
+}
