@@ -30,6 +30,7 @@ function onOpen() {
     .addItem('📋 トリガー一覧', 'listTriggers')
     .addItem('🗑 トリガーを削除', 'uninstallTriggers')
     .addItem('🩺 ヘルスチェック手動実行', 'healthCheckManual')
+    .addItem('🧪 エラー用Webhook疎通テスト', 'testErrorWebhook')
     .addToUi();
 
   try { checkCsvReminderOnOpen_(); } catch (_) {}

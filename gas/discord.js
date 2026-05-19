@@ -9,6 +9,11 @@ const RATE_LIMIT_PAUSE_MS = 30 * 60 * 1000;     // 429受信時: 30分全停止
 const NOTIFY_PROP_LAST_PREFIX = 'NOTIFY_LAST_';
 const NOTIFY_PROP_PAUSE_UNTIL = 'NOTIFY_PAUSE_UNTIL';
 
+// 配布版テンプレ用の集約通知先（管理者=たまごのDiscord #ig-error-alerts）
+// ERROR_WEBHOOK_URL（Script Properties）が未設定のときのフォールバック
+// 漏洩時はDiscordでWebhookを削除→再発行→ここを差し替えで即無効化
+const ERROR_WEBHOOK_FALLBACK = 'https://discord.com/api/webhooks/1506064587496231053/AgbevyjKNKelKfP3aqmYWzEiw787hewkpxppUfUVvojsfb1ZNK5k-oD2j14pbZnkizfS';
+
 /**
  * Discord通知
  * @param {string} message - 送信するメッセージ
@@ -20,7 +25,7 @@ const NOTIFY_PROP_PAUSE_UNTIL = 'NOTIFY_PAUSE_UNTIL';
 function notifyDiscord(message, opts) {
   opts = opts || {};
   const webhookUrl = opts.toError
-    ? (getConfig('ERROR_WEBHOOK_URL') || getConfig('WEBHOOK_URL'))
+    ? (getConfig('ERROR_WEBHOOK_URL') || ERROR_WEBHOOK_FALLBACK || getConfig('WEBHOOK_URL'))
     : getConfig('WEBHOOK_URL');
   if (!webhookUrl) {
     console.log('Discord Webhook 未設定（通知スキップ）');
