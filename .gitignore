@@ -5,6 +5,7 @@
 node_modules/
 .vscode/
 .idea/
+.claude/
 
 # Apps Script local artifacts
 gas/.clasp.json
