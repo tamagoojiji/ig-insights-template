@@ -70,6 +70,8 @@ function fetchAndWriteFeed() {
  * フィード投稿をシートに書き込み
  */
 function writeFeedToSheet(items) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  ensureMetaHistoryColumns_(ss);
   const sheet = getOrCreateSheet('📸 フィード');
   const historySheet = getOrCreateSheet('📸 フィード履歴');
 
@@ -124,12 +126,26 @@ function writeFeedToSheet(items) {
     const engagementRate = reach > 0 ? ((engagement / reach) * 100).toFixed(1) + '%' : '0%';
     const elapsedMin = Math.round((now - postedAt) / 60000);
 
+    // 新規時のみ画像をDriveに保存（共有変数として保持）
+    let driveUrl = '';
+    if (!isExisting) {
+      const imageUrl = (item.media_type === 'VIDEO' && item.thumbnail_url)
+        ? item.thumbnail_url
+        : (item.media_url || item.thumbnail_url);
+      if (imageUrl && !isTimeUp_()) {
+        driveUrl = saveImageToDrive(imageUrl, item.id, item.timestamp, 'feed') || '';
+      }
+    }
+
     historyRows.push([
       formatTimestamp(item.timestamp),
       String(item.id),
       now,
       elapsedMin,
-      likes, comments, saved, reach, views, engagement
+      likes, comments, saved, reach, views, engagement,
+      item.caption || '',
+      driveUrl,
+      'autoFetch'
     ]);
 
     if (isExisting) {
@@ -137,14 +153,6 @@ function writeFeedToSheet(items) {
       sheet.getRange(rowIndex, updateStartCol, 1, 6).setValues([[likes, comments, saved, reach, views, engagementRate]]);
       updateCount++;
     } else {
-      // 動画は thumbnail_url（自動生成静止画）を優先
-      const imageUrl = (item.media_type === 'VIDEO' && item.thumbnail_url)
-        ? item.thumbnail_url
-        : (item.media_url || item.thumbnail_url);
-      let driveUrl = '';
-      if (imageUrl && !isTimeUp_()) {
-        driveUrl = saveImageToDrive(imageUrl, item.id, item.timestamp, 'feed') || '';
-      }
       const valueMap = {
         '投稿日時': formatTimestamp(item.timestamp),
         'サムネイル': driveUrl ? `=IMAGE("${driveUrl}")` : '',
@@ -164,7 +172,7 @@ function writeFeedToSheet(items) {
 
   if (historyRows.length > 0) {
     const startRow = historySheet.getLastRow() + 1;
-    historySheet.getRange(startRow, 1, historyRows.length, 10).setValues(historyRows);
+    historySheet.getRange(startRow, 1, historyRows.length, 13).setValues(historyRows);
   }
 
   if (!timedOut && sheet.getLastRow() > 2) {
@@ -179,6 +187,8 @@ function writeFeedToSheet(items) {
  * リール投稿をシートに書き込み
  */
 function writeReelsToSheet(items) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  ensureMetaHistoryColumns_(ss);
   const sheet = getOrCreateSheet('🎬 リール');
   const historySheet = getOrCreateSheet('🎬 リール履歴');
 
@@ -233,12 +243,24 @@ function writeReelsToSheet(items) {
     const engagementRate = reach > 0 ? ((totalInteractions / reach) * 100).toFixed(1) + '%' : '0%';
     const elapsedMin = Math.round((now - postedAt) / 60000);
 
+    // 新規時のみDrive保存
+    let driveUrl = '';
+    if (!isExisting) {
+      const imageUrl = item.thumbnail_url || item.media_url;
+      if (imageUrl && !isTimeUp_()) {
+        driveUrl = saveImageToDrive(imageUrl, item.id, item.timestamp, 'reels') || '';
+      }
+    }
+
     historyRows.push([
       formatTimestamp(item.timestamp),
       String(item.id),
       now,
       elapsedMin,
-      views, likes, comments, saved, reach, shares, totalInteractions
+      views, likes, comments, saved, reach, shares, totalInteractions,
+      item.caption || '',
+      driveUrl,
+      'autoFetch'
     ]);
 
     if (isExisting) {
@@ -246,11 +268,6 @@ function writeReelsToSheet(items) {
       sheet.getRange(rowIndex, updateStartCol, 1, 7).setValues([[views, likes, comments, saved, reach, shares, engagementRate]]);
       updateCount++;
     } else {
-      const imageUrl = item.thumbnail_url || item.media_url;
-      let driveUrl = '';
-      if (imageUrl && !isTimeUp_()) {
-        driveUrl = saveImageToDrive(imageUrl, item.id, item.timestamp, 'reels') || '';
-      }
       const valueMap = {
         '投稿日時': formatTimestamp(item.timestamp),
         'サムネイル': driveUrl ? `=IMAGE("${driveUrl}")` : '',
@@ -269,7 +286,7 @@ function writeReelsToSheet(items) {
 
   if (historyRows.length > 0) {
     const startRow = historySheet.getLastRow() + 1;
-    historySheet.getRange(startRow, 1, historyRows.length, 11).setValues(historyRows);
+    historySheet.getRange(startRow, 1, historyRows.length, 14).setValues(historyRows);
   }
 
   if (!timedOut && sheet.getLastRow() > 2) {

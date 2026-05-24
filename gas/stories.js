@@ -15,6 +15,8 @@ function fetchAndWriteStories() {
     return { stories: 0 };
   }
 
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  ensureMetaHistoryColumns_(ss);
   const sheet = getOrCreateSheet('📖 ストーリーズ');
   const historySheet = getOrCreateSheet('📖 ストーリーズ履歴');
 
@@ -46,7 +48,7 @@ function fetchAndWriteStories() {
   const flushHistory_ = () => {
     if (historyRows.length === 0) return;
     const startRow = historySheet.getLastRow() + 1;
-    historySheet.getRange(startRow, 1, historyRows.length, 10).setValues(historyRows);
+    historySheet.getRange(startRow, 1, historyRows.length, 13).setValues(historyRows);
     historyRows.length = 0;
   };
 
@@ -67,27 +69,33 @@ function fetchAndWriteStories() {
     const postDate = new Date(story.timestamp);
     const elapsedMin = Math.round((now - postDate) / 60000);
 
+    // 新規時のみ画像保存（共有変数として保持）
+    const existingRow = existingMap.get(String(story.id));
+    let driveUrl = '';
+    if (!existingRow) {
+      const imageUrl = (story.media_type === 'VIDEO' && story.thumbnail_url)
+        ? story.thumbnail_url
+        : story.media_url;
+      if (imageUrl && !isTimeUp_()) {
+        driveUrl = saveImageToDrive(imageUrl, story.id, story.timestamp, 'stories') || '';
+      }
+    }
+
     historyRows.push([
       formatTimestamp(story.timestamp),
       String(story.id),
       nowStr,
       elapsedMin,
-      reach, views, replies, shares, navigation, profileVisits
+      reach, views, replies, shares, navigation, profileVisits,
+      story.caption || '',
+      driveUrl,
+      'autoFetch'
     ]);
 
-    const existingRow = existingMap.get(String(story.id));
     if (existingRow) {
       sheet.getRange(existingRow, 4, 1, 6).setValues([[reach, views, replies, shares, navigation, profileVisits]]);
       updateCount++;
     } else {
-      // 動画は thumbnail_url（Instagram側で自動生成された静止画）を優先
-      const imageUrl = (story.media_type === 'VIDEO' && story.thumbnail_url)
-        ? story.thumbnail_url
-        : story.media_url;
-      let driveUrl = '';
-      if (imageUrl && !isTimeUp_()) {
-        driveUrl = saveImageToDrive(imageUrl, story.id, story.timestamp, 'stories') || '';
-      }
       const newRow = [
         formatTimestamp(story.timestamp),
         driveUrl ? `=IMAGE("${driveUrl}")` : '',
