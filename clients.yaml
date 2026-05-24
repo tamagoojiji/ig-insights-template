@@ -1,0 +1,39 @@
+# IG Insights クライアントレジストリ
+#
+# 用途: clasp push のターゲット切替・状態管理・一斉展開
+# 使い方:
+#   ./scripts/push-to.sh <id>      # 単一クライアントへ push
+#   ./scripts/push-all.sh          # 全 active クライアントへ一斉 push
+#   ./scripts/status.sh            # 全クライアントの状態一覧
+#   ./scripts/add-client.sh        # 新規追加（対話形式）
+#
+# status 値:
+#   active     - 通常運用中（一斉 push の対象）
+#   suspended  - 一時停止（アカウント停止・運用休止など。push対象から除外）
+#   archived   - 完全終了（参照のみ）
+
+clients:
+  - id: master
+    name: テンプレマスター
+    status: active
+    script_id: 1sEfx6Lbc4_1efKbL2gL7cDNW8ONxObVLzNypOeLBTvsob_wnB2DsoAah
+    sheet_id: ""
+    role: テンプレ動作確認用マスターGAS
+    notes: ""
+
+  - id: chiii
+    name: chiii
+    status: suspended
+    suspended_at: 2026-05-20
+    script_id: 1mDO0dnp15hTP-fHwlW9anYreJ17W-KdowV_bz21WngTnc6wwoECtvFIB
+    sheet_id: ""
+    role: chiiiのIG Insights運用GAS
+    notes: Instagramアカウント停止済み。新規データ取得不可。現データが全て。
+
+  - id: puniko
+    name: puniko
+    status: active
+    script_id: ""
+    sheet_id: ""
+    role: punikoのIG Insights運用GAS
+    notes: scriptId未確定。GAS新規作成後にここを更新。
