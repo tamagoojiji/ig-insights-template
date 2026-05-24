@@ -20,11 +20,3 @@ clients:
     sheet_id: ""
     role: テンプレ動作確認用マスターGAS
     notes: ""
-
-  - id: puniko
-    name: puniko
-    status: active
-    script_id: ""
-    sheet_id: ""
-    role: punikoのIG Insights運用GAS
-    notes: scriptId未確定。GAS新規作成後にここを更新。
