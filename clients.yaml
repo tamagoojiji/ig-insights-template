@@ -21,15 +21,6 @@ clients:
     role: テンプレ動作確認用マスターGAS
     notes: ""
 
-  - id: chiii
-    name: chiii
-    status: suspended
-    suspended_at: 2026-05-20
-    script_id: 1mDO0dnp15hTP-fHwlW9anYreJ17W-KdowV_bz21WngTnc6wwoECtvFIB
-    sheet_id: ""
-    role: chiiiのIG Insights運用GAS
-    notes: Instagramアカウント停止済み。新規データ取得不可。現データが全て。
-
   - id: puniko
     name: puniko
     status: active
