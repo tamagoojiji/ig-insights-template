@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>購入者特典：アカウント凍結・乗っ取りへの備えチェックリスト</title>
+<style>
+  @page { size: A4; margin: 12mm 14mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Sans", "Yu Gothic", sans-serif; color: #2c3e50; font-size: 10.5pt; line-height: 1.7; background: #fff; }
+  .badge {
+    display: inline-block; background: #fdeff5; color: #c2185b;
+    font-size: 9pt; font-weight: bold; padding: 1mm 4mm; border-radius: 10px; margin-bottom: 2mm;
+  }
+  h1 {
+    font-size: 17pt; color: #1a73e8;
+    border-bottom: 3px solid #1a73e8; padding-bottom: 2mm; margin-bottom: 2mm;
+  }
+  .lead { color: #666; font-size: 10pt; margin-bottom: 5mm; }
+  h2 {
+    font-size: 13pt; color: #1a73e8; margin: 6mm 0 3mm;
+    display: flex; align-items: center; gap: 6px;
+  }
+  h2::before {
+    content: ""; display: inline-block; width: 4px; height: 15px;
+    background: #1a73e8; border-radius: 2px;
+  }
+  h2.red { color: #c0392b; }
+  h2.red::before { background: #c0392b; }
+  .check-block {
+    background: #f6f9fc; border-radius: 10px; padding: 4mm 6mm; margin-bottom: 4mm; break-inside: avoid;
+  }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 3mm; padding: 1.5mm 0;
+    border-bottom: 1px dashed #d8e2ee;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .box {
+    width: 4.5mm; height: 4.5mm; border: 1.5px solid #1a73e8; border-radius: 1.5mm;
+    flex-shrink: 0; margin-top: 1.2mm;
+  }
+  .check-item .t { flex: 1; }
+  .check-item .t small { color: #888; display: block; font-size: 9pt; line-height: 1.5; }
+  .freq {
+    font-size: 8.5pt; color: #fff; background: #1a73e8; border-radius: 8px;
+    padding: 0.5mm 3mm; flex-shrink: 0; margin-top: 1mm;
+  }
+  .steps { counter-reset: n; }
+  .step {
+    display: flex; gap: 3mm; align-items: flex-start; margin-bottom: 2.5mm; break-inside: avoid;
+  }
+  .step .num {
+    counter-increment: n; flex-shrink: 0;
+    width: 6.5mm; height: 6.5mm; border-radius: 50%;
+    background: #c0392b; color: #fff; font-weight: bold; font-size: 10pt;
+    display: flex; align-items: center; justify-content: center; margin-top: 0.8mm;
+  }
+  .step .num::before { content: counter(n); }
+  .step .t small { color: #888; display: block; font-size: 9pt; line-height: 1.5; }
+  .note {
+    background: #fff7e6; border-radius: 8px; padding: 4mm 5mm; margin: 3mm 0;
+    font-size: 9.5pt; break-inside: avoid;
+  }
+  .note strong { color: #a06a00; }
+  .footer {
+    margin-top: 8mm; padding-top: 3mm; border-top: 1px solid #d8e2ee;
+    font-size: 8.5pt; color: #999; text-align: center;
+  }
+  .menu { font-weight: bold; color: #1a4f9c; background: #eef4fd; border-radius: 4px; padding: 0 2mm; }
+</style>
+</head>
+<body>
+
+<span class="badge">購入者特典</span>
+<h1>アカウント凍結・乗っ取りへの備えチェックリスト</h1>
+<p class="lead">アカウントが凍結・乗っ取り・削除されると、インスタ側のデータは戻せません。「備えの点検」と「起きたときの初動」をこの1枚にまとめました。印刷して手元に置いておくのがおすすめです。</p>
+
+<h2>ふだんの予防（最初に1回だけ）</h2>
+<div class="check-block">
+<div class="check-item"><div class="box"></div><div class="t">インスタとFacebookに<strong>二段階認証</strong>を設定した<small>設定 → アカウントセンター → パスワードとセキュリティ。乗っ取り対策でいちばん効きます</small></div></div>
+<div class="check-item"><div class="box"></div><div class="t">パスワードを他のサービスと<strong>使い回していない</strong><small>使い回しは1か所漏れると全部危険になります</small></div></div>
+<div class="check-item"><div class="box"></div><div class="t">「規約違反になる自動ツール」を使っていない<small>自動いいね・自動フォローなどのツールは凍結の定番原因です。本テンプレートはMeta社公式の窓口だけを使うので該当しません</small></div></div>
+<div class="check-item"><div class="box"></div><div class="t">「著作権にご注意ください」等の警告DM・メールのリンクを<strong>押さない</strong><small>公式を装った乗っ取り詐欺の定番です。本物の警告はアプリ内の「設定 → アカウントステータス」で確認できます</small></div></div>
+</div>
+
+<h2>月1回の点検（5分）</h2>
+<div class="check-block">
+<div class="check-item"><div class="box"></div><div class="t">スプレッドシートを開いた<small>開くだけでインスタとの接続維持に役立ちます（60日の有効期限対策）</small><br></div><span class="freq">毎月</span></div>
+<div class="check-item"><div class="box"></div><div class="t">最新の投稿がシートに記録されている<small>いちばん下の行の日付が最近の投稿と合っているか見るだけでOK</small></div><span class="freq">毎月</span></div>
+<div class="check-item"><div class="box"></div><div class="t">Googleドライブに画像が保存されている<small>保存フォルダを開いて、最近の投稿の画像があるか確認</small></div><span class="freq">毎月</span></div>
+<div class="check-item"><div class="box"></div><div class="t">Discordのお知らせにエラーが出ていない<small>エラー通知が来ていたら、個別チャンネルで相談してください</small></div><span class="freq">毎月</span></div>
+<div class="check-item"><div class="box"></div><div class="t">インスタ公式の「情報をダウンロード」でzipを取り寄せて保管した<small>特典「過去の投稿取り込みガイド」の方法B。ストーリーズも含めた公式の完全バックアップになります</small></div><span class="freq">3か月に1回</span></div>
+</div>
+
+<h2 class="red">凍結・乗っ取りが起きたら（初動が勝負）</h2>
+<div class="steps">
+<div class="step"><div class="num"></div><div class="t"><strong>落ち着いて、まず何もしない</strong><small>あわてて怪しい「凍結解除代行」などに頼まないでください。二次被害の定番です</small></div></div>
+<div class="step"><div class="num"></div><div class="t"><strong>アプリ内の案内から異議申し立てをする</strong><small>凍結の場合、ログイン時に表示される案内に従って申請します。本人確認（顔写真など）を求められることがあります</small></div></div>
+<div class="step"><div class="num"></div><div class="t"><strong>乗っ取りの場合は instagram.com/hacked にアクセス</strong><small>Meta社公式の乗っ取り復旧ページです。メールが変更されていても復旧手続きができます</small></div></div>
+<div class="step"><div class="num"></div><div class="t"><strong>スプレッドシートとGoogleドライブのデータが無事なことを確認する</strong><small>ここにあなたの過去の数字と画像が残っています。アカウントが戻らなくても、この資産は消えません</small></div></div>
+<div class="step"><div class="num"></div><div class="t"><strong>復旧しない場合に備えて、新アカウントの準備を検討する</strong><small>過去データがスプシに残っているので、「何が伸びていたか」を引き継いだ状態で再スタートできます</small></div></div>
+</div>
+
+<div class="note"><strong>大事な考え方:</strong> アカウントは借り物、データは資産です。アカウント自体はMeta社の判断で消えることがありますが、スプレッドシートとドライブに残したデータはあなたのものです。月1回の点検だけは続けてください。</div>
+
+<div class="footer">IGインサイト保存テンプレート 購入者特典 ／ © BridgeSquare @tamago_app（再配布はご遠慮ください）</div>
+
+</body>
+</html>

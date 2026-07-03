@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>購入者特典：AI分析プロンプト集</title>
+<style>
+  @page { size: A4; margin: 12mm 14mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Sans", "Yu Gothic", sans-serif; color: #2c3e50; font-size: 10.5pt; line-height: 1.7; background: #fff; }
+  .badge {
+    display: inline-block; background: #fdeff5; color: #c2185b;
+    font-size: 9pt; font-weight: bold; padding: 1mm 4mm; border-radius: 10px; margin-bottom: 2mm;
+  }
+  h1 {
+    font-size: 18pt; color: #1a73e8;
+    border-bottom: 3px solid #1a73e8; padding-bottom: 2mm; margin-bottom: 2mm;
+  }
+  .lead { color: #666; font-size: 10pt; margin-bottom: 5mm; }
+  h2 {
+    font-size: 13pt; color: #1a73e8; margin: 6mm 0 3mm;
+    display: flex; align-items: center; gap: 6px;
+  }
+  h2::before {
+    content: ""; display: inline-block; width: 4px; height: 15px;
+    background: #1a73e8; border-radius: 2px;
+  }
+  .howto {
+    background: #f6f9fc; border-radius: 10px; padding: 4mm 6mm; margin-bottom: 4mm;
+    border-left: 5px solid #1a73e8; break-inside: avoid;
+  }
+  .howto ol { padding-left: 6mm; }
+  .howto li { margin-bottom: 1mm; }
+  .prompt-card {
+    border: 1px solid #d8e2ee; border-radius: 10px; padding: 4mm 5mm; margin-bottom: 4mm;
+    break-inside: avoid; background: #fff;
+  }
+  .prompt-card h3 { font-size: 11pt; color: #1a4f9c; margin-bottom: 1mm; }
+  .prompt-card .when { font-size: 9pt; color: #888; margin-bottom: 2mm; }
+  .prompt-text {
+    background: #f3f6fa; border-radius: 6px; padding: 3mm 4mm;
+    font-size: 9.5pt; line-height: 1.6; color: #333;
+    white-space: pre-line;
+  }
+  .note {
+    background: #fff7e6; border-radius: 8px; padding: 4mm 5mm; margin: 3mm 0;
+    font-size: 9.5pt; break-inside: avoid;
+  }
+  .note strong { color: #a06a00; }
+  .footer {
+    margin-top: 8mm; padding-top: 3mm; border-top: 1px solid #d8e2ee;
+    font-size: 8.5pt; color: #999; text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<span class="badge">購入者特典</span>
+<h1>AI分析プロンプト集</h1>
+<p class="lead">スプレッドシートにたまったデータを、ChatGPTやClaudeなどのAIチャットに貼り付けて分析させるための「コピペで使える質問文」10本セットです。データは、ためるだけでなく使ってこそ価値が出ます。</p>
+
+<h2>使い方（全プロンプト共通・3ステップ）</h2>
+<div class="howto">
+<ol>
+<li>スプレッドシートの「フィード」「リール」「ストーリーズ」いずれかのシートで、<strong>見出し行を含めて</strong>分析したい期間の行をドラッグで範囲選択し、コピーします（目安：直近1〜3か月分）</li>
+<li>AIチャット（ChatGPT・Claude・Geminiなど、どれでもOK）を開き、下のプロンプトを貼り付けます</li>
+<li>プロンプトのすぐ後ろに、コピーしたデータを貼り付けて送信します</li>
+</ol>
+</div>
+<div class="note"><strong>注意:</strong> キャプションに個人情報やお客様の名前などが入っている場合は、貼り付ける前に消してください。また、AIの答えは「参考意見」です。最終判断はご自身のアカウントの肌感覚と合わせて行ってください。</div>
+
+<h2>プロンプト10本</h2>
+
+<div class="prompt-card">
+<h3>1. 月次ふりかえり（まずはこれ）</h3>
+<p class="when">使いどき：毎月末に1回</p>
+<div class="prompt-text">あなたはInstagram運用の専門家です。以下は私のInstagram投稿の1か月分のデータです（1行=1投稿。閲覧数・リーチ・保存数・シェア数などの列があります）。
+①今月もっとも成果が良かった投稿トップ3とその共通点、②もっとも伸びなかった投稿とその理由の仮説、③来月に向けた改善アクションを3つ、初心者にもわかる言葉で教えてください。</div>
+</div>
+
+<div class="prompt-card">
+<h3>2. 伸びた投稿の「型」を見つける</h3>
+<p class="when">使いどき：投稿が30件以上たまったら</p>
+<div class="prompt-text">以下は私のInstagram投稿データです。保存数とシェア数が多い投稿に注目して、キャプションの書き出し・テーマ・投稿の種類（フィード/リール）に共通するパターンを見つけてください。そのパターンを「再現できるテンプレート」の形にまとめてください。</div>
+</div>
+
+<div class="prompt-card">
+<h3>3. 保存されやすい投稿を作る</h3>
+<p class="when">使いどき：保存数を伸ばしたいとき</p>
+<div class="prompt-text">以下のデータで、閲覧数のわりに保存数が多い投稿（保存率が高い投稿）を挙げてください。そのうえで、私のアカウントで保存率を上げるための投稿の作り方を、具体例つきで5つ提案してください。</div>
+</div>
+
+<div class="prompt-card">
+<h3>4. ベストな投稿時間を探す</h3>
+<p class="when">使いどき：投稿時間に迷ったら</p>
+<div class="prompt-text">以下は私のInstagram投稿データです（投稿日時の列があります）。曜日と時間帯ごとの成果の傾向を分析して、「もっとも反応が取れそうな投稿タイミング」を第3候補まで、理由つきで教えてください。データが足りない部分は「データ不足」と正直に言ってください。</div>
+</div>
+
+<div class="prompt-card">
+<h3>5. 次の投稿ネタを10個出す</h3>
+<p class="when">使いどき：ネタ切れのとき</p>
+<div class="prompt-text">以下は私のInstagram投稿データです。反応が良かったテーマの傾向をふまえて、次に投稿すべきネタを10個提案してください。それぞれ「タイトル案＋最初の1文＋狙い（保存狙い/シェア狙い/新規リーチ狙い）」の形で出してください。</div>
+</div>
+
+<div class="prompt-card">
+<h3>6. リールとフィードの使い分け診断</h3>
+<p class="when">使いどき：どちらに力を入れるか迷ったら</p>
+<div class="prompt-text">以下のデータをフィード投稿とリールに分けて比較し、①それぞれの得意な役割（新規に届く/ファンに刺さる等）、②私のアカウントではどちらに何割の力配分をすべきか、③リールの平均視聴時間から見た改善点、を教えてください。</div>
+</div>
+
+<div class="prompt-card">
+<h3>7. ストーリーズの改善</h3>
+<p class="when">使いどき：ストーリーズのデータがたまってきたら</p>
+<div class="prompt-text">以下は私のInstagramストーリーズのデータです（閲覧数・返信数・タップ移動・プロフィール表示などの列があります）。①最後まで見られているか、②プロフィール訪問やフォローにつながっているか、を分析して、ストーリーズの構成（枚数・順番・内容）の改善案を教えてください。</div>
+</div>
+
+<div class="prompt-card">
+<h3>8. 先月との比較で成長をチェック</h3>
+<p class="when">使いどき：2か月分以上たまったら</p>
+<div class="prompt-text">以下は私のInstagram投稿データ2か月分です。前半の1か月と後半の1か月を比べて、①伸びた指標と落ちた指標、②その原因として考えられる投稿内容の変化、③来月伸ばすために「続けること・やめること・新しく試すこと」を1つずつ教えてください。</div>
+</div>
+
+<div class="prompt-card">
+<h3>9. キャプションの添削</h3>
+<p class="when">使いどき：投稿前の下書きチェックに</p>
+<div class="prompt-text">以下は私の過去のInstagram投稿データです。反応が良かった投稿のキャプションの特徴を学んでください。そのうえで、この後に貼る新しい投稿の下書きを、その特徴に合わせて添削してください。書き出しの2行は特に念入りにお願いします。
+
+【下書き】
+（ここに新しい投稿の下書きを貼る）</div>
+</div>
+
+<div class="prompt-card">
+<h3>10. 1年後の目標から逆算する</h3>
+<p class="when">使いどき：運用の方向性を見直したいとき</p>
+<div class="prompt-text">以下は私のInstagram投稿データです。現状のペースと反応を分析したうえで、「1年後にフォロワーと反応を今の2倍にする」ための現実的なロードマップを、3か月ごとの目標と具体的な行動に分けて提案してください。無理のある提案はしないでください。</div>
+</div>
+
+<div class="footer">IGインサイト保存テンプレート 購入者特典 ／ © BridgeSquare @tamago_app（再配布はご遠慮ください）</div>
+
+</body>
+</html>
