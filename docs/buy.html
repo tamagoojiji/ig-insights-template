@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ご購入 | IGインサイト保存テンプレート</title>
+<meta name="robots" content="noindex">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; line-height: 1.8; color: #222; background: #faf7f5; }
+  .hero { background: linear-gradient(135deg, #fa7e1e 0%, #d62976 50%, #962fbf 100%); color: white; padding: 40px 20px; text-align: center; }
+  .hero h1 { font-size: 1.6em; }
+  .container { max-width: 560px; margin: 0 auto; padding: 30px 20px 60px; }
+  .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .price-line { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .price-now { font-size: 2.2em; font-weight: bold; color: #d62976; }
+  .badge { display: inline-block; background: #fff4c4; border: 1px solid #f0c000; color: #7a5c00; border-radius: 14px; padding: 2px 12px; font-size: 0.85em; font-weight: bold; }
+  .muted { color: #888; font-size: 0.9em; }
+  .opt { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 2px solid #eee; border-radius: 10px; margin-top: 12px; cursor: pointer; background: #fff; }
+  .opt:has(input:checked) { border-color: #d62976; background: #fdf3f8; }
+  .opt input { margin-top: 6px; width: 18px; height: 18px; accent-color: #d62976; }
+  .opt .t strong { display: block; }
+  .opt .t small { color: #777; line-height: 1.5; display: block; }
+  .total { display: flex; justify-content: space-between; font-size: 1.15em; font-weight: bold; border-top: 2px solid #eee; padding-top: 14px; margin-top: 18px; }
+  .note-sub { font-size: 0.85em; color: #888; text-align: right; }
+  #buy-btn { display: block; width: 100%; margin-top: 18px; padding: 15px; border: none; border-radius: 26px; background: linear-gradient(135deg, #fa7e1e 0%, #d62976 50%, #962fbf 100%); color: #fff; font-size: 1.1em; font-weight: bold; cursor: pointer; }
+  #buy-btn:disabled { opacity: 0.5; cursor: default; }
+  #msg { margin-top: 12px; text-align: center; color: #c0392b; font-size: 0.9em; min-height: 1.4em; }
+  .links { text-align: center; font-size: 0.85em; color: #888; }
+  .links a { color: #d62976; }
+  .benefit { background: #fdf3f8; border: 1px solid #f3c3da; border-radius: 10px; padding: 14px 18px; font-size: 0.92em; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+<h1>IGインサイト保存テンプレート ご購入</h1>
+</div>
+
+<div class="container">
+
+<div class="card">
+  <div class="price-line">
+    <span class="price-now" id="price">¥--,---</span>
+    <span class="muted">買い切り・追加課金なし</span>
+  </div>
+  <p id="launch" style="margin-top:6px;"></p>
+  <p class="muted" style="margin-top:6px;">※ 今後の販売数量に応じて価格を改定（値上げ）していく予定です。</p>
+</div>
+
+<div class="card">
+  <strong>オプション（任意）</strong>
+  <label class="opt">
+    <input type="checkbox" id="opt-kobetsu">
+    <span class="t"><strong>個別対応オプション ¥3,000</strong>
+    <small>初期設定が完了するまで、1対1で個別にサポートします。設定に不安がある方向け。</small></span>
+  </label>
+  <label class="opt">
+    <input type="checkbox" id="opt-aftercare">
+    <span class="t"><strong>アフターフォロー 月額¥1,000（初月無料）</strong>
+    <small>Discordでの継続サポート。本日のお支払いは¥0で、31日目から月額¥1,000。初月中の解約なら請求はありません。いつでも解約OK。</small></span>
+  </label>
+  <div class="total"><span>本日のお支払い合計</span><span id="total">¥--,---</span></div>
+  <p class="note-sub" id="sub-note" style="display:none;">＋ 31日目からアフターフォロー月額¥1,000</p>
+  <button id="buy-btn" disabled>購入手続きへ進む（カード決済）</button>
+  <p id="msg"></p>
+</div>
+
+<div class="card benefit">
+  <strong>購入者特典4点つき:</strong><br>
+  ① 過去の投稿取り込みガイド<br>
+  ② インサイトタブ早見表<br>
+  ③ AI分析プロンプト集<br>
+  ④ アフターフォロー初月無料<br>
+  <span class="muted" style="font-size:0.9em; color:#888;">購入後にご案内する購入者専用Discordで配布します。</span>
+</div>
+
+<p class="links">
+  <a href="./index.html">← 商品説明に戻る</a><br>
+  <a href="https://tamagoojiji.github.io/bridgesquare-legal/terms-of-service.html">利用規約</a> ｜
+  <a href="https://tamagoojiji.github.io/bridgesquare-legal/privacy-policy.html">プライバシーポリシー</a>
+</p>
+
+</div>
+
+<script>
+const API = new URLSearchParams(location.search).get("api") || "https://iginsights.tamago-ai-world.com";
+let price = null, kobetsuPrice = 3000;
+
+const yen = n => "¥" + n.toLocaleString("ja-JP");
+
+function updateTotal() {
+  if (price === null) return;
+  const kobetsu = document.getElementById("opt-kobetsu").checked;
+  const aftercare = document.getElementById("opt-aftercare").checked;
+  document.getElementById("total").textContent = yen(price + (kobetsu ? kobetsuPrice : 0));
+  document.getElementById("sub-note").style.display = aftercare ? "block" : "none";
+}
+
+async function loadPrice() {
+  try {
+    const r = await fetch(API + "/shop/price");
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    price = d.price;
+    kobetsuPrice = d.kobetsu_price;
+    document.getElementById("price").textContent = yen(d.price);
+    if (d.launch_remaining > 0) {
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = "🎁 先着5名様限定価格 — 残り " + Number(d.launch_remaining) + " 名";
+      document.getElementById("launch").replaceChildren(badge);
+    }
+    document.getElementById("buy-btn").disabled = false;
+    updateTotal();
+  } catch (e) {
+    document.getElementById("msg").textContent = "価格の取得に失敗しました。時間をおいて再読み込みしてください。";
+  }
+}
+
+document.getElementById("opt-kobetsu").addEventListener("change", updateTotal);
+document.getElementById("opt-aftercare").addEventListener("change", updateTotal);
+
+document.getElementById("buy-btn").addEventListener("click", async () => {
+  const btn = document.getElementById("buy-btn");
+  btn.disabled = true;
+  document.getElementById("msg").textContent = "";
+  try {
+    const r = await fetch(API + "/shop/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        kobetsu: document.getElementById("opt-kobetsu").checked,
+        aftercare: document.getElementById("opt-aftercare").checked,
+      }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || "決済ページの作成に失敗しました。");
+    location.href = d.url;
+  } catch (e) {
+    document.getElementById("msg").textContent = e.message;
+    btn.disabled = false;
+  }
+});
+
+loadPrice();
+</script>
+
+</body>
+</html>
