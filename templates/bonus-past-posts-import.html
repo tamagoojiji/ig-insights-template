@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>購入者特典：過去の投稿取り込みガイド</title>
+<style>
+  @page { size: A4; margin: 12mm 14mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Sans", "Yu Gothic", sans-serif; color: #2c3e50; font-size: 10.5pt; line-height: 1.7; background: #fff; }
+  .badge {
+    display: inline-block; background: #fdeff5; color: #c2185b;
+    font-size: 9pt; font-weight: bold; padding: 1mm 4mm; border-radius: 10px; margin-bottom: 2mm;
+  }
+  h1 {
+    font-size: 18pt; color: #1a73e8;
+    border-bottom: 3px solid #1a73e8; padding-bottom: 2mm; margin-bottom: 2mm;
+  }
+  .lead { color: #666; font-size: 10pt; margin-bottom: 6mm; }
+  h2 {
+    font-size: 13pt; color: #1a73e8; margin: 7mm 0 3mm;
+    display: flex; align-items: center; gap: 6px;
+  }
+  h2::before {
+    content: ""; display: inline-block; width: 4px; height: 15px;
+    background: #1a73e8; border-radius: 2px;
+  }
+  .route {
+    background: #f6f9fc; border-radius: 10px; padding: 5mm 6mm; margin-bottom: 4mm;
+    border-left: 5px solid #1a73e8; break-inside: avoid;
+  }
+  .route.story { border-left-color: #e8a400; }
+  .route h3 { font-size: 11.5pt; margin-bottom: 2mm; }
+  .route h3 .tag {
+    display: inline-block; font-size: 8.5pt; color: #fff; background: #1a73e8;
+    border-radius: 8px; padding: 0.5mm 3mm; margin-right: 2mm; vertical-align: middle;
+  }
+  .route.story h3 .tag { background: #e8a400; }
+  ol.steps { padding-left: 6mm; }
+  ol.steps li { margin-bottom: 1.5mm; }
+  .note {
+    background: #fff7e6; border-radius: 8px; padding: 4mm 5mm; margin: 3mm 0;
+    font-size: 9.5pt; break-inside: avoid;
+  }
+  .note strong { color: #a06a00; }
+  table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.5pt; break-inside: avoid; }
+  th { background: #eef4fd; color: #1a4f9c; text-align: left; }
+  th, td { border: 1px solid #d8e2ee; padding: 2mm 3mm; }
+  .footer {
+    margin-top: 8mm; padding-top: 3mm; border-top: 1px solid #d8e2ee;
+    font-size: 8.5pt; color: #999; text-align: center;
+  }
+  .menu { font-weight: bold; color: #1a4f9c; background: #eef4fd; border-radius: 4px; padding: 0 2mm; }
+</style>
+</head>
+<body>
+
+<span class="badge">購入者特典</span>
+<h1>過去の投稿取り込みガイド</h1>
+<p class="lead">このテンプレートが自動で保存するのは「設定が終わったあと」の投稿です。設定より前の過去の投稿は、このガイドの2つの方法でさかのぼって取り込めます。</p>
+
+<h2>まず全体像：投稿の種類で方法が変わります</h2>
+<table>
+<tr><th>取り込みたいもの</th><th>使う方法</th><th>むずかしさ</th></tr>
+<tr><td>過去のフィード・リール</td><td>方法A（ボタンを押すだけ）</td><td>かんたん</td></tr>
+<tr><td>過去のストーリーズ</td><td>方法B（インスタからデータを取り寄せる）</td><td>少し手間がかかる</td></tr>
+</table>
+
+<div class="route">
+<h3><span class="tag">方法A</span>過去のフィード・リール：ボタン1つで取り込み</h3>
+<ol class="steps">
+<li>スプレッドシートを開き、上のメニューから <span class="menu">📊 Instagram Insights</span> → <span class="menu">📚 過去全件取り込み（API）</span> を押します</li>
+<li>あとは待つだけです。過去の投稿を古いものまで順番に取り込み、シートに追記していきます</li>
+<li>投稿数が多い場合（数百件以上）は、途中で一度止まることがあります。その場合は同じボタンをもう一度押してください。<strong>続きから自動で再開</strong>します</li>
+</ol>
+<div class="note"><strong>ポイント:</strong> インスタ側の制限で、1時間に取り込める量に上限があります。数千件ある場合は、日を分けて何回か実行してください（やり直しにはなりません。毎回続きから進みます）。</div>
+</div>
+
+<div class="route story">
+<h3><span class="tag">方法B</span>過去のストーリーズ：インスタ公式のデータ取り寄せで復元</h3>
+<ol class="steps">
+<li>インスタアプリで <strong>アカウントセンター → あなたの情報とアクセス許可 → 情報をダウンロード</strong> を開きます</li>
+<li>対象で自分のアカウントを選び、期間・形式（JSON）を指定してダウンロードを申請します</li>
+<li>Meta社からダウンロードリンクがメールで届きます（<strong>24時間〜数日かかります</strong>。気長に待ってください）</li>
+<li>届いたzipファイルを、スプレッドシートのメニュー <span class="menu">📦 Meta公式zipアップロード</span> から取り込みます</li>
+<li>過去のストーリーズの画像と投稿日時がシートに追加されます</li>
+</ol>
+<div class="note"><strong>知っておいてほしいこと:</strong><br>
+・zipファイルは<strong>50MB以内</strong>が目安です。大きすぎる場合は、期間を半年ごとなどに分けて申請してください<br>
+・Meta社のデータには、過去のストーリーズの閲覧数などの<strong>数字が含まれていない場合があります</strong>。その場合、画像と日時は復元できますが数字は空欄になります（これはインスタ側の仕様で、どのツールでも復元できません）</div>
+</div>
+
+<h2>おすすめの進め方</h2>
+<ol class="steps">
+<li>まず<strong>方法A</strong>を実行（5分で終わることが多いです）</li>
+<li>その日のうちに<strong>方法Bのデータ取り寄せを申請</strong>だけしておく（届くまで数日かかるため）</li>
+<li>メールが届いたら方法Bの取り込みを実行</li>
+</ol>
+<div class="note"><strong>困ったら:</strong> 途中でエラーが出た・進まない場合は、購入者専用Discordのあなたの個別チャンネルに、画面のスクリーンショットを添えて質問してください。</div>
+
+<div class="footer">IGインサイト保存テンプレート 購入者特典 ／ © BridgeSquare @tamago_app（再配布はご遠慮ください）</div>
+
+</body>
+</html>
