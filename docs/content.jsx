@@ -88,11 +88,11 @@ function Step1({ done, onToggle }) {
       <ol start="5">
         <li>メニュー <Copyable>📊 Instagram Insights → 🔧 初回セットアップ（シート作成）</Copyable> を実行</li>
       </ol>
-      <StepImage slot="1-C" alt="スプシ上部メニュー「📊 Instagram Insights → 🔧 初回セットアップ」を展開した状態" />
+      <StepImage slot="1-C" src="images/setup-guide/spreadsheet-setup/03-menu-initial-setup.png" alt="スプシ上部メニュー「📊 Instagram Insights → 🔧 初回セットアップ（シート作成）」を赤枠で示したスクショ" />
       <ol start="6">
         <li>初回のみ権限承認ダイアログが出る →「許可」</li>
       </ol>
-      <StepImage slot="1-D" alt="権限承認ダイアログの「許可」ボタンを赤枠で示したスクショ" />
+      <StepImage slot="1-D" src="images/setup-guide/spreadsheet-setup/04-auth-required.png" alt="初回実行時に表示される「認証が必要です」ダイアログ（OKで許可）" />
     </StepSection>
   );
 }
