@@ -16,9 +16,7 @@ const TOC = [
   { id: "step-8", num: "08", title: "Drive 画像保存フォルダ" },
   { id: "step-9", num: "09", title: "Gemini API キー（任意）" },
   { id: "step-10", num: "10", title: "Discord Webhook（任意）" },
-  { id: "step-11", num: "11", title: "過去全件取り込み" },
-  { id: "step-12", num: "12", title: "Meta zip アップロード" },
-  { id: "step-13", num: "13", title: "トリガー設置" },
+  { id: "step-11", num: "11", title: "トリガー設置" },
   { kind: "section", label: "運用とリファレンス" },
   { id: "daily-ops", title: "日々の運用" },
   { id: "compliance", title: "規約・データの扱い" },
@@ -222,7 +220,7 @@ function App() {
             </p>
             <div className="hero-meta">
               <span className="meta-chip">⏱ <strong>所要 60〜120 分</strong></span>
-              <span className="meta-chip">📋 <strong>14 ステップ</strong>（うち 2 つは任意）</span>
+              <span className="meta-chip">📋 <strong>12 ステップ</strong>（うち 2 つは任意）</span>
               <span className="meta-chip">💴 <strong>運用コスト ほぼ ¥0</strong></span>
               <span className="meta-chip">🔒 <strong>BYO 型</strong>（トークンは自分で管理）</span>
             </div>
@@ -247,8 +245,6 @@ function App() {
           <Step9 done={!!done["step-9"]} onToggle={() => toggleDone("step-9")} />
           <Step10 done={!!done["step-10"]} onToggle={() => toggleDone("step-10")} />
           <Step11 done={!!done["step-11"]} onToggle={() => toggleDone("step-11")} />
-          <Step12 done={!!done["step-12"]} onToggle={() => toggleDone("step-12")} />
-          <Step13 done={!!done["step-13"]} onToggle={() => toggleDone("step-13")} />
 
           <div className="divider"/>
 
