@@ -306,7 +306,7 @@ function Step6({ done, onToggle }) {
       <Callout kind="success">
         <p><strong>🎉 ここまで来れば認証系は完了です</strong></p>
         <p>
-          このあと 60 日間はトークン更新を意識しなくて OK。さらに Step 13 でトリガーを設置すれば、
+          このあと 60 日間はトークン更新を意識しなくて OK。さらに Step 11 でトリガーを設置すれば、
           毎週日曜にトークンが自動でリフレッシュされ続けます。
         </p>
       </Callout>
@@ -385,7 +385,7 @@ function Step9({ done, onToggle }) {
     <StepSection id="step-9" num="09" title="Gemini API キー（OCR用・任意）" subtitle="任意 — 所要 約5分"
       done={done} onToggleDone={onToggle}>
       <p>
-        Gemini を登録すると、<strong>新着ストーリーズ取得時に画像内のテキストを自動OCR</strong>します（1日数件レベルなので無料枠で十分）。過去分はStep 11のCSVインポートで「説明」列をそのまま使うのでOCR不要。
+        Gemini を登録すると、<strong>新着ストーリーズ取得時に画像内のテキストを自動OCR</strong>します（1日数件レベルなので無料枠で十分）。
       </p>
       <h3>手順</h3>
       <ol>
@@ -438,9 +438,7 @@ function Step10({ done, onToggle }) {
         <ul>
           <li>✅ トークン自動更新成功（毎週日曜・成功時）</li>
           <li>⚠️ トークン更新失敗（要対応のシグナル）</li>
-          <li>✅ 過去全件取り込み完了</li>
           <li>⚠️ 取得エラー（API レート制限・権限不足等）</li>
-          <li>✅ Meta zip アップロード完了サマリ</li>
         </ul>
       </Callout>
       <Callout kind="danger">
@@ -462,301 +460,15 @@ function Step10({ done, onToggle }) {
 
 function Step11({ done, onToggle }) {
   return (
-    <StepSection id="step-11" num="11" title="過去全件取り込み（API）" subtitle="所要 投稿1000件で15〜25分（複数回実行）"
+    <StepSection id="step-11" num="11" title="トリガー設置（自動取得開始）" subtitle="所要 約30秒・最後の仕上げ"
       done={done} onToggleDone={onToggle}>
-      <p>
-        フィード・リールの過去投稿をすべて遡って取得します。Instagram Graph API のページング機能で 1 ページ 50 件ずつ取得し、
-        5 分の Apps Script 実行制限に達したら自動でカーソルを保存して中断します。
-      </p>
-      <h3>手順</h3>
-      <ol>
-        <li>メニュー <Copyable>📊 Instagram Insights → 📚 過去全件取り込み（API）</Copyable> を実行</li>
-        <li>確認ダイアログで「OK」 → 取得開始</li>
-        <li>5 分以内に終わった場合: 「✅ 過去全件取り込み完了」アラート + Discord 通知</li>
-        <li>5 分制限到達した場合: 「⏸️ 5 分制限に達したため中断しました」アラートが出る → <strong>もう一度同じメニューを実行</strong>すると、続きから自動で再開</li>
-        <li>累積件数が「フィード ◯◯件 / リール ◯◯件」と表示されたら全件完了</li>
-      </ol>
-      <Callout kind="warn">
-        <p>
-          <strong>ストーリーズは API 上 24 時間以内のみ取得可能</strong> — 過去のストーリーズを復元したい場合は、次の Step 12（Meta 公式 zip アップロード）を必ず実施してください。
-        </p>
-      </Callout>
-      <Callout kind="info">
-        <p><strong>もし途中でおかしくなったら</strong></p>
-        <p>メニュー <Copyable>🔁 取り込みカーソルをリセット</Copyable> で最初からやり直せます。シートに既に追加された行は重複防止機能で再追加されません。</p>
-      </Callout>
-      <Callout kind="info">
-        <p><strong>Gemini API は使いません</strong></p>
-        <p>
-          このメニューはフィード／リールのみ対象で、Gemini は一切呼びません。過去数千件の取り込みでも Gemini 無料枠の上限を気にせず実行できます。
-          OCR は別メニュー（🔍 ストーリーズ OCR 系）でのみ動作。
-        </p>
-      </Callout>
-      <Pitfall title="初回データ取得時にスプシ上部へ黄色の警告バーが出ます">
-        <p>「警告: 一部の数式で、外部関係者とのデータ送受信が行われようとしています」と表示されたら、右側の「<strong>アクセスを許可</strong>」をクリックしてください。</p>
-        <p><strong>原因</strong>: 各シートのサムネ列に <code>=IMAGE("https://drive.google.com/thumbnail?id=...")</code> という数式が入っており、自分の Drive に保存した画像 URL をスプシ内で表示するために外部参照を行います。Google がこれを「外部とのデータ送受信」として警告します。</p>
-        <p><strong>安全性</strong>: 自分の Drive の自分の画像を自分のスプシで表示するための承認です。データ漏洩リスクはありません。一度許可すれば次回以降は表示されません。</p>
-      </Pitfall>
-    </StepSection>
-  );
-}
-
-function Step12({ done, onToggle }) {
-  return (
-    <StepSection id="step-12" num="12" title="過去ストーリーズの取り込み（zip × CSV コラボ）" subtitle="初回＋毎月運用"
-      done={done} onToggleDone={onToggle}>
-      <p>
-        Instagram の過去ストーリーズは Graph API では取れません。<strong>Meta公式zip</strong>と<strong>Business Suite CSV</strong>を組み合わせて、画像とメトリクスの両方を揃えます。
-      </p>
-
-      <Callout kind="info">
-        <p><strong>コラボの仕組み</strong>：投稿日時で自動マッチングして1行にマージします。zipが画像・キャプション、CSVがメトリクス（リーチ・視聴数等）を提供。先にどっちをアップしてもOK。</p>
-      </Callout>
-
-      <Callout kind="warn">
-        <p><strong>動画ストーリーの扱い</strong></p>
-        <ul>
-          <li>サムネは<strong>静止画(先頭フレーム)として保存</strong>（動画再生は不可）</li>
-          <li><strong>新規ストーリー</strong>（取得時にAuto-fetch）→ Instagram公式の動画サムネを自動取得（綺麗）</li>
-          <li><strong>過去ストーリー</strong>（Meta zip）→ zipには .mp4 しか含まれず、Apps Scriptでは静止画抽出不可。<strong>運営側で変換代行</strong>するため別途依頼してください（Discord個別チャンネルで案内）</li>
-          <li><strong>本文（キャプション）</strong>は Business Suite CSVの「説明」列が情報源 → CSV取得範囲（直近3ヶ月）の動画のみ本文が入ります</li>
-        </ul>
-      </Callout>
-
-      <Callout kind="danger">
-        <p><strong>ストーリーズのzip取得範囲は「アーカイブ保存」設定に依存</strong></p>
-        <ul>
-          <li><strong>ON</strong> → 過去のストーリーが全てアカウントに残り、zipにも入る（年単位で復元可）</li>
-          <li><strong>OFF</strong> → 24時間で消え、zipにも入らない（過去復元は不可）</li>
-        </ul>
-        <p>フィード投稿・リールは設定に関わらず全期間zipに入ります。</p>
-      </Callout>
-
-      <h3>12-0. ストーリーズ アーカイブ保存をONにする（最初の1回）</h3>
-      <p>過去のストーリーズをzipで取れるようにするため、Instagram側の「アーカイブに保存」をONにしておきます。OFFのまま運用すると、今後ストーリーズを投稿してもzipには残らないので注意。</p>
-
-      <h4>アプリ（iPhone / Android）から設定</h4>
-      <ol>
-        <li>Instagramアプリ → プロフィール画面右上の<strong>「☰」</strong>メニュー</li>
-        <li>「<strong>設定とアクティビティ</strong>」</li>
-        <li>「<strong>アーカイブ</strong>」または「ストーリーズコントロール」（バージョンにより名称異なる）</li>
-        <li>「<strong>ストーリーズをアーカイブに保存</strong>」を<strong>ON</strong>にする</li>
-      </ol>
-
-      <h4>Webブラウザから設定（PC）</h4>
-      <ol>
-        <li><a href="https://www.instagram.com/accounts/edit/" target="_blank" rel="noreferrer">instagram.com</a> にログイン</li>
-        <li>左サイドバー「設定とアクティビティ」</li>
-        <li>「シェアと再シェア」→「ストーリー」</li>
-        <li>「ストーリーをアーカイブに保存」をON</li>
-      </ol>
-
-      <Callout kind="warn">
-        <p>ON にした<strong>以降の</strong>ストーリーがzipに残ります。それ以前のストーリーは設定変更しても復元できません（Meta側で消えています）。</p>
-      </Callout>
-
-      <h3>12-1. Meta公式zip（初回1回・過去全期間のストーリーズを復元）</h3>
-      <p>
-        Meta のアカウントセンターから自分のInstagramデータを zip ダウンロードします。申請から DL リンク到着まで<strong>数時間〜24時間</strong>、DL有効期限は<strong>4日間</strong>。
-      </p>
-
-      <h4>① アカウントセンターを開く</h4>
-      <ol>
-        <li><a href="https://accountscenter.facebook.com/info_and_permissions/dyi" target="_blank" rel="noreferrer">アカウントセンター → あなたの情報とアクセス許可</a> を開く（Facebookログイン必須）</li>
-        <li>右側の「<strong>あなたの情報をエクスポート</strong>」をクリック</li>
-      </ol>
-      <StepImage slot="12-1-1-account-center" alt="アカウントセンター > あなたの情報とアクセス許可" />
-
-      <h4>② エクスポートを作成</h4>
-      <ol>
-        <li>青ボタン「<strong>エクスポートを作成</strong>」をクリック</li>
-      </ol>
-      <StepImage slot="12-1-2-export-create" alt="エクスポートを作成画面" />
-
-      <h4>③ プロフィール選択：Instagram</h4>
-      <ol>
-        <li><strong>Instagram</strong> のプロフィール（@... アイコンが付いている方）を選択</li>
-      </ol>
-      <StepImage slot="12-1-3-select-profile" alt="プロフィール選択（Instagram）" />
-      <Pitfall>
-        <p>Facebookと両方表示されることがあります。必ず<strong>Instagram</strong>側を選んでください。Facebookを選ぶとIGのデータが入りません。</p>
-      </Pitfall>
-
-      <h4>④ エクスポート先：デバイスにエクスポート</h4>
-      <ol>
-        <li>「<strong>デバイスにエクスポート</strong>」を選択（zipダウンロード用）</li>
-      </ol>
-      <StepImage slot="12-1-4-export-destination" alt="エクスポート先選択" />
-
-      <h4>⑤ 4つの設定を変更</h4>
-      <p>確認画面が開きます。<strong>デフォルトのままだと取り込めません</strong>。下記4項目をすべて変更してください。</p>
-
-      <p><strong>5-1. 情報をカスタマイズ</strong></p>
-      <ol>
-        <li>「情報をカスタマイズ」をタップ</li>
-        <li>カテゴリごとに「<strong>すべてをクリア</strong>」を押してチェックを全解除</li>
-        <li>以下3つだけチェックを入れる：
-          <ul>
-            <li><strong>メディア</strong>（投稿・ストーリーズ・リールの画像本体 — 必須）</li>
-            <li><strong>ストーリーズでのインタラクション</strong>（リアクション・返信ログ）</li>
-            <li><strong>過去のInstagramインサイト</strong>（過去メトリクスデータ）</li>
-          </ul>
-        </li>
-        <li>「保存」</li>
-      </ol>
-      <StepImage slot="12-1-5-customize-types" alt="3つのカテゴリだけチェック" />
-
-      <p><strong>5-2. 期間 → 全期間</strong></p>
-      <ol>
-        <li>「期間」をタップ → 「<strong>全期間</strong>」を選択 → 「保存」</li>
-      </ol>
-      <StepImage slot="12-1-6-period" alt="期間：全期間" />
-
-      <p><strong>5-3. フォーマット → JSON</strong></p>
-      <ol>
-        <li>「フォーマット」をタップ → 「<strong>JSON</strong>」を選択 → 「保存」</li>
-      </ol>
-      <StepImage slot="12-1-7-format-json" alt="フォーマット：JSON" />
-      <Pitfall title="HTMLだと取り込めません">
-        <p>デフォルトはHTMLですが、必ず<strong>JSON</strong>に変更してください。HTMLだとスクリプトが読み込めません。</p>
-      </Pitfall>
-
-      <p><strong>5-4. メディアの画質 → 高画質</strong></p>
-      <ol>
-        <li>「メディアの画質」をタップ → 「<strong>高画質</strong>」を選択 → 「保存」</li>
-      </ol>
-      <StepImage slot="12-1-8-quality" alt="メディアの画質：高画質" />
-
-      <h4>⑥ 最終確認 → エクスポート開始</h4>
-      <p>確認画面に戻ったら、すべて設定済みになっているか確認：</p>
-      <ul>
-        <li>情報をカスタマイズ：<strong>ストーリーズでのインタラクション、メディア、過去のInstagramインサイト</strong></li>
-        <li>期間：<strong>全期間</strong></li>
-        <li>フォーマット：<strong>JSON</strong></li>
-        <li>メディアの画質：<strong>高画質</strong></li>
-      </ul>
-      <StepImage slot="12-1-9-final-config" alt="最終確認画面（設定済み）" />
-      <ol>
-        <li>下にスクロール → 青ボタン「<strong>エクスポートを開始</strong>」をタップ</li>
-        <li>申請完了 → 通知先メールアドレスに数時間〜24時間後にDLリンクが届く</li>
-      </ol>
-
-      <h4>⑦ DL案内メールが届く（数時間〜24時間後）</h4>
-      <p>Metaプライバシーチームから「Meta情報ファイルをダウンロードする準備ができました」というメールが届きます。</p>
-      <StepImage slot="12-1-10-download-mail" alt="Meta情報ファイルDL案内メール" />
-      <Pitfall title="DLリンクの有効期限は4日間">
-        <p>メールが届いてから<strong>4日以内</strong>にDLしないとリンクが失効します。失効した場合は最初からやり直し（再申請＋数時間〜24h待ち）になるので、届いたら早めにDLしてください。</p>
-      </Pitfall>
-
-      <h4>⑧ zipをダウンロード</h4>
-      <ol>
-        <li>メール本文の「<strong>export your information</strong>」リンクをクリック → Instagramの「あなたの情報をエクスポート」ページに飛ぶ</li>
-        <li>「利用可能なダウンロード」の該当ファイル（対象期間・アカウント名・有効期限を確認）の「<strong>ダウンロード</strong>」ボタンを押す</li>
-      </ol>
-      <StepImage slot="12-1-11-export-page" alt="あなたの情報をエクスポート（DL画面）" />
-      <ol start="3">
-        <li>「ファイルをダウンロード」画面に進む → 各ファイルの「<strong>Download</strong>」を押して全部 <Copyable>~/Downloads/</Copyable> に保存</li>
-      </ol>
-      <StepImage slot="12-1-12-multi-files" alt="ファイルをダウンロード（複数ファイル分割）" />
-      <Callout kind="info">
-        <p><strong>データが大きいと複数ファイルに自動分割されます</strong>（例：ファイル1/3, 2/3, 3/3）。気にせず<strong>全部DLしてください</strong>。あとは運営側で必要なものだけ取り出して処理します。</p>
-      </Callout>
-
-      <h4>⑨ 運営のGoogleアカウントをスプシ／Driveに共有（初回1回）</h4>
-      <Callout kind="info">
-        <p>運営側で取り込み代行や継続的なメンテナンスを行うため、運営のGoogleアカウントに編集権限を渡してください。<strong>初回1回だけ</strong>の作業です。</p>
-      </Callout>
-      <ol>
-        <li>スプシ（ig-insights-template）を開く → 右上「<strong>共有</strong>」</li>
-        <li>運営のメアド <Copyable>tamagoojiji@gmail.com</Copyable> を入力</li>
-        <li>権限を「<strong>編集者</strong>」に → 「通知を送信しない」にチェック → 共有</li>
-        <li>同じ手順で、Drive上の<strong>画像保存フォルダ</strong>（設定時に作ったフォルダ）にも同じメアドを<strong>編集者</strong>で共有</li>
-      </ol>
-      <Callout kind="warn">
-        <p>運営側で取り込み代行・修正・トラブル対応を続けるため、共有は外さないでください。卒業する場合は事前にDiscordで一声ください。</p>
-      </Callout>
-
-      <h4>⑩ DiscordでzipをDLリンクごと運営に送る</h4>
-      <Callout kind="info">
-        <p>過去ストーリーズの取り込みは、Apps Scriptの制約（ファイルサイズ・処理時間）の関係で<strong>運営側で代行</strong>します。利用者は<strong>DL→運営に送る</strong>だけでOKです。</p>
-      </Callout>
-      <ol>
-        <li>DLしたzip（複数ある場合は全部）を <a href="https://gigafile.nu/" target="_blank" rel="noreferrer">ギガファイル便</a> にアップロード
-          <ul>
-            <li>サイズ無制限・無料・登録不要</li>
-            <li>保持期間は最大100日でOK</li>
-            <li>パスワード保護を推奨（「ダウンロードキー」欄に4桁数字を設定）</li>
-          </ul>
-        </li>
-        <li>アップ完了後、表示される<strong>DLリンクURL</strong>とパスワードをコピー</li>
-        <li>Discordの個別サポートチャンネルに以下を貼り付けて送信：
-          <CodeBlock>{`【過去ストーリーズ取り込み依頼】
-ギガファイル便URL: https://xxxxxxxx.gigafile.nu/xxxxxxxxx
-パスワード: 1234
-インスタアカウント名: @your_account_name
-スプシURL: https://docs.google.com/spreadsheets/d/xxxxx/
-Drive画像フォルダURL: https://drive.google.com/drive/folders/xxxxx
-※ 上記2つに運営アカウント(tamagoojiji@gmail.com)を「編集者」で共有済み`}</CodeBlock>
-        </li>
-      </ol>
-
-      <h4>⑪ 反映完了通知を待つ（数日以内）</h4>
-      <ol>
-        <li>運営側で受け取ったzipを処理し、スプシに過去ストーリーズを反映します</li>
-        <li>反映完了次第、Discordの同チャンネルで通知が届きます</li>
-        <li>通知後、スプシを開いて <Copyable>📖 ストーリーズ</Copyable> シートに過去分が並んでいることを確認してください</li>
-      </ol>
-
-      <Callout kind="success">
-        <p><strong>1回送れば全期間分が反映されます</strong>。以降の月次運用は12-2のCSVインポート（軽量・自分で実行可）で進めてください。</p>
-      </Callout>
-
-      <Pitfall title="送る前に確認">
-        <p>zipの中身は個人情報（DM・連絡先など）も含まれます。送信前に必ず<strong>パスワード保護</strong>をかけてください。運営側は処理完了後にzipを速やかに削除します。</p>
-      </Pitfall>
-
-      <h3>12-2. Business Suite CSV（毎月運用・直近3ヶ月のメトリクス）</h3>
-      <ol>
-        <li><a href="https://business.facebook.com/latest/posts/active_stories" target="_blank" rel="noreferrer">Meta Business Suite → 投稿管理 → ストーリーズ</a> を開く</li>
-        <li>期間選択で取得したい期間を指定（<strong>最大3ヶ月</strong>）</li>
-        <li>「エクスポート」→ CSVが <Copyable>~/Downloads/</Copyable> に保存される</li>
-        <li>スプシのメニュー <Copyable>📤 Business Suite CSVインポート（ストーリーズ/フィード/リール自動判定）</Copyable> を実行 → ファイル選択 → 開始</li>
-        <li>サマリで以下を確認：
-          <ul>
-            <li>📖 新規追加: ◯件</li>
-            <li>🔗 Meta zip行とマージ: ◯件 ← zipアップ済みのストーリーにメトリクスが追加された数</li>
-            <li>⏭ 既存スキップ: ◯件</li>
-            <li>💬 キャプション補完: ◯件</li>
-          </ul>
-        </li>
-      </ol>
-
-      <Callout kind="success">
-        <p><strong>同じ期間を複数回アップしてOK</strong> — 投稿IDで重複検出、投稿日時でMeta zip行とマージします。</p>
-      </Callout>
-
-      <h3>12-3. 月次運用</h3>
-      <ol>
-        <li>Step 13 でトリガー設置すると、<strong>毎月1日に Discord で「CSVインポートしてね」通知</strong>が届く</li>
-        <li>30日経過するとスプシを開いた時にもトーストでリマインド</li>
-        <li>通知が来たら 12-2 のCSV取込を実行（毎月3分の手間）</li>
-      </ol>
-    </StepSection>
-  );
-}
-
-function Step13({ done, onToggle }) {
-  return (
-    <StepSection id="step-13" num="13" title="トリガー設置（自動取得開始）" subtitle="所要 約30秒・最後の仕上げ"
-      done={done} onToggleDone={onToggle}>
-      <p>30分ごとの自動インサイト取得 + 週次の長期トークン更新 + 月次のCSVリマインダー、を一括設置します。</p>
+      <p>30分ごとの自動インサイト取得 + 週次の長期トークン更新、を一括設置します。</p>
       <ol>
         <li>メニュー <Copyable>📊 Instagram Insights → ⏰ トリガーをインストール</Copyable> を実行</li>
         <li>「トリガーをインストールしました」アラートが表示されたら設置完了
           <ul>
             <li><Copyable>autoFetch</Copyable>: 30分ごと（インサイト自動取得）</li>
             <li><Copyable>refreshTokenJob</Copyable>: 毎週日曜9時（トークン更新）</li>
-            <li><Copyable>csvReminderJob</Copyable>: 毎月1日9時（ストーリーズCSV取込リマインダー）</li>
           </ul>
         </li>
         <li>30分後にスプシを開いて、フィード・リール・ストーリーズの行が自動更新されているか確認</li>
@@ -786,7 +498,6 @@ function DailyOps() {
         <li>セットアップ後は基本「触らない運用」で OK。30 分ごとに自動でデータが追記されます</li>
         <li>週 1 回、ダッシュボードシートで「伸びた投稿」「初速良好」「曜日 × 時間帯ヒートマップ」を確認 → 投稿戦略にフィードバック</li>
         <li>月 1 回はスプシを開く（30 日以上開かないとトークン失効リスク）</li>
-        <li>月1回（毎月1日にDiscord通知）Meta Business Suite からストーリーズCSVをDL →「📤 ストーリーズCSVインポート」</li>
       </ul>
       <h3>トラブル時のセルフチェック</h3>
       <ol>
@@ -841,13 +552,10 @@ function Faq() {
         </p>
       </FaqItem>
       <FaqItem q="ストーリーズが取れない">
-        <p>API 仕様で <strong>24 時間以内のみ</strong>取得可能です。過去分は Step 12 の Meta 公式 zip アップロードを使ってください。また、IG アカウントが「個人」の場合は不可（ビジネス／クリエイターに切替必須）。</p>
+        <p>API 仕様で <strong>24 時間以内のみ</strong>取得可能です。設定後のストーリーズは自動取得されます。設定より前の<strong>過去ストーリーズの復元</strong>は、購入者特典「過去データ取り寄せガイド」を参照してください。また、IG アカウントが「個人」の場合は不可（ビジネス／クリエイターに切替必須）。</p>
       </FaqItem>
       <FaqItem q="トークンが期限切れになった（60日超過）">
         <p><Copyable>🔄 トークン手動更新</Copyable> を実行 → 失敗する場合は短期トークンから取り直し（Step 5）。30 日以上スプシを開かない期間があると失効リスクが高まるため、月 1 回以上は開く運用を推奨します。</p>
-      </FaqItem>
-      <FaqItem q="Meta zip が 50MB を超える">
-        <p>Apps Script の制約で 50MB 以内推奨です。Meta 側で「期間」を半年単位などで分割エクスポートし、複数回アップロードで対応してください。</p>
       </FaqItem>
       <FaqItem q="OCR が動かない">
         <p>GEMINI_API_KEY が未設定の場合は OCR がスキップされます。<a href="https://aistudio.google.com" target="_blank" rel="noreferrer">AI Studio</a> で発行後、メニュー <Copyable>🔐 シークレット入力</Copyable> で登録してください。無料枠で月数百件は処理可能です。</p>
@@ -897,6 +605,6 @@ function AfterCare() {
 }
 
 Object.assign(window, {
-  Step0, Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9, Step10, Step11, Step12, Step13,
+  Step0, Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9, Step10, Step11,
   DailyOps, Compliance, Faq, AfterCare,
 });
