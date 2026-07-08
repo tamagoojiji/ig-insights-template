@@ -15,6 +15,11 @@ function onOpen() {
     .addItem('▶️ 全データ取得（手動）', 'manualFetchAll')
     .addItem('📸 フィード+リールのみ取得', 'manualFetchFeed')
     .addItem('📖 ストーリーズのみ取得', 'manualFetchStories')
+    .addItem('🔍 ストーリーズOCR一括（エラー行も再処理）', 'runStoriesOcrAll')
+    .addItem('🔢 ストーリーズOCRバッチ（件数指定）', 'runStoriesOcrBatch')
+    .addItem('🤖 自動OCR開始（5分おき・完走で自動停止）', 'startAutoOcr')
+    .addItem('🛑 自動OCR停止', 'stopAutoOcr')
+    .addItem('📈 自動OCR進捗', 'showOcrProgress')
     .addSeparator()
     .addItem('📚 過去全件取り込み（API）', 'backfillFromAPI')
     .addItem('🔁 取り込みカーソルをリセット', 'resetBackfillCursor')
@@ -38,8 +43,6 @@ function onOpen() {
     .addItem('🩺 ヘルスチェック手動実行', 'healthCheckManual')
     .addItem('🧪 エラー用Webhook疎通テスト', 'testErrorWebhook')
     .addToUi();
-
-  try { checkCsvReminderOnOpen_(); } catch (_) {}
 }
 
 /**

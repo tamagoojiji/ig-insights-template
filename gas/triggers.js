@@ -2,6 +2,8 @@
 // 時間トリガーのインストール・アンインストール
 // ==========
 
+// 'csvReminderJob' は新規作成しない（CSVリマインダー停止済み）が、
+// 既存のライブトリガーを removeOurTriggers_/uninstallTriggers で回収できるよう handler 名だけ残す
 const TRIGGER_HANDLERS = ['autoFetch', 'refreshTokenJob', 'autoOcrTick_', 'csvReminderJob', 'healthCheck'];
 
 /**
@@ -29,12 +31,6 @@ function installTriggers() {
     .atHour(9)
     .create();
 
-  ScriptApp.newTrigger('csvReminderJob')
-    .timeBased()
-    .onMonthDay(1)
-    .atHour(9)
-    .create();
-
   ScriptApp.newTrigger('healthCheck')
     .timeBased()
     .everyDays(1)
@@ -45,7 +41,6 @@ function installTriggers() {
     'トリガーをインストールしました\n\n' +
     '・autoFetch: 30分ごと（インサイト自動取得）\n' +
     '・refreshTokenJob: 毎週日曜 9時（トークン更新）\n' +
-    '・csvReminderJob: 毎月1日 9時（ストーリーズCSV取込みリマインダー）\n' +
     '・healthCheck: 毎日 9時（トリガー消失・取得停止の検知→エラー用Discord通知）'
   );
 }

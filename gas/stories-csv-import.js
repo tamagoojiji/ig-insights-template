@@ -402,6 +402,7 @@ function applyFeedRows_(rows) {
 
 /**
  * 月次のCSVインポートリマインダー（毎月1日9時に発火）
+ * 【未使用】過去分は取り込まない方針となり停止。トリガー作成・onOpen呼び出しは廃止済み。
  */
 function csvReminderJob() {
   const lastImport = getConfig('LAST_CSV_IMPORT_DATE');
@@ -425,6 +426,7 @@ function csvReminderJob() {
   notifyDiscord(message, { kind: 'csv_reminder', bypassCooldown: true });
 }
 
+// 【未使用】CSVリマインダー停止に伴い onOpen からの呼び出しを廃止済み。
 function checkCsvReminderOnOpen_() {
   const lastImport = getConfig('LAST_CSV_IMPORT_DATE');
   if (!lastImport) {
