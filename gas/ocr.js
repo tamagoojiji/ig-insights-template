@@ -26,7 +26,6 @@ function ocrImage_(imageUrl) {
   const mimeType = blob.getContentType() || 'image/jpeg';
   const base64 = Utilities.base64Encode(blob.getBytes());
 
-  // Vertex proxy 経由（ADC認証・特典クレジット対象・キー不要）
   const requestBody = {
     contents: [{
       parts: [
@@ -42,7 +41,45 @@ function ocrImage_(imageUrl) {
     requestBody.generationConfig.thinkingConfig = { thinkingBudget: 0 };
   }
 
+  // BYO: 利用者自身の Gemini APIキーがあれば自分の無料枠で直接叩く。
+  // 無ければ共有 Vertex proxy にフォールバック。どちらも OCR_MODEL 単一で統一。
+  const apiKey = getConfig('GEMINI_API_KEY');
+  if (apiKey) {
+    return geminiGenerateWithKey_(requestBody, OCR_MODEL, apiKey).trim();
+  }
   return vertexGenerate_(requestBody, [OCR_MODEL]).trim();
+}
+
+/**
+ * BYO: 利用者の Gemini APIキーで generativelanguage を直接呼ぶ。
+ * APIキーは URL クエリではなくヘッダ(x-goog-api-key)で送る（アクセスログ露出回避）。
+ */
+function geminiGenerateWithKey_(requestBody, model, apiKey) {
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
+    model + ':generateContent';
+  const res = UrlFetchApp.fetch(url, {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { 'x-goog-api-key': apiKey },
+    payload: JSON.stringify(requestBody),
+    muteHttpExceptions: true
+  });
+  const code = res.getResponseCode();
+  const body = res.getContentText();
+  if (code !== 200) {
+    throw new Error('Gemini API error HTTP ' + code + ': ' + body.slice(0, 300));
+  }
+  const cand = (JSON.parse(body).candidates || [])[0];
+  const parts = cand && cand.content && cand.content.parts;
+  const finish = cand && cand.finishReason;
+  const hasText = Array.isArray(parts) && parts.some((p) => typeof p.text === 'string');
+  // 候補なし / textを持つpart無し（空配列含む） / SAFETY・MAX_TOKENS等の異常終了
+  //  → 空文字で「処理済み」化せず例外にして再試行させる
+  if (!cand || !hasText || (finish && finish !== 'STOP')) {
+    throw new Error('Gemini OCR: 応答が正常終了しませんでした (' + (finish || 'no candidates') + ')');
+  }
+  // finishReason=STOP で text が空文字 = 文字なし画像。正常な空文字として許容
+  return parts.map((p) => p.text || '').join('');
 }
 
 /**

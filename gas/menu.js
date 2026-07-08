@@ -61,7 +61,7 @@ function checkConfig() {
     'Facebook アプリID: ' + (config.FB_APP_ID || '(未設定)'),
     'Facebook アプリシークレット: ' + mask(config.FB_APP_SECRET),
     'Drive フォルダID: ' + (config.DRIVE_FOLDER_ID || '(未設定)'),
-    'Gemini接続: Vertex proxy経由（キー不要）',
+    'Gemini接続: ' + (config.GEMINI_API_KEY ? '自分のAPIキー（' + mask(config.GEMINI_API_KEY) + '）' : '共有proxy経由（キー未設定）'),
     'Discord Webhook URL: ' + mask(config.WEBHOOK_URL),
     'トークン有効期限: ' + (config.TOKEN_EXPIRY || '(未設定)')
   ];
