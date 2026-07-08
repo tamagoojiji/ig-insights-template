@@ -268,7 +268,7 @@ function setupSettingsSheet() {
     ['Facebook アプリID', config.FB_APP_ID || '(未設定)'],
     ['Facebook アプリシークレット', maskValue_(config.FB_APP_SECRET)],
     ['Instagram アクセストークン', maskValue_(config.IG_ACCESS_TOKEN)],
-    ['Gemini接続', 'Vertex proxy経由（キー設定不要）'],
+    ['Gemini APIキー（任意）', config.GEMINI_API_KEY ? maskValue_(config.GEMINI_API_KEY) + '（自分の無料枠でOCR）' : '(未設定 → 共有proxy経由でOCR)'],
     ['Discord Webhook URL（任意）', maskValue_(config.WEBHOOK_URL)],
     ['Discord エラー通知用 Webhook URL（任意）', maskValue_(config.ERROR_WEBHOOK_URL)],
     ['', ''],
