@@ -249,8 +249,6 @@ function exchangeToLongLivedToken() {
  * 値はすべて Script Properties に保存され、シートには貼り付けない
  */
 function setupSettingsSheet() {
-  // 旧 Gemini APIキーの残留を消去（Vertex proxy 経由化で不要）
-  try { PropertiesService.getScriptProperties().deleteProperty('GEMINI_API_KEY'); } catch (_) {}
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName('⚙️ 設定');
   if (!sheet) {
