@@ -11,8 +11,6 @@ const OCR_PROMPT = '画像内に書かれているテキストを忠実に文字
  * - 外部URL（https://...）: UrlFetchApp で直接取得
  */
 function ocrImage_(imageUrl) {
-  const apiKey = getConfig('GEMINI_API_KEY');
-  if (!apiKey) throw new Error('GEMINI_API_KEY が未設定です（GASスクリプトプロパティを確認）');
   if (!imageUrl) throw new Error('画像URLが空です');
 
   let blob;
@@ -28,33 +26,23 @@ function ocrImage_(imageUrl) {
   const mimeType = blob.getContentType() || 'image/jpeg';
   const base64 = Utilities.base64Encode(blob.getBytes());
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${OCR_MODEL}:generateContent?key=${apiKey}`;
-  const payload = {
+  // Vertex proxy 経由（ADC認証・特典クレジット対象・キー不要）
+  const requestBody = {
     contents: [{
       parts: [
         { text: OCR_PROMPT },
-        { inline_data: { mime_type: mimeType, data: base64 } }
+        { inlineData: { mimeType: mimeType, data: base64 } }
       ]
     }],
     generationConfig: { temperature: 0, maxOutputTokens: 1024 }
   };
 
-  const res = UrlFetchApp.fetch(url, {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  });
-
-  const code = res.getResponseCode();
-  let data;
-  try { data = JSON.parse(res.getContentText()); } catch (_) { data = {}; }
-  if (code !== 200 || data.error) {
-    throw new Error(`Gemini API: ${data.error?.message || 'HTTP ' + code}`);
+  // 2.5 flash/lite は thinking 無効化（出力トークンを本文に使う）
+  if (OCR_MODEL.indexOf('2.5') !== -1 && OCR_MODEL.indexOf('pro') === -1) {
+    requestBody.generationConfig.thinkingConfig = { thinkingBudget: 0 };
   }
 
-  const parts = (data.candidates && data.candidates[0]?.content?.parts) || [];
-  return parts.map(p => p.text || '').join('').trim();
+  return vertexGenerate_(requestBody, [OCR_MODEL]).trim();
 }
 
 /**

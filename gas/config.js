@@ -9,7 +9,6 @@ const CONFIG_KEYS = [
   'TOKEN_EXPIRY',
   'FB_APP_ID',
   'FB_APP_SECRET',
-  'GEMINI_API_KEY',
   'WEBHOOK_URL',
   'ERROR_WEBHOOK_URL',
   'BACKFILL_CURSOR',
@@ -63,8 +62,6 @@ function promptAndSaveSecrets() {
       desc: '同画面の「アプリシークレット」（「表示」ボタン → FBパスワード入力で見える）' },
     { key: 'IG_ACCESS_TOKEN', label: 'Instagram アクセストークン',
       desc: 'Graph API Explorer で取得した短期/長期トークン' },
-    { key: 'GEMINI_API_KEY', label: 'Gemini APIキー（任意）',
-      desc: 'aistudio.google.com で発行（OCR を使わないなら空のままOK）' },
     { key: 'WEBHOOK_URL', label: 'Discord Webhook URL（任意）',
       desc: 'Discord チャンネル設定 → 連携サービス → ウェブフック（不要なら空のままOK）' },
     { key: 'ERROR_WEBHOOK_URL', label: 'Discord エラー通知用 Webhook URL（任意）',
@@ -144,7 +141,16 @@ function testConnection() {
       try {
         const ss = SpreadsheetApp.getActiveSpreadsheet();
         const sheet = ss.getSheetByName('⚙️ 設定');
-        if (sheet) sheet.getRange(5, 2).setValue(userId);
+        if (sheet) {
+          // ラベル検索で「Instagram ユーザーID」行を特定（固定行だと将来のレイアウト変更で壊れる）
+          const labels = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues();
+          for (let r = 0; r < labels.length; r++) {
+            if (String(labels[r][0]).indexOf('Instagram ユーザーID') === 0) {
+              sheet.getRange(r + 1, 2).setValue(userId);
+              break;
+            }
+          }
+        }
       } catch (_) {}
     } catch (e) {
       SpreadsheetApp.getUi().alert('IG_USER_ID自動取得エラー: ' + e.message);
@@ -240,6 +246,8 @@ function exchangeToLongLivedToken() {
  * 値はすべて Script Properties に保存され、シートには貼り付けない
  */
 function setupSettingsSheet() {
+  // 旧 Gemini APIキーの残留を消去（Vertex proxy 経由化で不要）
+  try { PropertiesService.getScriptProperties().deleteProperty('GEMINI_API_KEY'); } catch (_) {}
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName('⚙️ 設定');
   if (!sheet) {
@@ -259,7 +267,7 @@ function setupSettingsSheet() {
     ['Facebook アプリID', config.FB_APP_ID || '(未設定)'],
     ['Facebook アプリシークレット', maskValue_(config.FB_APP_SECRET)],
     ['Instagram アクセストークン', maskValue_(config.IG_ACCESS_TOKEN)],
-    ['Gemini APIキー（任意）', maskValue_(config.GEMINI_API_KEY)],
+    ['Gemini接続', 'Vertex proxy経由（キー設定不要）'],
     ['Discord Webhook URL（任意）', maskValue_(config.WEBHOOK_URL)],
     ['Discord エラー通知用 Webhook URL（任意）', maskValue_(config.ERROR_WEBHOOK_URL)],
     ['', ''],
