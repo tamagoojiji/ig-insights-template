@@ -156,45 +156,56 @@ function Step2({ done, onToggle }) {
 
 function Step3({ done, onToggle }) {
   const perms = [
-    ["instagram_business_basic", "基本情報・メディア取得"],
-    ["instagram_business_manage_insights", "インサイト数値取得"],
+    ["instagram_basic", "基本情報・メディア取得"],
+    ["instagram_manage_insights", "インサイト数値取得"],
     ["pages_read_engagement", "FBページ経由でIG接続"],
     ["pages_show_list", "ページ一覧取得"],
     ["business_management", "ビジネスアカウント管理"],
   ];
   return (
-    <StepSection id="step-3" num="03" title="Instagram製品追加 + 権限確認" subtitle="所要 約3分"
+    <StepSection id="step-3" num="03" title="権限（アクセス許可）を揃える" subtitle="所要 約5分"
       done={done} onToggleDone={onToggle}>
-      <p>Step 2 でアプリを作成した直後のダッシュボード画面から、Instagram 製品を追加して 5 権限が揃っているか確認します。</p>
+      <p>Step 2 で作ったアプリに、インサイト取得に必要な 5 つの権限を追加します。<strong>新しいMeta UI では「製品を追加」ではなく「ユースケース」から設定します</strong>（旧ガイドの「アプリに製品を追加」「Instagram グラフ API」は現在のUIには存在しません）。</p>
 
-      <h3>3-1. Instagram製品を追加</h3>
+      <Callout kind="warn">
+        <p><strong>先に Instagram と Facebookページの連携を必ず済ませてください（最大の詰まりどころ）。</strong> Instagram（プロアカウント）を Facebook ページに連携していないと、Step 5 のトークン取得で「<strong>ページがありません</strong>」と出て先へ進めません。手順は下の Pitfall 参照。</p>
+      </Callout>
+
+      <h3>3-1. 「FacebookログインによるAPI設定」を開く</h3>
       <ol>
-        <li>アプリダッシュボード本文の「<strong>アプリに製品を追加</strong>」セクションまでスクロール</li>
-        <li><strong>Instagram</strong> カードの「<strong>設定</strong>」をクリック → 左メニューに <strong>「Instagram グラフ API」</strong> が追加される</li>
+        <li>アプリのダッシュボード左メニュー「<strong>ユースケース</strong>」を開く</li>
+        <li>「Instagramでメッセージとコンテンツを管理」の「<strong>カスタマイズ</strong>」をクリック</li>
+        <li>左メニューの「<strong>FacebookログインによるAPI設定</strong>」を開く <span className="hint">（＝旧「Instagram グラフ API」に相当。graph.facebook.com 系はこちら）</span></li>
       </ol>
 
-      <h3>3-2. 権限が揃っているか確認</h3>
-      <p>「他（going away soon）」ユースケースで作ったアプリは、必要な権限が <strong>自動でStandard accessとして付与されている</strong>ため、追加操作は基本不要です。</p>
+      <h3>3-2. 5つの権限を追加する</h3>
       <ol>
-        <li>左メニューの「<strong>Instagram グラフ API</strong>」を開く（または商品ページ）</li>
-        <li>関連する権限一覧で、下記5つが <strong>Standard access</strong> として表示されているか確認 <span className="hint">（クリックでコピー）</span></li>
+        <li>「アクセス許可と機能」ブロックの「<strong>Add required content permissions</strong>」を押す → <code>instagram_basic</code> / <code>pages_read_engagement</code> / <code>pages_show_list</code> / <code>business_management</code> がまとめて追加される</li>
+        <li><strong>これだけでは <code>instagram_manage_insights</code> が入りません。</strong> 左メニュー「<strong>アクセス許可と機能</strong>」を開き、検索欄に <Copyable>instagram_manage_insights</Copyable> と入れて「<strong>追加</strong>」を押す</li>
       </ol>
+      <p>最終的に下記5つが「<strong>テスト準備完了</strong>」で並んでいればOKです <span className="hint">（クリックでコピー）</span>：</p>
       <ul className="plain">
         {perms.map(([k, v]) => (
           <li key={k}><Copyable>{k}</Copyable> — {v}</li>
         ))}
       </ul>
       <Callout kind="success">
-        <p><strong>「Standard access」= 開発モードで即使える</strong>。クリックや申請は不要。横の「アドバンスアクセスをリクエスト」ボタンは<strong>絶対に押さない</strong>（押すとMetaの審査が走り想定外）。</p>
+        <p><strong>「テスト準備完了」= 開発モードで即使える</strong>。アプリの管理者/開発者/テスターなら審査なしで使えます（本テンプレは自分のアプリで自分のアカウントを見るので<strong>アプリレビュー＝審査への提出は不要</strong>）。横の「アドバンスアクセス」系は<strong>押さない</strong>（審査が走ります）。</p>
       </Callout>
-      <Callout kind="info">
-        <p><strong>5権限が画面上に出ていなくてもOK</strong>：実際の動作確認は Step 6 の接続テストで行います。Step 5 で短期トークンが取得できれば権限は問題なく付いています。</p>
-      </Callout>
-      <Pitfall title="権限が見つからない場合">
-        <p>旧名（<code>instagram_basic</code> / <code>instagram_manage_insights</code>）で検索すると出ません。新名（<code>_business_</code> 付き）で検索してください。pagesとbusiness系は旧名のままで OK。</p>
+      <Pitfall title="権限が検索してもヒットしない場合">
+        <p><strong>追加済みの権限は「アクセス許可と機能」の検索に出なくなります</strong>（＝検索でヒットしない＝すでに追加済みの意味）。検索欄を空にして、上部の「追加済み」一覧に5つ揃っているかで確認してください。</p>
+      </Pitfall>
+      <Pitfall title="【重要】Instagramと Facebookページの連携（「ページがありません」対策）">
+        <p>Graph API はインサイトを「IGアカウント → Facebookページ → FBユーザー」の連携経由で取ります。連携が無いと Step 5 で「ページがありません」になります。手順（PCブラウザ）：</p>
+        <ol>
+          <li>Instagram を<strong>プロアカウント（ビジネス/クリエイター）</strong>にしておく（IG設定 → アカウントの種類とツール）</li>
+          <li>Facebookページが無ければ <a href="https://www.facebook.com/pages/create" target="_blank" rel="noreferrer">facebook.com/pages/create</a> で先に作成</li>
+          <li>facebook.com で<strong>そのFacebookページ本体にプロフィールを切り替える</strong>（右上アイコン → プロフィールを切り替え → 対象ページを選択）。<strong>個人プロフィールのままだと連携項目が出ません</strong></li>
+          <li>その状態で「設定とプライバシー」→「設定」→ 検索欄に「Instagram」→「<strong>リンク済みのアカウント</strong>」から Instagram を接続</li>
+        </ol>
       </Pitfall>
       <Pitfall title="UI構成がドキュメントと違う場合">
-        <p>Metaのダッシュボードは頻繁にUI変更されます。表示が違っても <strong>左メニューに「Instagramグラフ API」「アプリレビュー」のいずれか</strong> が存在し、そこから関連権限の状態が見られればOKです。最終確認は Step 6 の接続テスト結果で判断してください。</p>
+        <p>Metaのダッシュボードは頻繁にUI変更されます。表示が違っても <strong>「FacebookログインによるAPI設定」または「アクセス許可と機能」</strong> から5権限の状態が見られればOK。最終確認は Step 6 の接続テスト結果で判断してください。</p>
       </Pitfall>
     </StepSection>
   );
@@ -256,13 +267,13 @@ function Step5({ done, onToggle }) {
       <ol start="5">
         <li><Copyable>insta</Copyable> や <Copyable>pages</Copyable> と<strong>部分入力すると候補が絞られます</strong>。下記5つをそれぞれクリックして追加：
           <ul>{perms.map(p => <li key={p}><Copyable>{p}</Copyable></li>)}</ul>
-          <p className="hint" style={{marginTop: 6}}>※ Graph API Explorer では<strong>旧名のまま</strong>表示されます（Step 3 で見た新名 <code>instagram_business_basic</code> 等とは別表記）。これでOK、Meta側で内部的にマッピングされます。</p>
+          <p className="hint" style={{marginTop: 6}}>※ 権限名は Step 3 と<strong>同じ</strong>です。ドロップダウンに出ない権限があれば、Step 3 でその権限をまだ追加できていない可能性があります（特に <code>instagram_manage_insights</code>）。</p>
         </li>
       </ol>
       <StepImage slot="5-C" src="images/setup-guide/graph-api-explorer/05-adding-permissions.png" alt="権限を複数追加中の状態" />
       <StepImage slot="5-D" src="images/setup-guide/graph-api-explorer/06-all-permissions-added.png" alt="5つの権限すべて追加完了" />
       <ol start="6">
-        <li>「<strong>Generate Access Token</strong>」（アクセストークンを生成）をクリック → Facebook承認画面でFBページとIGアカウントが「1件を選択中」になっているか確認 →「保存」</li>
+        <li>「<strong>Generate Access Token</strong>」（アクセストークンを生成）をクリック → Facebook承認画面でFBページとIGアカウントが「1件を選択中」になっているか確認 →「保存」<span className="hint">（ここで「ページがありません」と出たら、IGとFacebookページが未連携です。Step 3 の Pitfall「Instagramと Facebookページの連携」を先に済ませてください）</span></li>
         <li>「<strong>Access Token</strong>」（アクセストークン）欄に表示される長い文字列をコピー</li>
       </ol>
       <ol start="7">
@@ -394,8 +405,11 @@ function Step9({ done, onToggle }) {
         <li>「Create API key in new project」で新規作成。プロジェクト名を聞かれたら例: <Copyable>ig-insights-gemini</Copyable> など分かりやすい名前を入れる</li>
         <li>発行された <Copyable>AIza...</Copyable> で始まる文字列をコピー</li>
         <li>スプシのメニュー <Copyable>📊 Instagram Insights → 🔐 シークレット入力</Copyable> を実行</li>
-        <li>「Gemini APIキー」のダイアログまで進み貼り付け → OK</li>
+        <li>「<strong>Gemini APIキー（任意・OCR用）</strong>」のダイアログまで進み貼り付け → OK</li>
       </ol>
+      <Callout kind="info">
+        <p><strong>保存できたか確認</strong>：メニュー「🔍 設定状況を確認」または「⚙️ 設定」シートの「Gemini APIキー」行に <code>AIza****○○（自分の無料枠でOCR）</code> と出れば成功。<code>(未設定 → 共有proxy経由でOCR)</code> のままなら貼付値の先頭が <code>AIza</code> か（空白・URL混入がないか）を確認。</p>
+      </Callout>
       <Callout kind="info">
         <p><strong>OCRが走るタイミング</strong>：30分ごとの自動取得で「新規ストーリーズ」を検出した時だけ。過去分のバッチOCRはありません。</p>
       </Callout>
@@ -406,7 +420,7 @@ function Step9({ done, onToggle }) {
         <p><strong>月額試算</strong>：新着 月100件 OCR でも約 <strong>$0.05（≒7円）</strong>。Gemini無料枠（1,500回/日）に余裕で収まります。</p>
       </Callout>
       <Callout kind="warn">
-        <p><strong>OCR 不要なら Step 9 スキップでOK</strong>。基本数値（リーチ・閲覧数・反応数）は Gemini なしでも問題なく取得・記録されます。</p>
+        <p><strong>このStepは任意（スキップ可）</strong>。キーを入れれば<strong>自分の無料枠</strong>でOCRが動きます。空のままにしても<strong>共有proxy経由でOCRは動作</strong>します（キー登録は「自分の無料枠・自分のデータ経路で処理したい」場合の設定）。基本数値（リーチ・閲覧数・反応数）はOCRの有無に関わらず取得・記録されます。</p>
       </Callout>
       <Callout kind="danger">
         <p><strong>APIキーの取り扱い</strong>：Step 4 のシークレットと同じく機密情報。公開リポジトリ・SNS・スクショ共有は厳禁。漏洩したら AI Studio から即時失効＆再発行。</p>
