@@ -203,6 +203,7 @@ function Step3({ done, onToggle }) {
           <li>facebook.com で<strong>そのFacebookページ本体にプロフィールを切り替える</strong>（右上アイコン → プロフィールを切り替え → 対象ページを選択）。<strong>個人プロフィールのままだと連携項目が出ません</strong></li>
           <li>その状態で「設定とプライバシー」→「設定」→ 検索欄に「Instagram」→「<strong>リンク済みのアカウント</strong>」から Instagram を接続</li>
         </ol>
+        <p className="hint" style={{marginTop: 6}}>※ 次の経路には連携項目が<strong>出ません</strong>（時間の無駄なので避ける）：Web版IGの「プロフィールを編集」／IGの「ビジネスツールと管理」（アカウント種別の切替のみ）／Meta Business Suiteの簡易設定（プロフィール・認証・言語設定だけの画面）。<strong>必ずFacebookページ本体に切り替えてからの「設定 → リンク済みのアカウント」</strong>を使うこと。アカウントセンターにFBアカウントを追加しただけでは連携されない点も注意。</p>
       </Pitfall>
       <Pitfall title="UI構成がドキュメントと違う場合">
         <p>Metaのダッシュボードは頻繁にUI変更されます。表示が違っても <strong>「FacebookログインによるAPI設定」または「アクセス許可と機能」</strong> から5権限の状態が見られればOK。最終確認は Step 6 の接続テスト結果で判断してください。</p>
@@ -259,6 +260,9 @@ function Step5({ done, onToggle }) {
         <li>「<strong>Metaアプリ</strong>」のドロップダウンで、Step 2 で作成した自分のアプリを選択</li>
         <li>「<strong>ユーザーまたはページ</strong>」のドロップダウンを開き、「<strong>ユーザーアクセストークンを取得</strong>」をクリック</li>
       </ol>
+      <Callout kind="info">
+        <p><strong>ここで表示される名前が「自分のFacebook個人名」になっていてOK</strong>（IGアカウント名やページ名にならなくて正常）。Graph APIのトークンは常に<strong>操作する人＝FBユーザー本人</strong>に紐づき、その人が管理するページ→連携IGアカウント、とAPIで辿ってインサイトを取ります。「人 → Facebookページ → IGアカウント」の関係です。</p>
+      </Callout>
       <StepImage slot="5-A" src="images/setup-guide/graph-api-explorer/02-explorer-initial.png" alt="Graph API Explorer 初期状態（Metaアプリ選択直後）" />
       <ol start="4">
         <li>「アクセス許可」欄の「許可を追加」をクリック → カテゴリ（Events Groups Pages / Other など）が表示される</li>
