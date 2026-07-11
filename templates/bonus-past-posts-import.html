@@ -2,188 +2,333 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>購入者特典：過去の投稿取り込みガイド【完全版】</title>
+<title>購入者特典：過去データ取り寄せガイド（Meta公式）</title>
 <style>
-  @page { size: A4; margin: 12mm 14mm; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: "Hiragino Sans", "Yu Gothic", sans-serif; color: #2c3e50; font-size: 10.5pt; line-height: 1.7; background: #fff; }
-  .badge {
-    display: inline-block; background: #fdeff5; color: #c2185b;
-    font-size: 9pt; font-weight: bold; padding: 1mm 4mm; border-radius: 10px; margin-bottom: 2mm;
+  :root{
+    --base:#eef2f7; --card:#ffffff;
+    --ink:#25323f; --ink2:#5c6b7a;
+    --blue:#2f6db0; --blue-d:#254f7c; --blue-t:#e7f0f9;
+    --amber:#cf8a3c; --amber-d:#a9691f; --amber-t:#f8eeda;
+    --green:#4d9b74; --green-t:#e6f2eb;
+    --line:#d6dfe9;
   }
-  h1 {
-    font-size: 18pt; color: #1a73e8;
-    border-bottom: 3px solid #1a73e8; padding-bottom: 2mm; margin-bottom: 2mm;
-  }
-  .lead { color: #666; font-size: 10pt; margin-bottom: 6mm; }
-  h2 {
-    font-size: 13pt; color: #1a73e8; margin: 7mm 0 3mm;
-    display: flex; align-items: center; gap: 6px;
-  }
-  h2::before {
-    content: ""; display: inline-block; width: 4px; height: 15px;
-    background: #1a73e8; border-radius: 2px;
-  }
-  h3 { font-size: 11pt; color: #1a4f9c; margin: 4mm 0 2mm; }
-  .benefit {
-    display: flex; gap: 3mm; align-items: flex-start; margin-bottom: 3mm; break-inside: avoid;
-    background: #f6f9fc; border-radius: 8px; padding: 3mm 4mm;
-  }
-  .benefit .icon { font-size: 14pt; flex-shrink: 0; }
-  .benefit .t strong { display: block; margin-bottom: 0.5mm; }
-  .benefit .t small { color: #666; font-size: 9.5pt; line-height: 1.55; display: block; }
-  .route {
-    background: #f6f9fc; border-radius: 10px; padding: 5mm 6mm; margin-bottom: 4mm;
-    border-left: 5px solid #1a73e8; break-inside: avoid;
-  }
-  .route.story { border-left-color: #e8a400; }
-  .route.csv { border-left-color: #34a853; }
-  .route h3 { margin-top: 0; }
-  .route h3 .tag {
-    display: inline-block; font-size: 8.5pt; color: #fff; background: #1a73e8;
-    border-radius: 8px; padding: 0.5mm 3mm; margin-right: 2mm; vertical-align: middle;
-  }
-  .route.story h3 .tag { background: #e8a400; }
-  .route.csv h3 .tag { background: #34a853; }
-  ol.steps { padding-left: 6mm; }
-  ol.steps li { margin-bottom: 1.5mm; }
-  ul.plain { padding-left: 6mm; }
-  ul.plain li { margin-bottom: 1mm; }
-  .note {
-    background: #fff7e6; border-radius: 8px; padding: 3.5mm 5mm; margin: 3mm 0;
-    font-size: 9.5pt; break-inside: avoid;
-  }
-  .note strong { color: #a06a00; }
-  .note.blue { background: #eef4fd; }
-  .note.blue strong { color: #1a4f9c; }
-  table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.5pt; break-inside: avoid; }
-  th { background: #eef4fd; color: #1a4f9c; text-align: left; }
-  th, td { border: 1px solid #d8e2ee; padding: 2mm 3mm; }
-  .qa { margin-bottom: 3mm; break-inside: avoid; }
-  .qa .q { font-weight: bold; color: #1a4f9c; }
-  .qa .a { font-size: 9.8pt; color: #444; }
-  .check-item {
-    display: flex; align-items: flex-start; gap: 3mm; padding: 1.5mm 0;
-    border-bottom: 1px dashed #d8e2ee; break-inside: avoid;
-  }
-  .check-item:last-child { border-bottom: none; }
-  .box {
-    width: 4.5mm; height: 4.5mm; border: 1.5px solid #1a73e8; border-radius: 1.5mm;
-    flex-shrink: 0; margin-top: 1.2mm;
-  }
-  .freq {
-    font-size: 8.5pt; color: #fff; background: #1a73e8; border-radius: 8px;
-    padding: 0.5mm 3mm; flex-shrink: 0; margin-top: 1mm; white-space: nowrap;
-  }
-  .footer {
-    margin-top: 8mm; padding-top: 3mm; border-top: 1px solid #d8e2ee;
-    font-size: 8.5pt; color: #999; text-align: center;
-  }
-  .menu { font-weight: bold; color: #1a4f9c; background: #eef4fd; border-radius: 4px; padding: 0 2mm; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:217mm 1464mm; margin:0; }
+  body{ font-family:"Hiragino Sans","Yu Gothic",sans-serif; color:var(--ink); background:var(--base); line-height:1.7; }
+  .page{ width:820px; margin:0 auto; padding:34px 40px 30px; }
+
+  /* ---- hero ---- */
+  .hero{ background:linear-gradient(135deg,#2f6db0,#254f7c); border-radius:20px; padding:30px 34px; color:#fff; position:relative; overflow:hidden; }
+  .hero::after{ content:""; position:absolute; right:-60px; top:-60px; width:200px; height:200px; background:rgba(255,255,255,.08); border-radius:50%; }
+  .hero .badge{ display:inline-block; background:rgba(255,255,255,.18); color:#fff; font-size:12px; font-weight:700; padding:4px 13px; border-radius:20px; letter-spacing:.04em; }
+  .hero h1{ font-size:32px; line-height:1.3; margin:12px 0 8px; font-weight:800; }
+  .hero p{ font-size:14px; color:#dfeaf6; max-width:600px; }
+  .hero .flow{ display:flex; align-items:center; gap:10px; margin-top:22px; flex-wrap:nowrap; }
+  .hero .fbox{ background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); border-radius:12px; padding:11px 14px; text-align:center; flex:1; }
+  .hero .fbox .ic{ font-size:22px; }
+  .hero .fbox .tt{ font-size:12.5px; font-weight:700; margin-top:3px; }
+  .hero .fbox .ds{ font-size:10.5px; color:#cfe0f2; }
+  .hero .arr{ color:rgba(255,255,255,.7); font-size:18px; font-weight:700; flex:0 0 auto; }
+  .hero .wait{ font-size:9.5px; color:#bcd3ec; display:block; }
+
+  h2{ font-size:20px; color:var(--blue-d); margin:34px 0 4px; display:flex; align-items:center; gap:10px; font-weight:800; }
+  h2 .n{ display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; background:var(--blue); color:#fff; border-radius:9px; font-size:15px; flex:0 0 auto; }
+  .sub{ color:var(--ink2); font-size:13px; margin:2px 0 16px 40px; }
+  .h2plain{ margin-left:0; }
+  .h2plain .sub{ margin-left:0; }
+
+  /* ---- benefits ---- */
+  .benefits{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .bcard{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; display:flex; gap:12px; align-items:flex-start; }
+  .bcard.wide{ grid-column:1 / -1; }
+  .bcard .ic{ font-size:24px; flex:0 0 auto; line-height:1.2; }
+  .bcard .tt{ font-size:14.5px; font-weight:800; color:var(--ink); margin-bottom:3px; }
+  .bcard .ds{ font-size:11.8px; color:var(--ink2); line-height:1.6; }
+  .bcard .ds b{ color:var(--amber-d); }
+
+  /* ---- step block ---- */
+  .step{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px 24px; margin-top:4px; }
+  .cols{ display:flex; gap:22px; align-items:flex-start; }
+  .cols .txt{ flex:1; }
+  .cols .fig{ flex:0 0 300px; }
+  ol.steps{ list-style:none; counter-reset:s; }
+  ol.steps li{ counter-increment:s; position:relative; padding:0 0 12px 34px; font-size:12.8px; color:var(--ink); }
+  ol.steps li::before{ content:counter(s); position:absolute; left:0; top:0; width:23px; height:23px; background:var(--blue-t); color:var(--blue-d); border-radius:50%; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  ol.steps li:not(:last-child)::after{ content:""; position:absolute; left:11px; top:24px; bottom:2px; width:2px; background:var(--line); }
+  ol.steps li b{ color:var(--blue-d); }
+
+  /* ---- device mockup ---- */
+  .device{ background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:0 6px 18px rgba(37,79,124,.10); overflow:hidden; }
+  .device .bar{ background:#f1f5fa; border-bottom:1px solid var(--line); padding:9px 14px; font-size:11.5px; font-weight:700; color:var(--blue-d); display:flex; align-items:center; gap:7px; }
+  .device .bar .dot{ width:8px; height:8px; border-radius:50%; background:#cdd8e4; }
+  .device .row{ padding:11px 14px; border-bottom:1px solid #eef2f7; font-size:12px; color:var(--ink); display:flex; justify-content:space-between; align-items:center; }
+  .device .row .chev{ color:#b7c3d1; }
+  .device .row.hl{ background:var(--amber-t); border-left:3px solid var(--amber); font-weight:800; color:var(--amber-d); }
+  .device .row.hl .chev{ color:var(--amber); }
+  .fcap{ font-size:10.5px; color:var(--ink2); text-align:center; margin-top:8px; }
+
+  .pills{ display:flex; gap:10px; margin-top:12px; }
+  .pill{ flex:1; border-radius:11px; padding:10px 12px; font-size:12px; font-weight:800; text-align:center; border:1.5px solid; }
+  .pill.ok{ background:var(--green-t); border-color:var(--green); color:#2f6f4f; }
+  .pill.ng{ background:#f3f4f6; border-color:#cdd4dc; color:#9aa4af; text-decoration:line-through; }
+
+  /* ---- menu mockup ---- */
+  .menuwrap{ display:inline-block; }
+  .menutop{ background:var(--blue); color:#fff; font-size:12px; font-weight:800; padding:8px 14px; border-radius:9px 9px 0 0; }
+  .menulist{ background:#fff; border:1px solid var(--line); border-top:none; border-radius:0 0 10px 10px; box-shadow:0 8px 20px rgba(37,79,124,.10); }
+  .menulist .mi{ padding:9px 14px; font-size:11.8px; border-bottom:1px solid #eef2f7; color:var(--ink); }
+  .menulist .mi:last-child{ border-bottom:none; }
+  .menulist .mi.hl{ background:var(--amber-t); color:var(--amber-d); font-weight:800; }
+
+  /* ---- branch ---- */
+  .branch{ margin-top:16px; }
+  .branchq{ text-align:center; background:var(--blue-d); color:#fff; font-size:12.5px; font-weight:800; padding:9px 16px; border-radius:11px; display:inline-block; }
+  .branchq-wrap{ text-align:center; }
+  .split{ display:flex; gap:14px; margin-top:14px; position:relative; }
+  .split::before{ content:""; position:absolute; top:-14px; left:50%; width:1px; height:14px; background:var(--line); }
+  .bcol{ flex:1; background:#fff; border:1px solid var(--line); border-radius:14px; padding:15px 16px; }
+  .bcol .cap{ font-size:12px; font-weight:800; padding:4px 10px; border-radius:8px; display:inline-block; margin-bottom:9px; }
+  .bcol.easy .cap{ background:var(--green-t); color:#2f6f4f; }
+  .bcol.big .cap{ background:var(--amber-t); color:var(--amber-d); }
+  .bcol ol{ list-style:none; counter-reset:b; }
+  .bcol ol li{ counter-increment:b; position:relative; padding:0 0 8px 26px; font-size:11.8px; color:var(--ink); }
+  .bcol ol li::before{ content:counter(b); position:absolute; left:0; top:1px; width:19px; height:19px; background:var(--blue-t); color:var(--blue-d); border-radius:50%; font-size:10.5px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .bcol .menu{ font-weight:800; color:var(--blue-d); background:var(--blue-t); border-radius:4px; padding:0 4px; }
+
+  .note{ background:var(--amber-t); border-radius:11px; padding:12px 15px; font-size:11.8px; color:var(--ink); margin-top:14px; border-left:4px solid var(--amber); }
+  .note b{ color:var(--amber-d); }
+  .note.blue{ background:var(--blue-t); border-left-color:var(--blue); }
+  .note.blue b{ color:var(--blue-d); }
+  .note.green{ background:var(--green-t); border-left-color:var(--green); }
+  .note.green b{ color:#2f6f4f; }
+
+  /* ---- timeline ---- */
+  .timeline{ display:flex; gap:0; margin-top:6px; }
+  .tl{ flex:1; text-align:center; position:relative; padding-top:34px; }
+  .tl::before{ content:""; position:absolute; top:11px; left:0; right:0; height:3px; background:var(--line); }
+  .tl:first-child::before{ left:50%; }
+  .tl:last-child::before{ right:50%; }
+  .tl .pt{ position:absolute; top:4px; left:50%; transform:translateX(-50%); width:18px; height:18px; border-radius:50%; background:var(--blue); border:3px solid #fff; box-shadow:0 0 0 1.5px var(--blue); }
+  .tl .when{ font-size:11px; font-weight:800; color:var(--blue-d); }
+  .tl .what{ font-size:11px; color:var(--ink2); margin-top:3px; padding:0 8px; }
+
+  /* ---- qa ---- */
+  .qa{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:13px 16px; margin-bottom:9px; }
+  .qa .q{ font-size:12.8px; font-weight:800; color:var(--blue-d); }
+  .qa .a{ font-size:11.8px; color:var(--ink2); margin-top:4px; }
+  .qa .a b{ color:var(--ink); }
+
+  .help{ background:var(--blue-d); color:#fff; border-radius:14px; padding:16px 20px; font-size:12.5px; margin-top:18px; display:flex; gap:12px; align-items:center; }
+  .help .ic{ font-size:26px; }
+  .help b{ color:#fff; }
+
+  .footer{ text-align:center; font-size:10.5px; color:var(--ink2); margin-top:22px; padding-top:14px; border-top:1px solid var(--line); }
+  .picklist{ background:var(--blue-t); border-radius:12px; padding:14px 17px; margin-top:14px; }
+  .picklist .pt{ font-size:12.8px; font-weight:800; color:var(--blue-d); margin-bottom:9px; }
+  .picklist .pi{ display:flex; gap:10px; align-items:flex-start; font-size:12.2px; color:var(--ink); padding:4px 0; }
+  .picklist .pi .ck{ flex:0 0 auto; width:19px; height:19px; border-radius:5px; background:var(--green); color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .picklist .pi b{ color:var(--blue-d); }
+  .picklist .pi .tag{ background:var(--amber-t); color:var(--amber-d); font-weight:800; border-radius:5px; padding:0 5px; }
+  .red{ color:#c0392b; }
+  .shotrow{ display:flex; gap:20px; align-items:stretch; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; }
+  .shotrow .shot{ flex:0 0 300px; position:relative; }
+  .shotrow .shot img{ width:100%; border:1px solid var(--line); border-radius:10px; display:block; }
+  .redbox{ position:absolute; left:3%; right:3%; border:3px solid #d64545; border-radius:6px; box-shadow:0 0 0 2px rgba(214,69,69,.18); }
+  .redbox .rbl{ position:absolute; right:-3px; top:-19px; background:#d64545; color:#fff; font-size:10px; font-weight:800; padding:1px 7px; border-radius:5px; white-space:nowrap; }
+  .annots{ flex:1; display:flex; flex-direction:column; justify-content:space-between; padding-top:81px; }
+  .asec{ font-size:11px; font-weight:800; color:#fff; background:var(--blue); border-radius:6px; padding:3px 10px; display:inline-block; margin:0 0 7px; }
+  .asec.mt{ margin-top:11px; }
+  .annot{ font-size:11.3px; color:var(--ink2); padding:3.5px 0; border-bottom:1px dashed var(--line); line-height:1.5; }
+  .annot b{ color:var(--ink); }
+  .annot.need{ background:#fdecec; border:2.5px solid #d64545; border-radius:8px; padding:7px 10px; margin:5px 0; color:var(--ink); }
+  .annot.need b{ color:#b02b2b; }
+  .annot.need .req{ display:inline-block; background:#d64545; color:#fff; font-size:9.5px; font-weight:800; border-radius:4px; padding:0 5px; margin-left:4px; }
+  .flowlist{ margin-top:14px; }
+  .flowrow{ display:flex; gap:18px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px; }
+  .flowrow .fimg{ flex:0 0 300px; }
+  .flowrow .fimg img{ width:100%; border:1px solid var(--line); border-radius:8px; display:block; }
+  .flowrow .ftext{ flex:1; display:flex; gap:11px; align-items:flex-start; font-size:13px; color:var(--ink2); line-height:1.6; }
+  .flowrow .ftext b{ color:var(--ink); }
+  .flowrow .ftext b.red{ color:#c0392b; }
+  .flowrow .fnum{ flex:0 0 auto; width:26px; height:26px; background:var(--blue); color:#fff; border-radius:50%; font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .urlbox{ display:inline-block; margin-top:5px; background:var(--blue-t); border:1px solid #c5d8ef; border-radius:7px; padding:4px 10px; font-size:11px; color:var(--blue-d); }
+  .urlbox a{ color:var(--blue-d); text-decoration:none; font-weight:800; word-break:break-all; }
 </style>
 </head>
 <body>
+<div class="page">
 
-<span class="badge">購入者特典</span>
-<h1>過去の投稿取り込みガイド【完全版】</h1>
-<p class="lead">このテンプレートが自動で保存するのは「設定が終わったあと」の投稿です。設定より前の過去の投稿は、このガイドの方法でさかのぼって取り込めます。前半で「やると何が変わるか」、後半で具体的な手順を説明します。</p>
+  <!-- HERO -->
+  <div class="hero">
+    <span class="badge">購入者特典</span>
+    <h1>過去データ取り寄せガイド</h1>
+    <p>ふだんの自動保存は「設定後」の投稿だけ。それより前の過去のフィード・リール・ストーリーズは、<b>Meta社公式の「情報をダウンロード」</b>でアカウントを丸ごと取り寄せて、スプレッドシートに取り込めます。</p>
+    <div class="flow">
+      <div class="fbox"><div class="ic">📥</div><div class="tt">①申請する</div><div class="ds">Meta社にDL依頼</div></div>
+      <div class="arr">→<span class="wait">数時間〜数日</span></div>
+      <div class="fbox"><div class="ic">💾</div><div class="tt">②zipを保存</div><div class="ds">メールで届く</div></div>
+      <div class="arr">→</div>
+      <div class="fbox"><div class="ic">📊</div><div class="tt">③取り込む</div><div class="ds">スプシにボタン</div></div>
+    </div>
+  </div>
 
-<h2>これをやると、何ができるようになるか</h2>
+  <!-- WHY -->
+  <h2 class="h2plain">これをやると、何ができるようになるか<span class="sub">「過去の実績を、消えない場所に丸ごと残す」ための作業です。</span></h2>
+  <div class="benefits">
+    <div class="bcard"><div class="ic">🛡</div><div><div class="tt">実績が消えなくなる</div><div class="ds">凍結・乗っ取り・誤削除が起きると数字も画像もまとめて消え、あとから取り出せません。<b>この取り寄せ自体もアカウントが生きている今しかできません。</b></div></div></div>
+    <div class="bcard"><div class="ic">📖</div><div><div class="tt">消えた過去ストーリーズが戻る</div><div class="ds">ストーリーズは24時間で取得の窓口が閉じ、ふだんの自動取得では追えません。公式DLなら画像・日時まで丸ごと復元できます。</div></div></div>
+    <div class="bcard"><div class="ic">🤖</div><div><div class="tt">AI分析の素材が増える</div><div class="ds">特典③「AI分析プロンプト集」は素材が多いほど深く効きます。過去がまとまると<b>反応が良かった型</b>をAIが見つけやすくなります。</div></div></div>
+    <div class="bcard"><div class="ic">💼</div><div><div class="tt">実績の「証拠」になる</div><div class="ds">PR案件・運用代行の営業などで、過去投稿を時系列の生データで提示できます。スクショより説得力が段違い。</div></div></div>
+    <div class="bcard wide"><div class="ic">🔄</div><div><div class="tt">もし再スタートになっても、勝ちパターンを引き継げる</div><div class="ds">作り直すことになっても「過去に何を出してきたか」のデータベースが手元にあれば、ゼロからの手探りではなく、実証済みの型を持って再スタートできます。</div></div></div>
+  </div>
 
-<div class="benefit"><span class="icon">🛡</span><span class="t"><strong>「アカウントが消えたら実績も全部消える」がなくなる</strong>
-<small>凍結・乗っ取り・誤削除が起きると、インスタ側の数字も画像もまとめて消え、あとから取り出す方法はありません。<strong>この取り込み作業自体も、アカウントが生きている今しかできません。</strong>先に手元へ写しておけば、何が起きてもあなたの実績データは残ります。</small></span></div>
+  <div class="note blue"><b>前提：</b>手順書のセットアップ（スプレッドシートの作成）が完了している状態で実行してください。</div>
 
-<div class="benefit"><span class="icon">🤖</span><span class="t"><strong>AI分析の精度が段違いになる（特典③との合わせ技）</strong>
-<small>特典③「AI分析プロンプト集」は、貼り付けるデータが多いほど正確になります。直近1か月分では「たまたま伸びた投稿」に引っ張られますが、過去全期間の数字があれば「あなたのアカウントで何度も再現されている伸びる型」をAIが見つけられます。ネタ出し・投稿時間の分析も、過去データがあるほど当たります。</small></span></div>
+  <!-- STEP 1 -->
+  <h2><span class="n">1</span>Meta社にデータをダウンロード申請する<span class="sub">作業は一瞬。ただし「届くまで」に数時間〜数日かかるので、まず申請だけ先に。</span></h2>
+  <div class="step">
+    <ol class="steps">
+      <li><b>アカウントセンター → あなたの情報とアクセス許可 → 情報をダウンロード</b> を開く（インスタアプリ：プロフィール → 設定 → アカウントセンター）<br><span class="urlbox">🔗 直接開く：<a href="https://accountscenter.instagram.com/info_and_permissions/">https://accountscenter.instagram.com/info_and_permissions/</a></span></li>
+      <li>「あなたの情報をエクスポート」で <b>「エクスポートを作成」</b>（画像①）</li>
+      <li>プロフィールで自分の <b>Instagram</b> を選ぶ（画像②）</li>
+      <li>「情報のタイプを選択」で <b class="red">メディアだけをオン</b>（他は各セクションの「すべてをクリア」でオフ。下の一覧参照）</li>
+      <li>エクスポート先は <b>「デバイスにエクスポート」</b>（画像③）</li>
+      <li>形式は<b>必ず JSON</b>／期間は<b>すべての期間</b>／画質は推奨のまま（画像④）</li>
+      <li><b>「エクスポートを開始」</b> → あとは待つだけ</li>
+      <li>送信したら、あとは <b>メールが届くまで待つ</b>だけ（→ 手順②へ）</li>
+    </ol>
+    <div class="flowlist">
+      <div class="flowrow">
+        <div class="fimg"><img src="assets/meta-step-1.png" alt="あなたの情報をエクスポート"></div>
+        <div class="ftext"><span class="fnum">1</span><div><b>あなたの情報をエクスポート</b> の画面で <b>「エクスポートを作成」</b> をタップします。</div></div>
+      </div>
+      <div class="flowrow">
+        <div class="fimg"><img src="assets/meta-step-2.png" alt="プロフィールを選択"></div>
+        <div class="ftext"><span class="fnum">2</span><div><b>プロフィールを選択</b> で、自分の <b>Instagram</b> をタップします（名前・アカウント名は黒塗りにしています）。</div></div>
+      </div>
+      <div class="flowrow">
+        <div class="fimg"><img src="assets/meta-step-3.png" alt="エクスポート先を選択"></div>
+        <div class="ftext"><span class="fnum">3</span><div><b>エクスポート先を選択</b> で <b>「デバイスにエクスポート」</b> を選びます（zipを自分の端末にダウンロードします）。</div></div>
+      </div>
+      <div class="flowrow">
+        <div class="fimg"><img src="assets/meta-step-4.png" alt="最終確認"></div>
+        <div class="ftext"><span class="fnum">4</span><div>最終確認画面で <b>情報のタイプ=メディア</b>・<b>期間=全期間</b>・<b>形式=JSON</b> を確認し、<b>「エクスポートを開始」</b> を押します（メール・アカウント名は黒塗りにしています）。</div></div>
+      </div>
+    </div>
+    <div class="picklist">
+      <div class="pt">✅「情報のタイプを選択」画面での操作</div>
+      <div class="pi"><span class="ck">✓</span><div>各セクション右上の <b>「すべてをクリア」</b> で、いったん全部オフにする</div></div>
+      <div class="pi"><span class="ck">✓</span><div>「あなたのInstagramアクティビティ」内の <span class="tag">メディア</span> <b>だけ</b>をオンにする ← このツールが使うのはこれ1つ（下の一覧の<b class="red">赤枠</b>）</div></div>
+      <div class="pi"><span class="ck">✓</span><div>下までスクロールして <b>「保存」</b>。不要な項目を外すぶん <b>zipが軽く・早く</b>なります</div></div>
+    </div>
+    <div class="note"><b>ここまでが手順①：</b>この申請さえ済ませておけば、あとはメールを待つだけ（→ 手順②）。<b>まず申請だけ先に</b>やっておくのがおすすめです。</div>
+  </div>
 
-<div class="benefit"><span class="icon">📊</span><span class="t"><strong>ダッシュボードが「全歴史版」で完成する</strong>
-<small>スプレッドシートが自動で作る「伸びた投稿ランキング」「反応が良い曜日×時間帯の色分け表」は、入っているデータの範囲でしか計算できません。過去分を取り込むと、アカウント開設からの全歴史で集計され、投稿戦略の判断材料が一気に増えます。</small></span></div>
+  <!-- 選択画面の全項目 -->
+  <h2 class="h2plain">選択画面：あなたのInstagramアクティビティ<span class="sub"><b class="red">赤枠のメディアだけON</b>。他の項目・他のセクションは全部オフ（各セクションの「すべてをクリア」）でOKです。</span></h2>
 
-<div class="benefit"><span class="icon">💼</span><span class="t"><strong>実績の「証拠」として使える</strong>
-<small>PR案件への応募、運用代行の営業、コンサルの申込みなどで「平均リーチ◯◯・保存率◯％」と数字の裏付けつきで提示できます。スクショと違い、時系列の生データなので説得力が違います。</small></span></div>
+  <div class="shotrow">
+    <div class="shot"><img src="assets/meta-media-list.png" alt="あなたのInstagramアクティビティの全項目（メディアのみチェック）"><div class="redbox" style="top:74%; height:4%;"><span class="rbl">これだけON</span></div></div>
+    <div class="annots">
+      <div class="annot"><b>アバターストア</b> — アバター/デジタルアイテムの購入・利用</div>
+      <div class="annot"><b>チェックアウト</b> — ショップでの購入・決済情報</div>
+      <div class="annot"><b>コメント</b> — 付けた/受けたコメント</div>
+      <div class="annot"><b>イベント</b> — イベント参加情報</div>
+      <div class="annot"><b>募金キャンペーン</b> — 寄付・募金の記録</div>
+      <div class="annot"><b>ギフト</b> — ギフト（投げ銭等）の記録</div>
+      <div class="annot"><b>「いいね！」</b> — あなたが押したいいね</div>
+      <div class="annot"><b>Meta Spark</b> — ARエフェクト関連</div>
+      <div class="annot"><b>収益化</b> — 収益化プログラムの情報</div>
+      <div class="annot"><b>保存済み</b> — 保存したコレクション</div>
+      <div class="annot"><b>ストーリーズでのインタラクション</b> — アンケート回答などストーリーズへの反応（※本体ではない）</div>
+      <div class="annot"><b>サブスクリプション</b> — 有料サブスク関連</div>
+      <div class="annot"><b>その他のアクティビティ</b> — 上記に入らない活動</div>
+      <div class="annot"><b>Instants</b> — Instants機能のデータ</div>
+      <div class="annot"><b>Threads</b> — Threadsの投稿（本ツールはIG対象）</div>
+      <div class="annot need"><b>メディア</b><span class="req">これだけON</span> — あなたの投稿・リール・ストーリーズの画像/動画・キャプション・日時。<b>このツールが唯一使う項目</b></div>
+      <div class="annot"><b>編集</b> — 編集履歴</div>
+      <div class="annot"><b>報告</b> — 通報した内容</div>
+      <div class="annot"><b>共有アクセス</b> — 共有アクセス設定</div>
+      <div class="annot"><b>AI</b> — AI機能とのやり取り</div>
+      <div class="annot"><b>メッセージ</b> — DM（<b class="red">サイズが大きくなりやすい主因</b>。オフ推奨）</div>
+    </div>
+  </div>
+  <div class="note"><b>他のセクションについて：</b>「個人の情報」「つながり」「記録済み情報」「広告情報」などは、このツールでは使いません。各セクション右上の「すべてをクリア」でオフにしておくと、zipが軽くなり取り込みも早く済みます（「過去のInstagramインサイト」を選んでも数字は取り込まれません）。</div>
 
-<div class="benefit"><span class="icon">🔄</span><span class="t"><strong>もし再スタートになっても、勝ちパターンを引き継げる</strong>
-<small>万一アカウントを作り直すことになっても、「過去に何が伸びたか」のデータベースが手元にあれば、ゼロからの手探りではなく、実証済みの型を持って再スタートできます。</small></span></div>
+  <!-- STEP 2: zip保存 -->
+  <h2><span class="n">2</span>メールで届いたzipを保存する<span class="sub">「エクスポートを開始」から数時間〜数日後、Meta社からメールが届きます。</span></h2>
+  <div class="step">
+    <ol class="steps">
+      <li>Meta社から <b>ダウンロードリンク付きのメール</b> が届きます（通知先アドレス宛）</li>
+      <li>メールのリンクを開き、<b>zipファイルを自分の端末に保存</b>します</li>
+      <li>リンクには<b>有効期限</b>があるので、届いたら<b>早めに保存</b>してください</li>
+    </ol>
+    <div class="note"><b>ポイント：</b>ここだけ数時間〜数日かかります。作業自体は一瞬なので、<b>手順①の申請だけ先に</b>済ませておけば、あとはメールを待つだけです。</div>
+  </div>
 
-<h2>全体像：投稿の種類で方法が変わります</h2>
-<table>
-<tr><th>取り込みたいもの</th><th>使う方法</th><th>むずかしさ</th></tr>
-<tr><td>過去のフィード・リール（数字つき）</td><td>方法A（ボタンを押すだけ）</td><td>かんたん</td></tr>
-<tr><td>過去のストーリーズ（画像・日時）</td><td>方法B（インスタからデータを取り寄せる）</td><td>少し手間がかかる</td></tr>
-<tr><td>数字の欠けを埋める（直近90日）</td><td>方法C（補完・任意）</td><td>ふつう</td></tr>
-</table>
-<div class="note blue"><strong>前提:</strong> 手順書の Step 6「接続テスト」まで完了している（＝ふだんの自動取得が動いている）状態で実行してください。</div>
+  <!-- STEP 3: 取り込む -->
+  <h2><span class="n">3</span>スプレッドシートに取り込む<span class="sub">届いたzipの「大きさ」で入口が2つに分かれます。どちらもボタン操作です。</span></h2>
+  <div class="step">
+    <div class="cols">
+      <div class="txt" style="flex:0 0 250px;">
+        <div class="menuwrap">
+          <div class="menutop">📊 Instagram Insights ▾</div>
+          <div class="menulist">
+            <div class="mi">📚 過去全件取り込み</div>
+            <div class="mi hl">📦 Meta公式zipアップロード</div>
+            <div class="mi">📁 Meta公式データ取り込み（Drive経由）</div>
+            <div class="mi">🔁 取り込みカーソルをリセット</div>
+          </div>
+        </div>
+        <div class="fcap" style="text-align:left;">▲ スプシ上部のメニューから選ぶ</div>
+      </div>
+      <div class="txt">
+        <div class="branch">
+          <div class="branchq-wrap"><span class="branchq">zipの大きさは？</span></div>
+          <div class="split">
+            <div class="bcol easy">
+              <span class="cap">50MB以内（少なめ）</span>
+              <ol>
+                <li><span class="menu">📦 Meta公式zipアップロード</span> を実行</li>
+                <li>zipを選択 →「アップロード開始」</li>
+                <li>「📸フィード / 🎬リール / 📖ストーリーズ ◯件追加」のまとめが出れば完了</li>
+              </ol>
+            </div>
+            <div class="bcol big">
+              <span class="cap">50MB超（動画多め）</span>
+              <ol>
+                <li>zipを解凍（ダブルクリック）</li>
+                <li>フォルダごと Google ドライブにアップ（ドラッグ&ドロップ）</li>
+                <li><span class="menu">📁 Drive経由</span> を実行しフォルダURLを指定（1GB級もOK）</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note green"><b>取り込めたか確認：</b>「ストーリーズ履歴」シートに行が増え、source列が <b>meta_zip</b> になっていれば成功です。</div>
+    <div class="note"><b>数字（リーチ等）が空欄でも仕様です：</b>Meta社の公式データには画像・キャプション・日時は入りますが、リーチや閲覧数は含まれない場合があります（どのツールでも復元不可）。これから先のストーリーズは、ふだんの自動取得が24時間以内に数字ごと保存するので心配いりません。</div>
+  </div>
 
-<div class="route">
-<h3><span class="tag">方法A</span>過去のフィード・リール：ボタン1つで全件取り込み</h3>
-<ol class="steps">
-<li>スプレッドシートのメニュー <span class="menu">📊 Instagram Insights</span> → <span class="menu">📚 過去全件取り込み（API）</span> を実行します</li>
-<li>確認ダイアログで「OK」→ 取得が始まります（古い投稿まで順番にさかのぼります）</li>
-<li>5分以内に終わった場合:「✅ 過去全件取り込み完了」の表示と、Discordにも通知が届きます</li>
-<li>投稿数が多く5分の制限に達した場合:「⏸️ 5分制限に達したため中断しました」と表示されます → <strong>もう一度同じメニューを実行</strong>してください。<strong>続きから自動で再開</strong>します（最初からやり直しにはなりません）</li>
-<li>「フィード ◯◯件 / リール ◯◯件」の累計が表示されたら全件完了です</li>
-</ol>
-<div class="note"><strong>所要時間の目安:</strong> 投稿1,000件で3〜5回の実行（合計15〜25分）。インスタ側の制限（1時間あたりの取得量）に達すると一時的に遅くなるので、その場合は少し時間をおいてから再実行してください。</div>
-<div class="note"><strong>初回だけ黄色い警告バーが出ます:</strong> スプシ上部に「警告: 一部の数式で、外部関係者とのデータ送受信が…」と出たら、右側の「<strong>アクセスを許可</strong>」を押してください。これは自分のGoogleドライブに保存した画像を、自分のスプシに表示するための承認で、データが外部に漏れるものではありません。一度許可すれば次回以降は出ません。</div>
-<div class="note"><strong>途中でおかしくなったら:</strong> メニュー <span class="menu">🔁 取り込みカーソルをリセット</span> で最初からやり直せます。すでにシートに入った行は重複防止機能があるので、二重に登録されることはありません。</div>
+  <!-- TIMELINE -->
+  <h2 class="h2plain">おすすめの進め方<span class="sub">「待ち時間」を味方にする、2ステップで完了。</span></h2>
+  <div class="timeline">
+    <div class="tl"><span class="pt"></span><div class="when">今日</div><div class="what">手順①の申請だけ先に済ませる（届くまで数日かかるため）</div></div>
+    <div class="tl"><span class="pt"></span><div class="when">数日後</div><div class="what">メールが届いたら手順②でzipを保存し、手順③で取り込む → これで完了</div></div>
+  </div>
+  <div class="note green"><b>取り込みは一度きりでOK：</b>過去分を取り込んだあとは、これから先の投稿をテンプレートが自動で保存し続けます。もう手動で取り寄せる必要はありません。</div>
+
+  <!-- QA -->
+  <h2 class="h2plain">よくあるつまずき</h2>
+  <div class="qa"><div class="q">Q. Meta社からのメールが届かない</div><div class="a">A. 迷惑メールを確認。無ければ「情報をダウンロード」ページを再訪すると、<b>作成済みファイルが一覧に出ている</b>ことがあります（そこから直接DL可）。</div></div>
+  <div class="qa"><div class="q">Q. 間違えてHTML形式で申請してしまった</div><div class="a">A. そのzipは取り込めません。形式を <b>JSON</b> にして申請し直してください。</div></div>
+  <div class="qa"><div class="q">Q. 取り込んだストーリーズの数字が空欄</div><div class="a">A. Meta社のデータに数字が無いケースで仕様です。<b>これから先は自動取得が24時間以内に数字ごと保存</b>するので心配いりません。</div></div>
+  <div class="qa"><div class="q">Q. 同じzipを2回取り込んでしまった</div><div class="a">A. 大丈夫。投稿IDと日時で重複チェックしているので、<b>二重登録にはなりません</b>。</div></div>
+
+  <div class="help"><div class="ic">💬</div><div>困ったら、エラー画面のスクリーンショットを添えて、<b>購入者専用Discordのあなた専用チャンネル</b>に投稿してください。状況を見て個別にご案内します。</div></div>
+
+  <div class="footer">IGインサイト保存テンプレート 購入者特典 ／ © BridgeSquare @tamago_app（再配布はご遠慮ください）</div>
+
 </div>
-
-<div class="route story">
-<h3><span class="tag">方法B</span>過去のストーリーズ：インスタ公式のデータ取り寄せで復元</h3>
-<p style="font-size:9.8pt; color:#555; margin-bottom:2mm;">過去のストーリーズは、インスタの仕組み上ボタン1つでは取得できません（公開から24時間で取得窓口が閉じるため）。代わりに、Meta社公式の「情報をダウンロード」機能で全データを取り寄せて、スプシに取り込みます。</p>
-
-<h3>B-1. Meta社からデータをダウンロード申請する</h3>
-<ol class="steps">
-<li>ブラウザで <strong>アカウントセンター → あなたの情報とアクセス許可 → 情報をダウンロード</strong> を開きます（インスタアプリからも、プロフィール → 設定 → アカウントセンター でたどれます）</li>
-<li>「情報をダウンロード」を選択します</li>
-<li>対象アカウントとして、<strong>該当のInstagramアカウントにチェック</strong>を入れます</li>
-<li>情報の種類:「すべて」または「コンテンツ」（投稿・ストーリーズ・リールが含まれる方）を選択</li>
-<li>形式: <strong>必ず JSON</strong> を選択（HTMLを選ぶと取り込めません。ここが一番のつまずきポイントです）</li>
-<li>期間: <strong>すべての期間</strong></li>
-<li>品質（画質）: 推奨設定のままでOK</li>
-<li>「リクエストを送信」→ 完了です。あとは待つだけ</li>
-<li><strong>数時間〜数日後</strong>、Meta社からメールでダウンロードリンクが届きます。リンクからzipファイルをパソコンに保存してください（リンクには有効期限があるので、届いたら早めに保存を）</li>
-</ol>
-
-<h3>B-2. スプシに取り込む（zipのサイズで2通り）</h3>
-<p style="font-size:9.8pt; margin-bottom:2mm;"><strong>zipが50MB以内の場合（投稿が少なめの方）:</strong></p>
-<ol class="steps">
-<li>メニュー <span class="menu">📦 Meta公式zipアップロード（全期間・画像+キャプション）</span> を実行</li>
-<li>ダイアログでzipファイルを選択 →「アップロード開始」</li>
-<li>完了すると「📸 フィード追加◯件 / 🎬 リール追加◯件 / 📖 ストーリーズ追加◯件 / 🖼 画像保存◯件 / ⏭ 既存スキップ◯件」のまとめが表示されます</li>
-</ol>
-<p style="font-size:9.8pt; margin-bottom:2mm;"><strong>zipが50MBを超える場合（動画が多い方は普通に超えます）:</strong></p>
-<ol class="steps">
-<li>パソコンでzipファイルを展開（ダブルクリックで解凍）します</li>
-<li>展開してできたフォルダを、<strong>フォルダごとGoogleドライブにアップロード</strong>します（drive.google.com にドラッグ&ドロップ）</li>
-<li>メニュー <span class="menu">📁 Meta公式データ取り込み（Driveフォルダ経由・大容量対応）</span> を実行し、アップロードしたフォルダのURLを指定します（1GB級でも取り込めます）</li>
-</ol>
-<div class="note"><strong>取り込み後の確認:</strong> 「ストーリーズ履歴」シートに新しい行が増えていて、source列が「meta_zip」になっていれば成功です。</div>
-<div class="note"><strong>知っておいてほしいこと:</strong> Meta社のデータには、過去のストーリーズの<strong>画像・キャプション・投稿日時は含まれますが、リーチや閲覧数などの数字は含まれていない場合があります</strong>。その場合、数字の欄は空欄で保存されます。これはMeta社側の仕様で、どのツールを使っても復元できません（直近90日分だけは、下の方法Cで一部埋められます）。</div>
-</div>
-
-<div class="route csv">
-<h3><span class="tag">方法C</span>（任意）数字の欠けを埋める：Business Suite CSV</h3>
-<p style="font-size:9.8pt; color:#555;">Meta Business Suite（business.facebook.com）から「直近90日程度」の指標CSVを書き出して取り込む補完ルートです。方法Bで画像と日時だけ入ったストーリーズの行に、<strong>あとから数字をくっつけて埋める（自動マージ）</strong>ことができます。メニューは <span class="menu">📤 Business Suite CSVインポート</span>。エクスポート画面の細かい設定と「Instagramタブが押せない」ときの対処は、<strong>セットアップ手順書の Step 12-補</strong> に画像つきで載せています。余裕が出てきたらで大丈夫です。</p>
-</div>
-
-<h2>おすすめの進め方（チェックリスト）</h2>
-<div class="check-item"><div class="box"></div><div style="flex:1;">方法Aを実行する（5分制限で止まったら再実行、完了表示まで）</div><span class="freq">今日</span></div>
-<div class="check-item"><div class="box"></div><div style="flex:1;">方法B-1のダウンロード申請だけ済ませる（届くまで数日かかるので、先に申請だけ）</div><span class="freq">今日</span></div>
-<div class="check-item"><div class="box"></div><div style="flex:1;">Meta社からメールが届いたら、zipを保存して方法B-2で取り込む</div><span class="freq">数日後</span></div>
-<div class="check-item"><div class="box"></div><div style="flex:1;">余裕があれば方法Cで直近90日の数字を補完する</div><span class="freq">任意</span></div>
-<div class="check-item"><div class="box"></div><div style="flex:1;">「情報をダウンロード」のzipを定期的に取り寄せて保管する（公式の完全バックアップになります）</div><span class="freq">3か月に1回</span></div>
-
-<h2>よくあるつまずき</h2>
-<div class="qa"><p class="q">Q. 方法Aが途中で止まった／エラーが出た</p><p class="a">A. もう一度同じメニューを実行すれば続きから再開します。何度やってもおかしいときは「🔁 取り込みカーソルをリセット」→ 再実行。重複登録はされません。</p></div>
-<div class="qa"><p class="q">Q. Meta社からのメールが届かない</p><p class="a">A. 迷惑メールフォルダを確認してください。それでも無ければ、アカウントセンターの「情報をダウンロード」ページを再訪すると、作成済みファイルが一覧に出ていることがあります（そこから直接ダウンロード可能です）。</p></div>
-<div class="qa"><p class="q">Q. 間違えてHTML形式で申請してしまった</p><p class="a">A. そのzipは取り込めないので、形式を<strong>JSON</strong>にしてもう一度申請してください。</p></div>
-<div class="qa"><p class="q">Q. 取り込んだストーリーズの数字が空欄</p><p class="a">A. Meta社のデータに数字が含まれていないケースで、仕様です。直近90日分だけは方法Cで補完できます。これから先のストーリーズは、ふだんの自動取得が24時間以内に数字ごと保存していくので心配ありません。</p></div>
-<div class="qa"><p class="q">Q. 同じzipやCSVを2回取り込んでしまった</p><p class="a">A. 大丈夫です。投稿IDと日時で重複チェックしているので、二重登録にはなりません。</p></div>
-
-<div class="note"><strong>困ったら:</strong> エラー画面のスクリーンショットを添えて、購入者専用Discordのあなた専用チャンネルに投稿してください。状況を見て個別に案内します。</div>
-
-<div class="footer">IGインサイト保存テンプレート 購入者特典 ／ © BridgeSquare @tamago_app（再配布はご遠慮ください）</div>
-
 </body>
 </html>
