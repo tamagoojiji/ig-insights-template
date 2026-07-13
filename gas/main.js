@@ -18,6 +18,12 @@ function manualFetchAll() {
     if (!isTimeUp_()) {
       storyResult = fetchAndWriteStories();
     }
+    // 取得した未OCR行を再試行バッチでOCR（ダッシュボードより先＝OCR優先。429時は即中断し
+    // 残りは次サイクルで自動再試行）。
+    let ocr = null;
+    if (!isTimeUp_()) {
+      try { ocr = runStoriesOcrSilent_(10); } catch (e) { Logger.log(`OCR例外: ${e.message}`); }
+    }
     if (!isTimeUp_()) {
       updateDashboard();
     }
@@ -28,6 +34,7 @@ function manualFetchAll() {
       `📸 フィード: ${feedResult.feed}件\n` +
       `🎬 リール: ${feedResult.reels}件\n` +
       `📖 ストーリーズ: ${storyResult.stories}件` +
+      (ocr ? `\n🔍 OCR: 成功${ocr.processed} / 失敗${ocr.failed}` + (ocr.quotaHit ? '（無料枠オーバーで中断・残りは自動で再試行）' : '') : '') +
       (timeUp ? '\n\n⚠️ 時間制限のため一部未取得です。\nもう一度実行すると続きを取得します。' : '')
     );
   } catch (e) {
@@ -63,10 +70,17 @@ function manualFetchStories() {
     checkAndRefreshToken();
     ensureV22Migration_();
     const result = fetchAndWriteStories();
+    // 取得で増えた未OCR行を再試行バッチでOCR（ダッシュボードより先＝OCR優先。429時は即中断し
+    // 残りは次サイクルで自動再試行）。
+    let ocr = null;
+    if (!isTimeUp_()) {
+      try { ocr = runStoriesOcrSilent_(10); } catch (e) { Logger.log(`OCR例外: ${e.message}`); }
+    }
     if (!isTimeUp_()) updateDashboard();
     const timeUp = isTimeUp_();
     SpreadsheetApp.getUi().alert(
       `取得${timeUp ? '（一部）' : ''}完了！\n📖 ストーリーズ: ${result.stories}件` +
+      (ocr ? `\n🔍 OCR: 成功${ocr.processed} / 失敗${ocr.failed}` + (ocr.quotaHit ? '（無料枠オーバーで中断・残りは自動で再試行）' : '') : '') +
       (timeUp ? '\n\n⚠️ 時間制限のため一部未処理。もう一度実行で続きを処理します。' : '')
     );
   } catch (e) {
@@ -85,6 +99,19 @@ function autoFetch() {
     fetchAndWriteFeed();
     if (!isTimeUp_()) {
       fetchAndWriteStories();
+    }
+    // ストーリーズOCRのエラー/未処理行を再試行（最大10件）。ダッシュボード更新より「先」に実行
+    // ＝OCR優先（updateDashboard は重く、後に置くと5分制限でOCRが毎tickスキップされるため）。
+    // Gemini無料枠オーバー時は runStoriesOcrSilent_ 側で即中断し、次回サイクルで再試行する。
+    if (!isTimeUp_()) {
+      try {
+        const ocr = runStoriesOcrSilent_(10);
+        if (ocr.processed || ocr.failed) {
+          Logger.log(`OCRリトライ: 成功${ocr.processed} 失敗${ocr.failed} 残${ocr.remaining}` + (ocr.quotaHit ? ' / 無料枠オーバーで中断' : ''));
+        }
+      } catch (e) {
+        Logger.log(`OCRリトライ例外: ${e.message}`);
+      }
     }
     if (!isTimeUp_()) {
       updateDashboard();
