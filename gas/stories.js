@@ -69,10 +69,17 @@ function fetchAndWriteStories() {
     const postDate = new Date(story.timestamp);
     const elapsedMin = Math.round((now - postDate) / 60000);
 
-    // 新規時のみ画像保存（共有変数として保持）
+    // 画像保存: 新規行、または画像保存に失敗して空のまま残っている既存行が対象。
+    // ストーリーがアクティブ（投稿から約24時間以内）なうちは media_url が有効なので、
+    // 一時的な保存失敗を次回以降の取得で自動リトライし「[画像なし]」を解消する。
     const existingRow = existingMap.get(String(story.id));
+    let recoveredExisting = false;
+    if (existingRow) {
+      const thumbCell = sheet.getRange(existingRow, 2);
+      recoveredExisting = !thumbCell.getFormula() && !thumbCell.getValue();
+    }
     let driveUrl = '';
-    if (!existingRow) {
+    if (!existingRow || recoveredExisting) {
       const imageUrl = (story.media_type === 'VIDEO' && story.thumbnail_url)
         ? story.thumbnail_url
         : story.media_url;
@@ -95,6 +102,22 @@ function fetchAndWriteStories() {
     if (existingRow) {
       sheet.getRange(existingRow, 4, 1, 6).setValues([[reach, views, replies, shares, navigation, profileVisits]]);
       updateCount++;
+
+      // 今回画像を拾い直せた既存行は、サムネイルとOCRを補完する
+      if (recoveredExisting && driveUrl) {
+        sheet.getRange(existingRow, 2).setFormula(`=IMAGE("${driveUrl}")`);
+        setThumbnailRowHeight(sheet, existingRow, 1);
+        const ocrCol = ensureStoriesOcrColumn_(sheet);
+        if (!isTimeUp_()) {
+          try {
+            const text = ocrImage_(driveUrl);
+            sheet.getRange(existingRow, ocrCol).setValue(text || OCR_EMPTY_SENTINEL);
+          } catch (e) {
+            Logger.log(`OCR補完エラー (${story.id}): ${e.message}`);
+            sheet.getRange(existingRow, ocrCol).setValue(`[エラー] ${e.message}`);
+          }
+        }
+      }
     } else {
       const newRow = [
         formatTimestamp(story.timestamp),
