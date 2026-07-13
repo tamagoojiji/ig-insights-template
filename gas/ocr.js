@@ -292,18 +292,27 @@ function isOcrDone_(cellValue) {
 }
 
 /**
+ * Gemini無料枠オーバー（quota超過 / 429 / レート制限）かどうかを判定
+ * これを検知したら、その回のOCRは即中断する（叩き続けても全失敗＋枠の無駄食いになるため）。
+ * 残った [エラー] 行は枠が戻る次サイクルで自動的に再試行される。
+ */
+function isQuotaError_(msg) {
+  return /\b429\b|quota|exhaust|RESOURCE_EXHAUSTED|rate limit|too many requests/i.test(String(msg || ''));
+}
+
+/**
  * UI無しでOCR実行 (トリガー用)
  * remaining = 「次回再試行が必要な件数」（時間切れ未着手 + 今回エラー + maxItems到達でスキップ）
  */
 function runStoriesOcrSilent_(maxItems) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('📖 ストーリーズ');
-  if (!sheet) return { processed: 0, failed: 0, remaining: 0 };
+  if (!sheet) return { processed: 0, failed: 0, remaining: 0, quotaHit: false };
   const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return { processed: 0, failed: 0, remaining: 0 };
+  if (lastRow < 2) return { processed: 0, failed: 0, remaining: 0, quotaHit: false };
   const thumbCol = findColumn_(sheet, 'サムネイル');
   const idCol = findColumn_(sheet, 'メディアID');
-  if (thumbCol < 1 || idCol < 1) return { processed: 0, failed: 0, remaining: 0 };
+  if (thumbCol < 1 || idCol < 1) return { processed: 0, failed: 0, remaining: 0, quotaHit: false };
   const ocrCol = ensureStoriesOcrColumn_(sheet);
 
   const ids = sheet.getRange(2, idCol, lastRow - 1, 1).getValues();
@@ -311,7 +320,7 @@ function runStoriesOcrSilent_(maxItems) {
   const values = sheet.getRange(2, thumbCol, lastRow - 1, 1).getValues();
   const existing = sheet.getRange(2, ocrCol, lastRow - 1, 1).getValues();
 
-  let processed = 0, failed = 0, remaining = 0;
+  let processed = 0, failed = 0, remaining = 0, quotaHit = false, attempted = 0;
   for (let i = 0; i < ids.length; i++) {
     if (!ids[i][0]) continue;
     if (isOcrDone_(existing[i][0])) continue;
@@ -323,7 +332,10 @@ function runStoriesOcrSilent_(maxItems) {
     const imageUrl = extractImageUrl_(raw);
     if (!imageUrl) { failed++; remaining++; continue; }
 
-    if (isTimeUp_() || processed >= maxItems) { remaining++; continue; }
+    // attempted は成功/失敗どちらでもカウント。失敗が続いても maxItems で確実に打ち切る
+    // （失敗時 processed が増えず上限が効かない問題への対策）。
+    if (isTimeUp_() || attempted >= maxItems) { remaining++; continue; }
+    attempted++;
     try {
       const text = ocrImage_(imageUrl);
       sheet.getRange(i + 2, ocrCol).setValue(text || OCR_EMPTY_SENTINEL);
@@ -332,9 +344,12 @@ function runStoriesOcrSilent_(maxItems) {
       sheet.getRange(i + 2, ocrCol).setValue(`[エラー] ${e.message}`);
       failed++;
       remaining++;
+      // 無料枠オーバーは叩き続けても全失敗するだけなので、この回は即中断。
+      // 残りは枠が戻る次サイクルで自動再試行される。
+      if (isQuotaError_(e.message)) { quotaHit = true; break; }
     }
   }
-  return { processed, failed, remaining };
+  return { processed, failed, remaining, quotaHit };
 }
 
 function runStoriesOcr_(maxItems) {
@@ -365,7 +380,7 @@ function runStoriesOcr_(maxItems) {
     const values = sheet.getRange(2, thumbCol, lastRow - 1, 1).getValues();
     const existing = sheet.getRange(2, ocrCol, lastRow - 1, 1).getValues();
 
-    let processed = 0, skipped = 0, failed = 0, noImage = 0;
+    let processed = 0, skipped = 0, failed = 0, noImage = 0, quotaHit = false;
     let firstError = '';
     for (let i = 0; i < ids.length; i++) {
       if (isTimeUp_()) break;
@@ -385,18 +400,25 @@ function runStoriesOcr_(maxItems) {
         sheet.getRange(i + 2, ocrCol).setValue(`[エラー] ${e.message}`);
         if (!firstError) firstError = e.message;
         failed++;
+        // 無料枠オーバー(429)は叩き続けても全失敗＋枠の無駄食いになるので即中断。
+        // 残った [エラー] 行は枠が戻る次サイクル（autoFetch）で自動再試行される。
+        if (isQuotaError_(e.message)) { quotaHit = true; break; }
       }
     }
     const timeUp = isTimeUp_();
     const reachedBatchLimit = processed >= maxItems && maxItems !== Infinity;
+    const statusLabel = quotaHit ? '（無料枠オーバーで中断）'
+      : timeUp ? '（時間切れ）' : reachedBatchLimit ? '（バッチ完了）' : '完了';
     ui.alert(
-      `🔍 ストーリーズOCR${timeUp ? '（時間切れ）' : reachedBatchLimit ? '（バッチ完了）' : '完了'}\n\n` +
+      `🔍 ストーリーズOCR${statusLabel}\n\n` +
       `✅ 新規処理: ${processed}件\n` +
       `⏭ スキップ: ${skipped}件（処理済）\n` +
       `🖼 画像なし: ${noImage}件\n` +
       `❌ 失敗: ${failed}件` +
       (firstError ? `\n   最初のエラー例: ${firstError.substring(0, 200)}` : '') +
-      (timeUp || reachedBatchLimit ? '\n\n⚠️ 続きはもう一度実行してください。' : '')
+      (quotaHit
+        ? '\n\n⏳ 無料枠を使い切ったため中断しました。数分おいて再実行すると続きを処理します（残りは自動取得でも順次再試行されます）。'
+        : (timeUp || reachedBatchLimit ? '\n\n⚠️ 続きはもう一度実行してください。' : ''))
     );
   } catch (e) {
     ui.alert(`エラー: ${e.message}`);

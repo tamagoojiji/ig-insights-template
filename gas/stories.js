@@ -103,20 +103,17 @@ function fetchAndWriteStories() {
       sheet.getRange(existingRow, 4, 1, 6).setValues([[reach, views, replies, shares, navigation, profileVisits]]);
       updateCount++;
 
-      // 今回画像を拾い直せた既存行は、サムネイルとOCRを補完する
+      // 今回画像を拾い直せた既存行はサムネイルを補完。OCRはその場で叩かず後段の
+      // runStoriesOcrSilent_（429即中断＋次サイクル再試行）に一任する（救済時の即時OCRは
+      // 無料枠の瞬間超過=429を招くため）。[画像なし] を消して未OCRに戻せば後段バッチが拾う。
       if (recoveredExisting && driveUrl) {
         sheet.getRange(existingRow, 2).setFormula(`=IMAGE("${driveUrl}")`);
         setThumbnailRowHeight(sheet, existingRow, 1);
+        // 画像が復活したので [画像なし] センチネルだけ未OCRに戻し、後段バッチに再OCRさせる。
+        // 既にOCR本文/説明文が入っている行や [エラー]（後段が拾う）は触らない＝既存データ保護。
         const ocrCol = ensureStoriesOcrColumn_(sheet);
-        if (!isTimeUp_()) {
-          try {
-            const text = ocrImage_(driveUrl);
-            sheet.getRange(existingRow, ocrCol).setValue(text || OCR_EMPTY_SENTINEL);
-          } catch (e) {
-            Logger.log(`OCR補完エラー (${story.id}): ${e.message}`);
-            sheet.getRange(existingRow, ocrCol).setValue(`[エラー] ${e.message}`);
-          }
-        }
+        const ocrCell = sheet.getRange(existingRow, ocrCol);
+        if (String(ocrCell.getValue()) === '[画像なし]') ocrCell.setValue('');
       }
     } else {
       const newRow = [
@@ -131,17 +128,11 @@ function fetchAndWriteStories() {
       setThumbnailRowHeight(sheet, startRow, 1);
       copyCustomFormulasToNewRow_(sheet, startRow);
 
+      // OCRはその場で叩かず後段 runStoriesOcrSilent_（429即中断＋次サイクル再試行）に一任する。
+      // 画像なし行だけここで確定（OCR対象外）。画像ありはOCR列を空のままにして後段バッチに拾わせる。
       const ocrCol = ensureStoriesOcrColumn_(sheet);
       if (!driveUrl) {
         sheet.getRange(startRow, ocrCol).setValue('[画像なし]');
-      } else if (!isTimeUp_()) {
-        try {
-          const text = ocrImage_(driveUrl);
-          sheet.getRange(startRow, ocrCol).setValue(text || OCR_EMPTY_SENTINEL);
-        } catch (e) {
-          Logger.log(`OCRエラー (${story.id}): ${e.message}`);
-          sheet.getRange(startRow, ocrCol).setValue(`[エラー] ${e.message}`);
-        }
       }
       newCount++;
     }
