@@ -6,7 +6,8 @@
 #   4. clasp push -f → Web App が無ければ初回 clasp deploy、有れば clasp redeploy。env の GAS_DEPLOY_ID を更新
 #   5. --keychain-bootstrap: ?bootstrap=1 でアクセスキーを発行して Keychain（env の KEYCHAIN）へ保存（既存キーは上書きしない）
 #   6. Keychain にキーがあれば ?action=installWarm で表示用キャッシュの30分トリガーを入れ（既にあれば作らない）、
-#      format=json を取得して件数を表示（キーは表示しない。キャッシュが空の初回は構築に1分ほどかかり 404 になるので最大6回まで取り直す）
+#      format=json&build=1 で表示用キャッシュを1回同期構築（1〜2分。応答は 404 になり得るが裏で完了する）してから、
+#      format=json を取得して件数を表示（キーは表示しない。準備中・404 の間は10秒おきに最大4分待ち、超えたら失敗）
 # 使い方: scripts/install-webapp.sh --account-file <accounts/<id>.env> [--keychain-bootstrap]
 set -euo pipefail
 ACCOUNT_REQUIRED=(ID GAS_SCRIPT_ID)
@@ -141,9 +142,9 @@ if [[ $BOOTSTRAP -eq 1 ]]; then
 fi
 
 # 6. キャッシュ温めトリガー＋動作確認（キーは curl の設定を標準入力で渡し、画面・引数に出さない）
-exec_get() { # $1=クエリ（k= 以外） $2=出力先 → HTTP コード等を表示
+exec_get() { # $1=クエリ（k= 以外） $2=出力先 [$3=最大秒・既定60] → HTTP コード等を表示
   { printf 'url = "%s?%s&k=' "$EXEC" "$1"; security find-generic-password -s "$KEYCHAIN" -w | tr -d '\n'; printf '"\n'; } \
-    | curl -sL -K - -o "$2" -w '%{http_code} / %{size_download} bytes / %{time_total}s'
+    | curl -sL -K - --max-time "${3:-60}" -o "$2" -w '%{http_code} / %{size_download} bytes / %{time_total}s' || true
 }
 if [[ -n "${KEYCHAIN:-}" ]] && security find-generic-password -s "$KEYCHAIN" >/dev/null 2>&1; then
   # トリガー作成には script.scriptapp スコープが要る（スコープ追加は手動の再承認が要るので自動では足さない）
@@ -161,11 +162,19 @@ if [[ -n "${KEYCHAIN:-}" ]] && security find-generic-password -s "$KEYCHAIN" >/d
   else
     echo "WARN: appsscript.json の oauthScopes に script.scriptapp が無いため installWarm を省略（GAS エディタでスコープを足して再承認後に再実行）" >&2
   fi
-  for i in 1 2 3 4 5 6; do
-    R=$(exec_get "format=json" "$TMP/app.json")
+  DEADLINE=$((SECONDS + 240)); READY=0
+  echo "build=1: HTTP $(exec_get "format=json&build=1" "$TMP/app.json")"
+  while [[ $SECONDS -lt $DEADLINE ]]; do
+    LEFT=$((DEADLINE - SECONDS)); (( LEFT > 60 )) && LEFT=60
+    R=$(exec_get "format=json" "$TMP/app.json" "$LEFT")
     echo "format=json: HTTP $R"
-    [[ "$R" == 200* ]] && break
+    if [[ "$R" == 200* ]] && grep -q '"updatedAt"' "$TMP/app.json" && ! grep -q '"building":true' "$TMP/app.json"; then READY=1; break; fi
+    LEFT=$((DEADLINE - SECONDS)); (( LEFT > 10 )) && LEFT=10; (( LEFT > 0 )) && sleep "$LEFT"
   done
+  if [[ $READY -ne 1 ]]; then
+    echo "ERROR: 4分待っても表示用データを取得できませんでした（最後の応答: $(head -c 60 "$TMP/app.json")）" >&2
+    exit 1
+  fi
   python3 - "$TMP/app.json" <<'PY'
 import json, sys
 try:
