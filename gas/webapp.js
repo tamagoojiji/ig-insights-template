@@ -27,13 +27,20 @@ function doGet(e) {
 
   if (params.action === 'installWarm') return ContentService.createTextOutput(appInstallWarm_());
 
+  if (params.action === 'refresh') {
+    return ContentService.createTextOutput(JSON.stringify(appRefresh_())).setMimeType(ContentService.MimeType.JSON);
+  }
+
   if (params.format === 'json' && params.part === 'captions') {
     return ContentService.createTextOutput(JSON.stringify(getCaptions(params.k, params.build === '1')))
       .setMimeType(ContentService.MimeType.JSON);
   }
 
   if (params.format === 'json') {
-    return ContentService.createTextOutput(JSON.stringify(getAppData(params.k, params.build === '1')))
+    // 最後に「最新にする」が押された時刻はキャッシュに入れず、毎回 Script Property から付ける
+    const refreshAt = Number(getConfig('APP_REFRESH_AT')) || null;
+    const out = Object.assign({}, getAppData(params.k, params.build === '1'), { refreshAt: refreshAt, refreshCooldownSec: APP_REFRESH_COOLDOWN_SEC });
+    return ContentService.createTextOutput(JSON.stringify(out))
       .setMimeType(ContentService.MimeType.JSON);
   }
 
@@ -81,6 +88,7 @@ function appBuild_() {
   const data = {
     updatedAt: now,
     builtAt: now,
+    builtAtMs: started,
     followers: appReadFollowers_(ss.getSheetByName('📊 フォロワー推移')),
     stories: appReadRows_(ss.getSheetByName('📖 ストーリーズ'), tz, (g, base) => {
       const text = String(g('画像内テキスト') || '').trim();
