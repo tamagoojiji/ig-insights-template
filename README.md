@@ -62,7 +62,8 @@ GAS（`gas/`）に加えて、スマホ用の静的画面（`web/`）と Busines
 | `scripts/push-gas.sh --account-file <env> [--check]` | 本番を `clasp pull` して commit 済み `gas/` と比較（差分があれば中止）→ `GAS_SCRIPT_ID` の一時 `.clasp.json` で push。反映は別途 `clasp redeploy <GAS_DEPLOY_ID>` |
 | `scripts/deploy-web.sh --account-file <env>` | `web/` の `__ACCOUNT__`・`__TITLE__`・`__GAS_ID__` を置換し、取説（`<accountsリポ>/manual/<id>/取扱説明書（図解）.html`）に「アプリに戻る」バーを足して VPS `/opt/docker/ig-app/<id>/`（`/ig/<id>/`）へ配信 |
 | `scripts/deploy-bsuite.sh --account-file <env> [--state <json>]` | VPS `/opt/docker/ig-bsuite-<id>/` に巡回コンテナを配置（アクセスキーは Mac Keychain から `.env` へ、compose のサービスを追記・更新して起動） |
-| `scripts/new-account.sh <id>` | 新規アカウント立ち上げ（雛形・手順表示のみ） |
+| `scripts/new-account.sh --id <id> --title <表示名> --accounts-dir <path> [--business-id <id>] [--asset-id <id>] [--url-path </ig/<id>/>]` | 新規アカウント立ち上げ: スプシ＋bound GAS を作成（`clasp create --type sheets`）→ 共通版 `gas/` を push → Web App を初回 `clasp deploy` → `<accounts-dir>/<id>.env` を生成（`URL_PATH` 既定 `/ig/<id>/`、`KEYCHAIN=ig-app-key-<id>`）。アクセスキーはまだ発行しない |
+| `scripts/new-account.sh --bootstrap --account-file <env>` | 持ち主がスプシのメニュー（🔐 シークレット入力）で Google の承認を済ませた後に実行。`?bootstrap=1` でアクセスキーを発行し Keychain へ保存（新しい GAS は承認前だと Web App が「アクセスが拒否されました」を返すため、作成と分けている） |
 
 ## ライセンス
 
