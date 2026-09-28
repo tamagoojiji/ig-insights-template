@@ -37,6 +37,10 @@
   header .guide { flex:0 0 auto; display:inline-flex; align-items:center; min-height:44px; padding:0 14px; border-radius:8px; background:var(--soft); color:var(--ink); font-size:14px; font-weight:700; text-decoration:none; white-space:nowrap; }
   header h1 { font-size:clamp(17px, 5.6vw, 20px); font-weight:700; margin:0; white-space:nowrap; }
   header .meta { font-size:12px; color:var(--sub); margin-top:2px; }
+  header > div { min-width:0; }
+  header .refresh { display:inline-flex; align-items:center; min-height:44px; margin-top:6px; padding:0 12px; border:0; border-radius:8px; background:var(--soft); color:var(--ink); font-size:13px; font-weight:700; white-space:nowrap; cursor:pointer; }
+  header .refresh:disabled { color:var(--sub); cursor:default; }
+  header .rferr { font-size:12px; color:var(--accent); margin-top:4px; }
   .seg { display:flex; gap:8px; margin:12px 0 4px; flex-wrap:wrap; }
   .seg button { min-height:44px; padding:0 14px; border:1px solid #bbb; border-radius:22px; background:#fff; cursor:pointer; font-size:14px; }
   .seg button[aria-pressed="true"] { background:var(--ink); border-color:var(--ink); color:#fff; font-weight:700; }
@@ -119,6 +123,8 @@
     <div>
       <h1>__TITLE__</h1>
       <div class="meta" id="meta">読み込み中…</div>
+      <button type="button" class="refresh" id="refresh" disabled>最新にする</button>
+      <div class="rferr" id="rferr" role="status" hidden></div>
     </div>
     <a class="guide" href="manual.html">使い方を見る</a>
   </header>

@@ -1,7 +1,7 @@
 #!/bin/bash
 # 既存の ig-insights 系 GAS（古い派生版を含む）に、静的Webアプリ用の口（gas/webapp.js・gas/webapp-addon.js）だけを後付けする
 #   1. GAS_SCRIPT_ID を一時ディレクトリへ clasp pull（本番の現行コードが土台。他のファイルには触らない）
-#   2. webapp.js / webapp-addon.js を上書きコピー、appsscript.json に webapp 設定、CONFIG_KEYS に APP_ACCESS_KEY / APP_STORY_DAYS を追記
+#   2. webapp.js / webapp-addon.js を上書きコピー、appsscript.json に webapp 設定、CONFIG_KEYS に APP_ACCESS_KEY / APP_STORY_DAYS / APP_REFRESH_AT を追記
 #   3. 依存関数（findColumn_ / getConfig / setConfig / notifyDiscord）が無ければ中止
 #   4. clasp push -f → Web App が無ければ初回 clasp deploy、有れば clasp redeploy。env の GAS_DEPLOY_ID を更新
 #   5. --keychain-bootstrap: ?bootstrap=1 でアクセスキーを発行して Keychain（env の KEYCHAIN）へ保存（既存キーは上書きしない）
@@ -58,7 +58,7 @@ if not mt:
     print('WARN: config.js に CONFIG_KEYS 配列が見つからないため追記しません（getConfig は任意キーを読めるので動作には影響なし）')
     sys.exit(0)
 body = mt.group(2)
-add = [k for k in ('APP_ACCESS_KEY', 'APP_STORY_DAYS') if not re.search(r"['\"]" + k + r"['\"]", body)]
+add = [k for k in ('APP_ACCESS_KEY', 'APP_STORY_DAYS', 'APP_REFRESH_AT') if not re.search(r"['\"]" + k + r"['\"]", body)]
 if not add:
     print('config.js: CONFIG_KEYS は追記不要')
     sys.exit(0)

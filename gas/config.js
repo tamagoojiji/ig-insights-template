@@ -18,7 +18,8 @@ const CONFIG_KEYS = [
   'LAST_AUTOFETCH_SUCCESS',
   'FOLLOWERS_NOTIFIED_DATE',
   'APP_ACCESS_KEY',
-  'APP_STORY_DAYS'
+  'APP_STORY_DAYS',
+  'APP_REFRESH_AT'
 ];
 
 function getConfig(key) {

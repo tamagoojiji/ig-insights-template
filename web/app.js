@@ -111,6 +111,7 @@ async function load(retried) {
   if (!KEY) return showKeyError();
   try {
     const d = await fetchData(dataUrl());
+    setRefreshAt(d);
     if (d && d.building) return showBuilding(retried);
     render(d);
     loadCaptions();
@@ -139,13 +140,70 @@ function loadCaptions() {
     if (el) el.innerHTML = capHtml(el.dataset.kind, el.dataset.id);
   });
 }
-function render(d) {
+function render(d, refreshed) {
   markFire(d);
   state.data = d;
   const u = d.builtAt ? md(d.builtAt) + ' ' + hm(d.builtAt) : '—';
-  document.getElementById('meta').textContent = '更新 ' + u + ' ・ フォロワー ' + (d.followers == null ? '—' : n(d.followers));
+  document.getElementById('meta').textContent = (refreshed ? '更新しました（' + hm(d.builtAt) + '）' : '更新 ' + u) + ' ・ フォロワー ' + (d.followers == null ? '—' : n(d.followers));
   draw();
 }
+
+// 「最新にする」: 押せるのは30分に1回（押した時刻はサーバー側で管理。別の端末で押しても同じ）
+const rf = { at: null, cd: 1800, busy: false, loaded: false };
+function setRefreshAt(d) {
+  if (!d || !('refreshAt' in d)) return;
+  rf.at = d.refreshAt || null;
+  rf.cd = Number(d.refreshCooldownSec) || 1800;
+  rf.loaded = true;
+  updateRefreshBtn();
+}
+function setRefreshErr(msg) {
+  const el = document.getElementById('rferr');
+  el.textContent = msg;
+  el.hidden = !msg;
+}
+function updateRefreshBtn() {
+  const b = document.getElementById('refresh');
+  if (rf.busy) return;
+  const left = rf.at ? rf.at + rf.cd * 1000 - Date.now() : 0;
+  if (left > 0) { b.disabled = true; b.textContent = '更新済み（あと ' + Math.ceil(left / 60000) + '分）'; }
+  else { b.disabled = !rf.loaded; b.textContent = '最新にする'; }
+}
+async function doRefresh() {
+  const b = document.getElementById('refresh');
+  rf.busy = true;
+  b.disabled = true;
+  b.textContent = '更新中…';
+  setRefreshErr('');
+  const done = msg => { rf.busy = false; if (msg) setRefreshErr(msg); updateRefreshBtn(); };
+  let r;
+  try {
+    r = await fetchData(GAS_URL + '?k=' + encodeURIComponent(KEY) + '&action=refresh');
+  } catch (err) {
+    return done(err.forbidden ? 'このURLでは更新できませんでした' : '通信できませんでした。電波のよい所でもう一度押してください');
+  }
+  if (!r || !r.ok) {
+    if (r && r.reason === 'cooldown') { rf.at = r.nextAt - rf.cd * 1000; return done(''); }
+    return done('混み合っています。少し待ってからもう一度押してください');
+  }
+  rf.at = r.startedAt;
+  const deadline = Date.now() + 5 * 60000;
+  const poll = async () => {
+    try {
+      const d = await fetchData(dataUrl());
+      if (d && !d.building && Number(d.builtAtMs) > r.startedAt) {
+        setRefreshAt(d);
+        render(d, true);
+        loadCaptions();
+        return done('');
+      }
+    } catch (err) {} // 途中の通信失敗は次の回で取り直す
+    if (Date.now() >= deadline) return done('時間がかかっています。しばらくしてから開き直してください');
+    setTimeout(poll, 20000);
+  };
+  setTimeout(poll, 20000);
+}
+setInterval(updateRefreshBtn, 10000);
 function showError(err) {
   document.getElementById('meta').textContent = '読み込みに失敗しました';
   document.getElementById('main').innerHTML = '<div class="state">データを読み込めませんでした（' + esc(err && err.message ? err.message : err) + '）<br><button type="button" id="retry">もう一度読み込む</button></div>';
@@ -310,7 +368,8 @@ function capBlock(kind, id, title) {
 
 document.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.p) { state.period = b.dataset.p; draw(); }
+  if (b.id === 'refresh') doRefresh();
+  else if (b.dataset.p) { state.period = b.dataset.p; draw(); }
   else if (b.dataset.t) { state.tab = b.dataset.t; draw(); window.scrollTo(0, 0); }
   else if (b.dataset.sort) { if (state.tab === 'reels') state.reelSort = b.dataset.sort; else state.feedSort = b.dataset.sort; draw(); }
   else if (b.dataset.act === 'all') { state.period = 'all'; draw(); }
