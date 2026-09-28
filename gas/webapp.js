@@ -1,6 +1,7 @@
 /**
- * スマホ閲覧用 Web App（arumama インサイト）
+ * スマホ閲覧用の静的アプリ（web/）向け JSON API と、Business Suite 巡回の書き込み口
  * アクセスは ?k=<APP_ACCESS_KEY> で保護。キーは Script Properties 管理。
+ * 依存: findColumn_ / getConfig / setConfig / notifyDiscord（既存の GAS 側）、webapp-addon.js
  */
 
 function doGet(e) {
@@ -24,6 +25,8 @@ function doGet(e) {
     return ContentService.createTextOutput('403 forbidden');
   }
 
+  if (params.action === 'installWarm') return ContentService.createTextOutput(appInstallWarm_());
+
   if (params.format === 'json' && params.part === 'captions') {
     return ContentService.createTextOutput(JSON.stringify(getCaptions(params.k)))
       .setMimeType(ContentService.MimeType.JSON);
@@ -34,12 +37,7 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
-  const tpl = HtmlService.createTemplateFromFile('app');
-  tpl.key = key;
-  return tpl.evaluate()
-    .setTitle('arumama インサイト')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  return ContentService.createTextOutput('このURLは直接開けません。アプリのURLから開いてください');
 }
 
 function getAppData(key) {
@@ -73,12 +71,15 @@ function appBuild_() {
   let gen = appCacheGen_();
   if (!gen) {
     gen = Utilities.getUuid();
-    try { CacheService.getScriptCache().put('app:v2:gen', gen, 21600); } catch (e) {}
+    try { CacheService.getScriptCache().put('app:v3:gen', gen, 21600); } catch (e) {}
   }
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const tz = 'Asia/Tokyo';
   const now = Utilities.formatDate(new Date(), tz, 'yyyy/MM/dd HH:mm');
   const caps = { reels: {}, feeds: {}, stories: {} };
+  // ストーリーズは直近 APP_STORY_DAYS 日（既定120）だけ返す（件数が多いアカウントでも重くしない）
+  const storyDays = Number(getConfig('APP_STORY_DAYS')) || 120;
+  const storySince = new Date(Date.now() - storyDays * 86400000);
 
   const data = {
     updatedAt: now,
@@ -96,7 +97,7 @@ function appBuild_() {
         navigation: Number(g('ナビゲーション')) || 0,
         profileVisits: Number(g('プロフィールアクセス')) || 0
       }, appBsuiteFields_(g));
-    }),
+    }, storySince),
     reels: appReadRows_(ss.getSheetByName('🎬 リール'), tz, (g, base) => {
       const avg = g('平均視聴時間');
       const caption = String(g('キャプション') || '');
@@ -134,13 +135,13 @@ function appBuild_() {
 
 /**
  * ScriptCache に10分保持。1キー100KB制限のため JSON を分割して保存する
- * （30000文字＝UTF-8で最大90KB）。キー: app:v2:<name>:n（件数）/ app:v2:<name>:<i>
+ * （30000文字＝UTF-8で最大90KB）。キー: app:v3:<name>:n（件数）/ app:v3:<name>:<i>
  */
 const APP_CACHE_TTL_SEC = 2400; // 40分。自動取得(30分ごと)と巡回書き込みの直後に appBuild_ で作り直すので、通常は切れない
 const APP_CACHE_CHUNK = 30000;
 
 function appCacheGen_() {
-  try { return CacheService.getScriptCache().get('app:v2:gen') || ''; } catch (e) { return ''; }
+  try { return CacheService.getScriptCache().get('app:v3:gen') || ''; } catch (e) { return ''; }
 }
 
 function appCacheEntries_(name, obj, gen) {
@@ -151,11 +152,11 @@ function appCacheEntries_(name, obj, gen) {
     let end = Math.min(i + APP_CACHE_CHUNK, json.length);
     const c = json.charCodeAt(end - 1);
     if (end < json.length && c >= 0xD800 && c <= 0xDBFF) end--; // サロゲートペアを割らない
-    entries['app:v2:' + name + ':' + n] = json.slice(i, end);
+    entries['app:v3:' + name + ':' + n] = json.slice(i, end);
     i = end;
   }
-  entries['app:v2:' + name + ':n'] = String(n);
-  entries['app:v2:' + name + ':g'] = gen;
+  entries['app:v3:' + name + ':n'] = String(n);
+  entries['app:v3:' + name + ':g'] = gen;
   return entries;
 }
 
@@ -172,12 +173,12 @@ function appCachePut_(entries) {
 function appCacheGet_(name) {
   try {
     const cache = CacheService.getScriptCache();
-    const n = Number(cache.get('app:v2:' + name + ':n'));
+    const n = Number(cache.get('app:v3:' + name + ':n'));
     if (!n) return null;
     const keys = [];
-    for (let i = 0; i < n; i++) keys.push('app:v2:' + name + ':' + i);
-    const got = cache.getAll(keys.concat(['app:v2:gen', 'app:v2:' + name + ':g']));
-    if (!got['app:v2:gen'] || got['app:v2:gen'] !== got['app:v2:' + name + ':g']) return null;
+    for (let i = 0; i < n; i++) keys.push('app:v3:' + name + ':' + i);
+    const got = cache.getAll(keys.concat(['app:v3:gen', 'app:v3:' + name + ':g']));
+    if (!got['app:v3:gen'] || got['app:v3:gen'] !== got['app:v3:' + name + ':g']) return null;
     let json = '';
     for (let i = 0; i < n; i++) {
       const part = got[keys[i]];
@@ -195,8 +196,8 @@ function appCacheGet_(name) {
 function appCacheClear_() {
   try {
     const cache = CacheService.getScriptCache();
-    cache.removeAll(['app:v2:data:n', 'app:v2:caps:n']);
-    cache.put('app:v2:gen', Utilities.getUuid(), 21600);
+    cache.removeAll(['app:v3:data:n', 'app:v3:caps:n']);
+    cache.put('app:v3:gen', Utilities.getUuid(), 21600);
   } catch (e) {
     Logger.log('appCacheClear_ 失敗: ' + e.message);
   }
@@ -295,28 +296,38 @@ function bsuiteWrite_(items) {
     updated++;
   });
 
-  notifyDiscord('👥 閲覧者内訳: 更新 ' + updated + '件 / 未発見 ' + notFound.length + '件', { kind: 'bsuite', bypassCooldown: true });
+  try { notifyDiscord('👥 閲覧者内訳: 更新 ' + updated + '件 / 未発見 ' + notFound.length + '件', { kind: 'bsuite', bypassCooldown: true }); } catch (e) { Logger.log('notifyDiscord 失敗: ' + e.message); }
   return { updated: updated, notFound: notFound };
 }
 
 function bsuiteAlert_(message) {
-  notifyDiscord(String(message || '(no message)'), { toError: true, kind: 'bsuiteAlert', bypassCooldown: true });
+  try { notifyDiscord(String(message || '(no message)'), { toError: true, kind: 'bsuiteAlert', bypassCooldown: true }); } catch (e) { Logger.log('notifyDiscord 失敗: ' + e.message); }
   return { ok: true };
 }
 
 /**
  * ヘッダー1回・値・数式だけ読み、ヘッダー名で列を解決して行オブジェクト化する
  */
-function appReadRows_(sheet, tz, build) {
+function appReadRows_(sheet, tz, build, since) {
   if (!sheet || sheet.getLastRow() < 2) return [];
-  const lastRow = sheet.getLastRow();
   const lastCol = sheet.getLastColumn();
-  const range = sheet.getRange(2, 1, lastRow - 1, lastCol);
-  const values = range.getValues();
-  const formulas = range.getFormulas();
   const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(h => String(h).trim());
   const colIdx = {};
   headers.forEach((h, i) => { if (h && !(h in colIdx)) colIdx[h] = i; });
+  // since 指定時は投稿日時列だけ先に読み、対象行を含む範囲だけ読む
+  let top = 2, n = sheet.getLastRow() - 1;
+  if (since && '投稿日時' in colIdx) {
+    const hit = [];
+    sheet.getRange(2, colIdx['投稿日時'] + 1, n, 1).getValues().forEach((v, i) => {
+      const d = appParseDate_(v[0]);
+      if (d && d >= since) hit.push(i);
+    });
+    if (!hit.length) return [];
+    top = 2 + hit[0];
+    n = hit[hit.length - 1] - hit[0] + 1;
+  }
+  const values = sheet.getRange(top, 1, n, lastCol).getValues();
+  const formulas = 'サムネイル' in colIdx ? sheet.getRange(top, colIdx['サムネイル'] + 1, n, 1).getFormulas() : null;
 
   const out = [];
   for (let r = 0; r < values.length; r++) {
@@ -326,7 +337,8 @@ function appReadRows_(sheet, tz, build) {
     if (!id) continue;
     const postedAt = appParseDate_(g('投稿日時'));
     if (!postedAt) continue;
-    const f = 'サムネイル' in colIdx ? formulas[r][colIdx['サムネイル']] : '';
+    if (since && postedAt < since) continue;
+    const f = formulas ? formulas[r][0] : '';
     const m = f ? String(f).match(/IMAGE\(\s*"([^"]+)"/i) : null;
     out.push(build(g, {
       id: id,
