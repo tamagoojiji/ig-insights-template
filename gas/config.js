@@ -6,6 +6,7 @@ const CONFIG_KEYS = [
   'IG_ACCESS_TOKEN',
   'IG_USER_ID',
   'DRIVE_FOLDER_ID',
+  'REEL_VIDEO_FOLDER_ID',
   'TOKEN_EXPIRY',
   'FB_APP_ID',
   'FB_APP_SECRET',
@@ -14,7 +15,9 @@ const CONFIG_KEYS = [
   'ERROR_WEBHOOK_URL',
   'BACKFILL_CURSOR',
   'LAST_CSV_IMPORT_DATE',
-  'LAST_AUTOFETCH_SUCCESS'
+  'LAST_AUTOFETCH_SUCCESS',
+  'FOLLOWERS_NOTIFIED_DATE',
+  'APP_ACCESS_KEY'
 ];
 
 function getConfig(key) {
@@ -84,6 +87,10 @@ function promptAndSaveSecrets() {
     const newVal = (res.getResponseText() || '').trim();
     if (newVal) {
       setConfig(item.key, newVal);
+      // 手動でトークンを入れ直した＝復旧操作なので、リフレッシュ抑制を解除する
+      if (item.key === 'IG_ACCESS_TOKEN') {
+        PropertiesService.getScriptProperties().deleteProperty('TOKEN_REFRESH_LAST_ATTEMPT');
+      }
       savedCount++;
     }
   }
@@ -176,7 +183,7 @@ function testConnection() {
 
     SpreadsheetApp.getUi().alert(
       `接続成功！\n\nユーザー名: ${data.username}\n投稿数: ${data.media_count}` +
-      (longTokenResult ? '\n\n✅ 長期トークンに変換しました（60日間有効）' : '\n\n⚠️ 長期トークンへの変換に失敗しました（アプリID/シークレットを確認してください）')
+      (longTokenResult ? '\n\n✅ 長期トークンに変換しました（実失効: ' + (getConfig('TOKEN_EXPIRY') || '不明') + '）' : '\n\n⚠️ 長期トークンへの変換に失敗しました（アプリID/シークレットを確認してください）')
     );
   } catch (e) {
     SpreadsheetApp.getUi().alert(`エラー: ${e.message}`);
@@ -208,40 +215,7 @@ function autoFetchIGUserId_(token) {
  * 短期トークンを長期トークンに変換
  */
 function exchangeToLongLivedToken() {
-  const token = getConfig('IG_ACCESS_TOKEN');
-  const appId = getConfig('FB_APP_ID');
-  const appSecret = getConfig('FB_APP_SECRET');
-
-  if (!token || !appId || !appSecret) {
-    Logger.log('長期トークン変換: アプリID/シークレットが未設定');
-    return false;
-  }
-
-  try {
-    const url = `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${token}`;
-    const res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-    const data = JSON.parse(res.getContentText());
-
-    if (data.error) {
-      Logger.log(`長期トークン変換エラー: ${data.error.message}`);
-      return false;
-    }
-
-    if (data.access_token) {
-      setConfig('IG_ACCESS_TOKEN', data.access_token);
-
-      const expiry = new Date();
-      expiry.setDate(expiry.getDate() + 60);
-      setConfig('TOKEN_EXPIRY', Utilities.formatDate(expiry, 'Asia/Tokyo', 'yyyy/MM/dd'));
-      updateExpiryOnSheet(expiry);
-
-      Logger.log('長期トークンに変換成功');
-      return true;
-    }
-  } catch (e) {
-    Logger.log(`長期トークン変換例外: ${e.message}`);
-  }
-  return false;
+  return fbExchangeLongLivedToken_({ notify: false });
 }
 
 /**

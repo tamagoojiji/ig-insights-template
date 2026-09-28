@@ -19,3 +19,14 @@ internal/_drafts/
 *-sa.json
 service-account-*.json
 admin/
+
+# bsuite ローカル実行物
+__pycache__/
+*.pyc
+bsuite/.venv/
+bsuite/state/
+bsuite/logs/
+
+# アカウント実ファイルは private リポ ig-insights-accounts に置く
+accounts/*.env
+!accounts/example.env

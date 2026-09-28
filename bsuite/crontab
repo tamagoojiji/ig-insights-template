@@ -1,0 +1,7 @@
+# ig-bsuite cron（cron はイメージの ENV を引き継がないので必要な環境変数をここで渡す）
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+TZ=Asia/Tokyo
+PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+# 毎日04:40 JST（ig-insights の 05:00 と重ねない）
+40 4 * * * cd /app && set -a && . .env && set +a && python scrape.py >> /var/log/cron.log 2>&1
