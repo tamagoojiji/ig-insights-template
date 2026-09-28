@@ -93,6 +93,7 @@ function manualFetchStories() {
  */
 function autoFetch() {
   try {
+    ensureTriggers_(); // 欠けた必須トリガーを毎回自動復旧（Google側のトリガー脱落対策）
     checkAndRefreshToken();
     ensureV22Migration_();
 
@@ -113,6 +114,8 @@ function autoFetch() {
         Logger.log(`OCRリトライ例外: ${e.message}`);
       }
     }
+    appCacheClear_();
+    if (!isTimeUp_()) { try { appBuild_(); } catch (e) { Logger.log(`appBuild_ 失敗: ${e.message}`); } } // 次の表示でキャッシュ切れにならないよう作り直す
     if (!isTimeUp_()) {
       updateDashboard();
     }
@@ -121,6 +124,7 @@ function autoFetch() {
     Logger.log('自動取得完了' + (isTimeUp_() ? '（時間制限で一部スキップ）' : ''));
   } catch (e) {
     Logger.log(`autoFetch エラー: ${e.message}\n${e.stack}`);
+    try { notifyFetchError_('autoFetch（30分毎の自動取得）', 'autofetch_error', e); } catch (_) {}
   }
 }
 
@@ -165,6 +169,9 @@ function initializeAllSheets() {
 
   const reelFastSheet = getOrCreateSheet('⚡ リール初速良好');
   if (reelFastSheet.getLastRow() === 0) setupReelFastGrowthHeader(reelFastSheet);
+
+  const followerSheet = getOrCreateSheet('📊 フォロワー推移');
+  if (followerSheet.getLastRow() === 0) setupFollowerHistoryHeader(followerSheet);
 
   getOrCreateSheet('📊 ダッシュボード');
 

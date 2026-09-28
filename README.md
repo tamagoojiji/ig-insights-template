@@ -53,6 +53,17 @@ scripts/   Pages反映スクリプト等
 
 スクレイピングは行わず、Meta公式 Graph API のみを使用。詳細は `internal/legal-notes.md` を参照。
 
+## 複数アカウント運用（スマホ画面・巡回つき）
+
+GAS（`gas/`）に加えて、スマホ用の静的画面（`web/`）と Business Suite 巡回（`bsuite/`）をアカウントごとに配信する。コードはこのリポで共通、アカウント固有の値は **このリポに置かない**（1アカウント1ファイルの `<id>.env` を private リポで管理。項目は `accounts/example.env`）。
+
+| スクリプト | 内容 |
+|---|---|
+| `scripts/push-gas.sh --account-file <env> [--check]` | 本番を `clasp pull` して commit 済み `gas/` と比較（差分があれば中止）→ `GAS_SCRIPT_ID` の一時 `.clasp.json` で push。反映は別途 `clasp redeploy <GAS_DEPLOY_ID>` |
+| `scripts/deploy-web.sh --account-file <env>` | `web/` の `__ACCOUNT__`・`__TITLE__`・`__GAS_ID__` を置換し、取説（`<accountsリポ>/manual/<id>/取扱説明書（図解）.html`）に「アプリに戻る」バーを足して VPS `/opt/docker/ig-app/<id>/`（`/ig/<id>/`）へ配信 |
+| `scripts/deploy-bsuite.sh --account-file <env> [--state <json>]` | VPS `/opt/docker/ig-bsuite-<id>/` に巡回コンテナを配置（アクセスキーは Mac Keychain から `.env` へ、compose のサービスを追記・更新して起動） |
+| `scripts/new-account.sh <id>` | 新規アカウント立ち上げ（雛形・手順表示のみ） |
+
 ## ライセンス
 
 Personal use only. 商用配布や転売はお問い合わせください。

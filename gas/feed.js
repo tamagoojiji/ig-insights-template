@@ -194,9 +194,12 @@ function writeReelsToSheet(items) {
 
   if (sheet.getLastRow() === 0) setupReelHeader(sheet);
   if (historySheet.getLastRow() === 0) setupReelHistoryHeader(historySheet);
+  ensureReelVideoColumn_(sheet);
+  ensureReelAvgWatchColumn_(sheet);
 
   const idCol = findColumn_(sheet, 'メディアID');
   const updateStartCol = findColumn_(sheet, '視聴数');
+  const avgWatchCol = findColumn_(sheet, '平均視聴時間');
   if (idCol < 1 || updateStartCol < 1) {
     Logger.log('リール: 必須ヘッダー（メディアID/視聴数）が見つかりません');
     return 0;
@@ -242,13 +245,20 @@ function writeReelsToSheet(items) {
     const totalInteractions = insights.total_interactions || (likes + comments + saved + shares);
     const engagementRate = reach > 0 ? ((totalInteractions / reach) * 100).toFixed(1) + '%' : '0%';
     const elapsedMin = Math.round((now - postedAt) / 60000);
+    const avgWatchSec = insights.ig_reels_avg_watch_time != null ? Math.round(insights.ig_reels_avg_watch_time / 1000) : '';
 
     // 新規時のみDrive保存
     let driveUrl = '';
+    let videoUrl = '';
     if (!isExisting) {
       const imageUrl = item.thumbnail_url || item.media_url;
       if (imageUrl && !isTimeUp_()) {
         driveUrl = saveImageToDrive(imageUrl, item.id, item.timestamp, 'reels') || '';
+      }
+      // 動画本編(mp4)。media_url は署名付きで数日で失効するため取得時に落とす。
+      // 失敗しても null が返るだけで、指標の取得は止めない。
+      if (item.media_url && !isTimeUp_()) {
+        videoUrl = saveVideoToDrive(item.media_url, item.id, item.timestamp) || '';
       }
     }
 
@@ -266,6 +276,7 @@ function writeReelsToSheet(items) {
     if (isExisting) {
       const rowIndex = existingMap.get(String(item.id));
       sheet.getRange(rowIndex, updateStartCol, 1, 7).setValues([[views, likes, comments, saved, reach, shares, engagementRate]]);
+      if (avgWatchCol > 0) sheet.getRange(rowIndex, avgWatchCol).setValue(avgWatchSec);
       updateCount++;
     } else {
       const valueMap = {
@@ -274,11 +285,13 @@ function writeReelsToSheet(items) {
         'キャプション': item.caption || '',
         '視聴数': views, 'いいね数': likes, 'コメント数': comments, '保存数': saved,
         'リーチ': reach, 'シェア数': shares, 'エンゲージメント率': engagementRate,
-        'メディアID': item.id
+        'メディアID': item.id,
+        '動画URL': videoUrl
       };
       const newRow = buildRowFromMap_(sheet, valueMap);
       const startRow = sheet.getLastRow() + 1;
       sheet.getRange(startRow, 1, 1, newRow.length).setValues([newRow]);
+      if (avgWatchCol > 0) sheet.getRange(startRow, avgWatchCol).setValue(avgWatchSec);
       setThumbnailRowHeight(sheet, startRow, 1);
       newCount++;
     }

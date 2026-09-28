@@ -45,7 +45,8 @@ function fetchAllMedia(maxItems) {
     const data = JSON.parse(res.getContentText());
 
     if (data.error) {
-      throw new Error(`Instagram API Error: ${data.error.message}`);
+      // igFetch と同形式（code付き）で投げ、isTokenExpiredError_ の code:190 判定に乗せる
+      throw new Error(`Instagram API Error: ${data.error.message} (code: ${data.error.code})`);
     }
 
     if (data.data) {

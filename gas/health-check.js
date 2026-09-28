@@ -4,7 +4,10 @@
 // ==========
 
 const HEALTH_STALE_HOURS = 2;
-const REQUIRED_TRIGGERS = ['autoFetch', 'refreshTokenJob'];
+// 必須トリガーの定義源は triggers.js の TRIGGER_SPECS に一本化し、ここでは Object.keys() で導出する
+// （二重定義による判定漏れを防ぐ）。healthCheck 自身も含まれるが、実行中は必ず存在するので誤検知しない。
+// ※ トップレベルで導出すると GAS のファイル評価順により TRIGGER_SPECS 未定義になり得るため、
+//   各関数の実行時に Object.keys(TRIGGER_SPECS) を評価する。
 
 /**
  * トリガー存在＋最終autoFetch成功時刻をチェック
@@ -12,9 +15,12 @@ const REQUIRED_TRIGGERS = ['autoFetch', 'refreshTokenJob'];
  */
 function healthCheck() {
   try {
+    // まず欠けたトリガーの自動復旧を試みる（手動再インストールを不要にする）
+    const restored = ensureTriggers_();
+
     const triggers = ScriptApp.getProjectTriggers();
     const handlers = triggers.map(t => t.getHandlerFunction());
-    const missing = REQUIRED_TRIGGERS.filter(h => handlers.indexOf(h) < 0);
+    const missing = Object.keys(TRIGGER_SPECS).filter(h => handlers.indexOf(h) < 0);
 
     const lastStr = getConfig('LAST_AUTOFETCH_SUCCESS');
     const lastMs = lastStr ? parseInt(lastStr, 10) : 0;
@@ -22,7 +28,7 @@ function healthCheck() {
 
     const alerts = [];
     if (missing.length > 0) {
-      alerts.push('・トリガー消失: ' + missing.join(', '));
+      alerts.push('・トリガー消失（自動復旧も失敗）: ' + missing.join(', '));
     }
     if (hoursSince === null) {
       alerts.push('・autoFetch成功記録なし（初回未実行 or 過去成功時刻ロスト）');
@@ -31,15 +37,33 @@ function healthCheck() {
     }
 
     if (alerts.length === 0) {
-      Logger.log('healthCheck OK（autoFetch ' + Math.floor(hoursSince) + 'h以内）');
+      // 消えていたトリガーを自動復旧できた場合のみ、非アラームで報告（手動操作は不要）
+      if (restored.length > 0) {
+        notifyDiscord(
+          '🔧 消失した時間トリガーを自動復旧しました: ' + restored.join(', ') + '\n' +
+          '手動の再インストールは不要です（autoFetch/healthCheck が自動修復）。',
+          { kind: 'trigger_restored', toError: true }
+        );
+      }
+      Logger.log('healthCheck OK（autoFetch ' + Math.floor(hoursSince) + 'h以内'
+        + (restored.length ? ' / 自動復旧: ' + restored.join(',') : '') + '）');
       return;
     }
 
     const ss = SpreadsheetApp.getActiveSpreadsheet();
+    // 自動復旧できたトリガーは併記して「消えたが直した」ことを明示する
+    const restoredLine = restored.length
+      ? '\n✅ 自動復旧済み: ' + restored.join(', ') + '（手動操作は不要）'
+      : '';
+    // 手動インストールを促すのは復旧に失敗したトリガーが残っているときだけ。
+    // stale（取得遅延）等は自動復旧済み or 次回 autoFetch で回復するので案内を変える。
+    const action = missing.length > 0
+      ? '対処: スプシメニュー「📊 Instagram Insights → ⏰ トリガーをインストール」を再実行してください。'
+      : '対処: 次回 autoFetch（最大30分後）で取得が再開します。回復しない場合はトークン/設定を確認してください。';
     const message =
       '🚨 IGインサイト ヘルスチェック異常\n\n' +
-      alerts.join('\n') + '\n\n' +
-      '対処: スプシメニュー「📊 Instagram Insights → ⏰ トリガーをインストール」を再実行してください。\n' +
+      alerts.join('\n') + restoredLine + '\n\n' +
+      action + '\n' +
       'スプシ: ' + ss.getUrl();
 
     notifyDiscord(message, {
@@ -65,7 +89,7 @@ function healthCheckManual() {
     : '(記録なし)';
   const triggers = ScriptApp.getProjectTriggers();
   const handlers = triggers.map(t => t.getHandlerFunction());
-  const missing = REQUIRED_TRIGGERS.filter(h => handlers.indexOf(h) < 0);
+  const missing = Object.keys(TRIGGER_SPECS).filter(h => handlers.indexOf(h) < 0);
 
   SpreadsheetApp.getUi().alert(
     'ヘルスチェック実行結果\n\n' +

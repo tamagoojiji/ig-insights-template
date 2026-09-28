@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>__TITLE__</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="__ACCOUNT__">
+<script>
+  // app.js の読込を待たずにデータ取得を始める（app.js の fetchData が引き継ぐ）
+  (function () {
+    try {
+      var m = location.search.match(/[?&]k=([^&]+)/) || location.hash.match(/[#&]k=([^&]+)/);
+      var k = m ? decodeURIComponent(m[1]) : (localStorage.getItem('ig_k___ACCOUNT__') || localStorage.getItem('__ACCOUNT___k'));
+      if (!k) return;
+      var u = 'https://script.google.com/macros/s/__GAS_ID__/exec?k=' + encodeURIComponent(k) + '&format=json';
+      window.__pre = { url: u, p: fetch(u).then(function (r) { return r.text(); }) };
+      window.__pre.p.catch(function () {});
+    } catch (e) {}
+  })();
+</script>
+<link rel="preload" href="app.js" as="script">
+<style>
+  :root { --ink:#222; --sub:#666; --line:#e5e5e5; --bg:#fff; --soft:#f5f5f5; --accent:#C8402B; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; background:var(--bg); color:var(--ink);
+    font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    font-size:15px; line-height:1.5; -webkit-text-size-adjust:100%; }
+  button { font:inherit; color:inherit; }
+  .wrap { max-width:720px; margin:0 auto; padding:12px 16px calc(80px + env(safe-area-inset-bottom)); }
+  header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  header .guide { flex:0 0 auto; display:inline-flex; align-items:center; min-height:44px; padding:0 14px; border-radius:8px; background:var(--soft); color:var(--ink); font-size:14px; font-weight:700; text-decoration:none; white-space:nowrap; }
+  header h1 { font-size:clamp(17px, 5.6vw, 20px); font-weight:700; margin:0; white-space:nowrap; }
+  header .meta { font-size:12px; color:var(--sub); margin-top:2px; }
+  .seg { display:flex; gap:8px; margin:12px 0 4px; flex-wrap:wrap; }
+  .seg button { min-height:44px; padding:0 14px; border:1px solid #bbb; border-radius:22px; background:#fff; cursor:pointer; font-size:14px; }
+  .seg button[aria-pressed="true"] { background:var(--ink); border-color:var(--ink); color:#fff; font-weight:700; }
+  .seg.sort { align-items:center; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px; }
+  .seg.sort button { flex:0 0 auto; }
+  .seg .lbl { font-size:12px; color:var(--sub); flex:0 0 auto; white-space:nowrap; }
+  .seg.sort button { font-size:13px; padding:0 12px; border-radius:8px; }
+  .seg.sort button[aria-pressed="true"] { background:#fff; color:var(--ink); border:2px solid var(--ink); }
+  .note { font-size:12px; color:var(--sub); margin:6px 0 0; }
+  details.legend { margin:4px 0 0; }
+  details.legend summary { list-style:none; display:inline-flex; align-items:center; min-height:44px; padding:0 14px; border:1px solid #bbb; border-radius:8px; background:var(--soft); font-size:13px; font-weight:700; color:var(--ink); cursor:pointer; }
+  details.legend[open] summary { background:var(--ink); border-color:var(--ink); color:#fff; }
+  details.legend summary::-webkit-details-marker { display:none; }
+  details.legend summary::before { content:'▸'; margin-right:6px; }
+  details.legend[open] summary::before { content:'▾'; }
+  details.legend .note { margin:0 0 6px; }
+  details.legend[open] > .note:first-of-type, details.legend[open] #legend-dyn { margin-top:8px; }
+  .count { font-size:14px; color:var(--sub); margin:16px 0 4px; }
+  .fire { color:var(--accent); font-weight:700; white-space:nowrap; }
+
+  /* ストーリーズ */
+  .day { padding:16px 0; border-top:1px solid var(--line); }
+  .day:first-of-type { border-top:0; }
+  .day h2 { font-size:17px; margin:0; }
+  .day .sum { font-size:14px; margin:2px 0 10px; }
+  .day .sum span, .nw { white-space:nowrap; }
+  .strip { display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:6px; -webkit-overflow-scrolling:touch; }
+  .story { flex:0 0 120px; scroll-snap-align:start; }
+  .story.gs { flex-basis:133px; padding-left:12px; border-left:1px solid var(--line); }
+  .story button.th { display:block; position:relative; width:120px; padding:0; border:0; background:none; cursor:pointer; }
+  .thumb { width:100%; aspect-ratio:9/16; object-fit:cover; display:block; border-radius:8px; background:var(--soft); }
+  .ph { width:100%; aspect-ratio:9/16; border-radius:8px; background:var(--soft); color:#777; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .num { position:absolute; left:6px; top:6px; background:rgba(0,0,0,.65); color:#fff; font-size:13px; font-weight:700; border-radius:12px; padding:1px 7px; }
+  .mini { width:100%; border-collapse:collapse; margin-top:6px; table-layout:fixed; }
+  .mini td { padding:2px 0; vertical-align:top; }
+  .mini .l { display:block; font-size:12px; color:var(--sub); line-height:1.3; }
+  .mini .v { display:block; font-size:14px; font-weight:600; line-height:1.3; }
+
+  /* リール・フィード */
+  .row { display:flex; gap:12px; width:100%; text-align:left; padding:12px 0; border:0; border-top:1px solid var(--line); background:none; cursor:pointer; align-items:flex-start; }
+  .row:first-child { border-top:0; }
+  .row .thumb, .row .ph { width:72px; flex:0 0 72px; }
+  .row.feed .thumb, .row.feed .ph { aspect-ratio:4/5; }
+  .row .body { min-width:0; flex:1; }
+  .row .cap { font-size:15px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row .date { font-size:12px; color:var(--sub); }
+  .row .mets { font-size:14px; margin-top:4px; }
+  .row .mets span { white-space:nowrap; }
+
+  .state { padding:32px 0; text-align:center; color:var(--sub); }
+  .state button { margin-top:12px; min-height:44px; padding:0 18px; border:1px solid var(--ink); border-radius:22px; background:#fff; cursor:pointer; }
+
+  /* 下部タブ */
+  nav.tabs { position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:10; }
+  nav.tabs .in { max-width:720px; margin:0 auto; display:flex; }
+  nav.tabs button { flex:1; min-height:56px; border:0; background:none; color:#555; font-size:14px; cursor:pointer; border-top:3px solid transparent; }
+  nav.tabs button[aria-selected="true"] { color:var(--accent); font-weight:700; border-top-color:var(--accent); }
+
+  /* ボトムシート */
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:20; display:flex; align-items:flex-end; justify-content:center; }
+  .sheet { background:#fff; width:100%; max-width:720px; max-height:88vh; overflow-y:auto; border-radius:16px 16px 0 0; padding:8px 16px calc(24px + env(safe-area-inset-bottom)); }
+  .sheet .top { display:flex; justify-content:space-between; align-items:center; position:sticky; top:-8px; background:#fff; padding-top:8px; }
+  .sheet .top b { font-size:15px; }
+  .sheet .close { min-width:44px; min-height:44px; border:0; background:none; font-size:15px; cursor:pointer; color:var(--ink); }
+  .sheet .big { display:block; max-height:36vh; max-width:100%; margin:4px auto 12px; border-radius:8px; object-fit:contain; }
+  .sheet .ph.bigph { width:160px; margin:4px auto 12px; }
+  .kv { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:4px 16px; margin:0 0 12px; }
+  .kv div { display:flex; justify-content:space-between; border-bottom:1px solid var(--line); padding:6px 0; font-size:15px; }
+  .kv div span:first-child { color:var(--sub); }
+  .kv div span:last-child { font-weight:600; }
+  .full { white-space:pre-wrap; text-align:left; font-size:15px; background:#fff; border-top:1px solid var(--line); padding-top:10px; margin:0; overflow-wrap:anywhere; }
+  .sheet h3 { font-size:14px; color:var(--sub); margin:12px 0 4px; font-weight:600; }
+  .sheet a.link { display:inline-flex; align-items:center; min-height:44px; color:var(--ink); font-weight:700; }
+</style>
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>__TITLE__</h1>
+      <div class="meta" id="meta">読み込み中…</div>
+    </div>
+    <a class="guide" href="manual.html">使い方を見る</a>
+  </header>
+  <div class="seg" id="period" role="group" aria-label="表示する期間">
+    <button type="button" data-p="7">直近7日</button>
+    <button type="button" data-p="30">30日</button>
+    <button type="button" data-p="all">全部</button>
+  </div>
+  <details class="legend"><summary>数字の見方（🔥・継続率）</summary><div id="legend-dyn"></div><p class="note">スキップ率・視聴者の名前一覧はIGアプリでのみ確認できます（フォロワー内訳は各投稿の詳細に表示）</p></details>
+  <main id="main"><div class="state">読み込み中…</div></main>
+</div>
+
+<nav class="tabs" aria-label="表示切替">
+  <div class="in" role="tablist">
+    <button type="button" role="tab" data-t="stories">ストーリーズ</button>
+    <button type="button" role="tab" data-t="reels">リール</button>
+    <button type="button" role="tab" data-t="feeds">フィード</button>
+  </div>
+</nav>
+
+<div id="sheetRoot"></div>
+
+</body>
+</html>

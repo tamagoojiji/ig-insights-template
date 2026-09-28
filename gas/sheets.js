@@ -77,7 +77,7 @@ function setupReelHeader(sheet) {
   const headers = [
     '投稿日時', 'サムネイル', 'キャプション',
     '視聴数', 'いいね数', 'コメント数', '保存数',
-    'リーチ', 'シェア数', 'エンゲージメント率', 'メディアID'
+    'リーチ', 'シェア数', 'エンゲージメント率', 'メディアID', '動画URL'
   ];
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
   sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#EA4335').setFontColor('#FFFFFF');
@@ -86,7 +86,47 @@ function setupReelHeader(sheet) {
   sheet.getRange(2, 3, sheet.getMaxRows() - 1, 1).setWrap(true).setVerticalAlignment('top');
   sheet.setColumnWidth(11, 1);
   sheet.getRange(1, 11, sheet.getMaxRows(), 1).setNumberFormat('@');
+  sheet.setColumnWidth(12, 240);
   sheet.setRowHeight(1, 30);
+}
+
+/**
+ * 「🎬 リール」シートに「動画URL」列が無ければ末尾に追加。
+ * 既存データ・既存の列番号（メディアID=11列目）に影響しない非破壊マイグレーション。
+ */
+function ensureReelVideoColumn_(sheet) {
+  if (!sheet || sheet.getLastColumn() === 0) return;
+  if (findColumn_(sheet, '動画URL') > 0) return;
+  const newCol = sheet.getLastColumn() + 1;
+  sheet.getRange(1, newCol).setValue('動画URL')
+    .setFontWeight('bold').setBackground('#EA4335').setFontColor('#FFFFFF');
+  sheet.setColumnWidth(newCol, 240);
+}
+
+/**
+ * 「🎬 リール」シートに「平均視聴時間」列（秒）が無ければ末尾に追加。
+ * 既存データ・既存の列番号に影響しない非破壊マイグレーション。
+ */
+function ensureReelAvgWatchColumn_(sheet) {
+  if (!sheet || sheet.getLastColumn() === 0) return;
+  if (findColumn_(sheet, '平均視聴時間') > 0) return;
+  const newCol = sheet.getLastColumn() + 1;
+  sheet.getRange(1, newCol).setValue('平均視聴時間')
+    .setFontWeight('bold').setBackground('#EA4335').setFontColor('#FFFFFF');
+}
+
+/**
+ * Business Suite 由来の閲覧者内訳4列が無ければ末尾に追加。
+ * 既存データ・既存の列番号に影響しない非破壊マイグレーション。
+ */
+function ensureBsuiteColumns_(sheet) {
+  if (!sheet || sheet.getLastColumn() === 0) return;
+  ['フォロワー閲覧', 'フォロワー以外閲覧', '女性比率', '主要年齢層'].forEach(h => {
+    if (findColumn_(sheet, h) > 0) return;
+    const newCol = sheet.getLastColumn() + 1;
+    sheet.getRange(1, newCol).setValue(h)
+      .setFontWeight('bold').setBackground('#EA4335').setFontColor('#FFFFFF');
+  });
 }
 
 /**
@@ -156,6 +196,20 @@ function setupStoriesHistoryHeader(sheet) {
   sheet.setColumnWidth(1, 140);
   sheet.setColumnWidth(2, 200);
   sheet.getRange(1, 2, sheet.getMaxRows(), 1).setNumberFormat('@');
+  sheet.setFrozenRows(1);
+  sheet.setRowHeight(1, 30);
+}
+
+/**
+ * 📊 フォロワー推移シートのヘッダーを設定
+ */
+const FOLLOWER_HEADERS = ['日付', 'フォロワー数', '増減', '増加', '減少', 'ソース', '更新日時'];
+
+function setupFollowerHistoryHeader(sheet) {
+  const headers = FOLLOWER_HEADERS;
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers])
+    .setFontWeight('bold').setBackground('#1565C0').setFontColor('#FFFFFF');
+  sheet.getRange('A2:A').setNumberFormat('@');
   sheet.setFrozenRows(1);
   sheet.setRowHeight(1, 30);
 }

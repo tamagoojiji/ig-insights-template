@@ -10,7 +10,7 @@ function refreshTokenJob() {
     if (result === false) {
       throw new Error('長期トークン更新に失敗しました');
     }
-    notifyDiscord('✅ IGトークンを自動更新しました（次回 +60日有効）', { kind: 'refresh_success' });
+    notifyDiscord('✅ IGトークンを自動更新しました（実失効: ' + (getConfig('TOKEN_EXPIRY') || '不明') + '）', { kind: 'refresh_success' });
     console.log('IGトークン更新成功');
   } catch (e) {
     const msg = e.message || String(e);

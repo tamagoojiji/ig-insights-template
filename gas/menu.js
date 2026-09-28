@@ -11,10 +11,12 @@ function onOpen() {
     .addSeparator()
     .addItem('🔗 接続テスト（→長期トークン化＋USER_ID取得）', 'testConnection')
     .addItem('📁 Drive画像保存フォルダを準備', 'ensureDriveFolder')
+    .addItem('🎥 リール動画フォルダIDを設定', 'setReelVideoFolder')
     .addSeparator()
     .addItem('▶️ 全データ取得（手動）', 'manualFetchAll')
     .addItem('📸 フィード+リールのみ取得', 'manualFetchFeed')
     .addItem('📖 ストーリーズのみ取得', 'manualFetchStories')
+    .addItem('👥 フォロワー数を記録（手動）', 'manualRecordFollowers')
     .addItem('🔍 ストーリーズOCR一括（エラー行も再処理）', 'runStoriesOcrAll')
     .addItem('🔢 ストーリーズOCRバッチ（件数指定）', 'runStoriesOcrBatch')
     .addItem('🤖 自動OCR開始（5分おき・完走で自動停止）', 'startAutoOcr')
@@ -23,6 +25,11 @@ function onOpen() {
     .addSeparator()
     .addItem('📚 過去全件取り込み（API）', 'backfillFromAPI')
     .addItem('🔁 取り込みカーソルをリセット', 'resetBackfillCursor')
+    .addItem('🎥 過去リールの動画(mp4)を一括保存', 'startReelVideoBackfill')
+    .addItem('📈 リール動画保存の進捗', 'showReelVideoBackfillProgress')
+    .addItem('⏹ リール動画保存を停止', 'stopReelVideoBackfill')
+    .addItem('🔗 Drive動画URLをシートに紐付け', 'linkReelVideosFromDrive')
+    .addItem('💡 名前つけ待ちの名前案を通知（手動）', 'suggestReelNames')
     .addItem('📦 Meta公式zipアップロード（全期間・画像+キャプション）', 'openMetaZipDialog')
     .addItem('📁 Meta公式データ取り込み（Driveフォルダ経由・大容量対応）', 'openMetaDriveDialog')
     .addItem('📷 履歴行に画像URL一括付与（Meta export経由・推奨）', 'openBindFromMetaExportDialog')
@@ -61,6 +68,7 @@ function checkConfig() {
     'Facebook アプリID: ' + (config.FB_APP_ID || '(未設定)'),
     'Facebook アプリシークレット: ' + mask(config.FB_APP_SECRET),
     'Drive フォルダID: ' + (config.DRIVE_FOLDER_ID || '(未設定)'),
+    'リール動画フォルダID: ' + (config.REEL_VIDEO_FOLDER_ID || '(未設定)'),
     'Gemini接続: ' + (config.GEMINI_API_KEY ? '自分のAPIキー（' + mask(config.GEMINI_API_KEY) + '）' : '共有proxy経由（キー未設定）'),
     'Discord Webhook URL: ' + mask(config.WEBHOOK_URL),
     'トークン有効期限: ' + (config.TOKEN_EXPIRY || '(未設定)')
@@ -97,4 +105,47 @@ function ensureDriveFolder() {
     '⚙️ 設定シートのフォルダID欄も更新されます。'
   );
   setupSettingsSheet();
+}
+
+/**
+ * リール動画(mp4)の保存先フォルダIDを設定
+ * 他アカウントから共有されたフォルダを想定しているため、新規作成はせずIDを受け取る
+ */
+function setReelVideoFolder() {
+  const ui = SpreadsheetApp.getUi();
+  const current = getConfig('REEL_VIDEO_FOLDER_ID');
+
+  const res = ui.prompt(
+    '🎥 リール動画(mp4)の保存先フォルダ',
+    '保存先フォルダのURLまたはIDを貼り付けてください。\n' +
+    '（このアカウントに「編集者」権限で共有されている必要があります）' +
+    (current ? '\n\n現在の設定: ' + current : ''),
+    ui.ButtonSet.OK_CANCEL
+  );
+  if (res.getSelectedButton() !== ui.Button.OK) return;
+
+  const input = res.getResponseText().trim();
+  if (!input) return;
+
+  // フォルダURLが貼られた場合はID部分を抜き出す
+  const matched = input.match(/[-\w]{25,}/);
+  const folderId = matched ? matched[0] : input;
+
+  try {
+    const folder = DriveApp.getFolderById(folderId);
+    // 「閲覧者」で共有されていると getFolderById は通るのに保存時だけ失敗するため、
+    // 実際に書き込めるかをその場で確かめる（テストファイルは即ゴミ箱へ）
+    folder.createFile('ig-insights-write-test.txt', '').setTrashed(true);
+    setConfig('REEL_VIDEO_FOLDER_ID', folderId);
+    ui.alert(
+      '✅ リール動画の保存先を設定しました\n\n' +
+      'フォルダ名: ' + folder.getName() + '\n' +
+      'URL: ' + folder.getUrl()
+    );
+  } catch (e) {
+    ui.alert(
+      '❌ フォルダにアクセスできません\n\n' + e.message + '\n\n' +
+      'IDが正しいか、このアカウントに編集者権限で共有されているか確認してください。'
+    );
+  }
 }
