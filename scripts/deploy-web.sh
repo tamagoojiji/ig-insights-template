@@ -22,7 +22,12 @@ if [[ ! "$GAS_DEPLOY_ID" =~ ^[A-Za-z0-9_-]+$ ]]; then
   exit 1
 fi
 
-MANUAL_SRC="$(dirname "$(dirname "$ACCOUNT_FILE")")/manual/$ID/取扱説明書（図解）.html"
+# 取説の場所: account ファイルに MANUAL=<パス>（絶対 or account ファイルのディレクトリ基準）があればそれ、無ければ <accounts repo>/manual/<id>/
+if [[ -n "${MANUAL:-}" ]]; then
+  [[ "$MANUAL" = /* ]] && MANUAL_SRC="$MANUAL" || MANUAL_SRC="$(dirname "$ACCOUNT_FILE")/$MANUAL"
+else
+  MANUAL_SRC="$(dirname "$(dirname "$ACCOUNT_FILE")")/manual/$ID/取扱説明書（図解）.html"
+fi
 if [[ ! -f "$MANUAL_SRC" ]]; then
   echo "ERROR: 取説がありません: $MANUAL_SRC" >&2
   exit 1
