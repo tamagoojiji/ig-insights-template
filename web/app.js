@@ -26,7 +26,9 @@ function dataUrl(part) { return GAS_URL + '?k=' + encodeURIComponent(KEY) + '&fo
 async function fetchData(url) {
   const pre = window.__pre && window.__pre.url === url ? window.__pre : null;
   if (pre) window.__pre = null;
-  const text = await (pre ? pre.p : fetch(url, { cache: 'no-store' }).then(res => res.text()));
+  // GAS は混んでいると 30秒〜数分応答せず最後に 404 を返すことがあるので、25秒で打ち切って再試行へ回す
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new SyntaxError('timeout')), 25000));
+  const text = await Promise.race([pre ? pre.p : fetch(url, { cache: 'no-store' }).then(res => res.text()), timeout]);
   if (/^403 forbidden/.test(text)) { const e = new Error('forbidden'); e.forbidden = true; throw e; }
   return JSON.parse(text);
 }
@@ -101,22 +103,33 @@ function markFire(d) {
   });
 }
 
-async function load() {
+// retried: 自動の再試行は1回だけ（GAS の準備中応答・HTML（一時的な404）応答のとき）
+async function load(retried) {
   state.data = null;
   state.captions = null;
   document.getElementById('main').innerHTML = '<div class="state">読み込み中…</div>';
   if (!KEY) return showKeyError();
   try {
-    render(await fetchData(dataUrl()));
+    const d = await fetchData(dataUrl());
+    if (d && d.building) return showBuilding(retried);
+    render(d);
     loadCaptions();
   } catch (err) {
     if (err.forbidden) showKeyError();
+    else if (!retried && err instanceof SyntaxError) load(true);
     else showError(err);
   }
 }
+function showBuilding(retried) {
+  document.getElementById('meta').textContent = 'データ準備中';
+  document.getElementById('main').innerHTML = '<div class="state">データ準備中…数十秒後にもう一度開いてください' +
+    (retried ? '<br><button type="button" id="retry">もう一度読み込む</button>' : '') + '</div>';
+  if (retried) document.getElementById('retry').onclick = () => load();
+  else setTimeout(() => load(true), 20000);
+}
 // キャプション全文は描画後に裏で取得し、開いている詳細シートがあれば差し替える
 function loadCaptions() {
-  fetchData(dataUrl('captions')).then(c => {
+  fetchData(dataUrl('captions')).then(c => { if (c && c.building) throw new Error('building'); return c; }).then(c => {
     state.captions = c;
     const el = document.getElementById('capFull');
     if (el) el.innerHTML = capHtml(el.dataset.kind, el.dataset.id);
@@ -136,7 +149,7 @@ function render(d) {
 function showError(err) {
   document.getElementById('meta').textContent = '読み込みに失敗しました';
   document.getElementById('main').innerHTML = '<div class="state">データを読み込めませんでした（' + esc(err && err.message ? err.message : err) + '）<br><button type="button" id="retry">もう一度読み込む</button></div>';
-  document.getElementById('retry').onclick = load;
+  document.getElementById('retry').onclick = () => load();
 }
 function showKeyError() {
   document.getElementById('meta').textContent = '読み込みに失敗しました';

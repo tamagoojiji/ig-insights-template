@@ -28,30 +28,31 @@ function doGet(e) {
   if (params.action === 'installWarm') return ContentService.createTextOutput(appInstallWarm_());
 
   if (params.format === 'json' && params.part === 'captions') {
-    return ContentService.createTextOutput(JSON.stringify(getCaptions(params.k)))
+    return ContentService.createTextOutput(JSON.stringify(getCaptions(params.k, params.build === '1')))
       .setMimeType(ContentService.MimeType.JSON);
   }
 
   if (params.format === 'json') {
-    return ContentService.createTextOutput(JSON.stringify(getAppData(params.k)))
+    return ContentService.createTextOutput(JSON.stringify(getAppData(params.k, params.build === '1')))
       .setMimeType(ContentService.MimeType.JSON);
   }
 
   return ContentService.createTextOutput('このURLは直接開けません。アプリのURLから開いてください');
 }
 
-function getAppData(key) {
+// キャッシュが空なら構築を裏で始めて { building: true } を返す（build=1 のときだけ同期で構築）
+function getAppData(key, build) {
   appCheckKey_(key);
-  return appCacheGet_('data') || appBuild_().data;
+  return appCacheGet_('data') || (build ? appBuild_().data : appKickBuild_());
 }
 
 /**
  * 詳細シート用の全文 { reels: {id: キャプション}, feeds: {id: キャプション}, stories: {id: 画像内テキスト} }
  * （getAppData の後に裏で取得）
  */
-function getCaptions(key) {
+function getCaptions(key, build) {
   appCheckKey_(key);
-  return appCacheGet_('caps') || appBuild_().caps;
+  return appCacheGet_('caps') || (build ? appBuild_().caps : appKickBuild_());
 }
 
 function appCheckKey_(key) {
@@ -68,11 +69,7 @@ function appCaptionHead_(c) {
  * シートを1回読み、軽量データとキャプション全文を作ってキャッシュに入れる
  */
 function appBuild_() {
-  let gen = appCacheGen_();
-  if (!gen) {
-    gen = Utilities.getUuid();
-    try { CacheService.getScriptCache().put('app:v3:gen', gen, 21600); } catch (e) {}
-  }
+  const started = Date.now();
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const tz = 'Asia/Tokyo';
   const now = Utilities.formatDate(new Date(), tz, 'yyyy/MM/dd HH:mm');
@@ -125,26 +122,19 @@ function appBuild_() {
     }, appBsuiteFields_(g)))
   };
 
-  // 構築中に appCacheClear_ が走った（世代が変わった）なら古い結果は登録しない
-  if (appCacheGen_() === gen) {
-    appCachePut_(Object.assign(appCacheEntries_('data', data, gen), appCacheEntries_('caps', caps, gen)));
-    if (appCacheGen_() !== gen) appCacheClear_(); // 保存の直前に更新が入った場合は取り消す
-  }
+  appCachePut_(started, { data: data, caps: caps });
   return { data: data, caps: caps };
 }
 
 /**
- * ScriptCache に10分保持。1キー100KB制限のため JSON を分割して保存する
- * （30000文字＝UTF-8で最大90KB）。キー: app:v3:<name>:n（件数）/ app:v3:<name>:<i>
+ * ScriptCache に6時間（上限）保持。1キー100KB制限のため JSON を分割して保存する（30000文字＝UTF-8で最大90KB）
+ * 作り直しは完成した一式で上書きする（それまでは古い一式を返し続ける＝stale-while-revalidate）
+ * キー: app:v4:<name> = "<構築開始ms>:<分割数>"（完成した一式を指す）/ app:v4:<name>:<構築開始ms>:<i>
  */
-const APP_CACHE_TTL_SEC = 2400; // 40分。自動取得(30分ごと)と巡回書き込みの直後に appBuild_ で作り直すので、通常は切れない
+const APP_CACHE_TTL_SEC = 21600;
 const APP_CACHE_CHUNK = 30000;
 
-function appCacheGen_() {
-  try { return CacheService.getScriptCache().get('app:v3:gen') || ''; } catch (e) { return ''; }
-}
-
-function appCacheEntries_(name, obj, gen) {
+function appCacheChunks_(name, obj, started) {
   const json = JSON.stringify(obj);
   const entries = {};
   let n = 0;
@@ -152,33 +142,55 @@ function appCacheEntries_(name, obj, gen) {
     let end = Math.min(i + APP_CACHE_CHUNK, json.length);
     const c = json.charCodeAt(end - 1);
     if (end < json.length && c >= 0xD800 && c <= 0xDBFF) end--; // サロゲートペアを割らない
-    entries['app:v3:' + name + ':' + n] = json.slice(i, end);
+    entries['app:v4:' + name + ':' + started + ':' + n] = json.slice(i, end);
     i = end;
   }
-  entries['app:v3:' + name + ':n'] = String(n);
-  entries['app:v3:' + name + ':g'] = gen;
-  return entries;
+  return { entries: entries, pointer: started + ':' + n };
 }
 
-// data と caps を1回の putAll で同じ世代として保存する
-function appCachePut_(entries) {
+// 分割データを書いてから指す先を切り替え、前の一式を消す。後から始まった構築が先に書いていたら何もしない
+// 並行する構築の書き込みは UserLock で直列化（doPost が ScriptLock を持ったまま呼ぶので別種のロックを使う）
+function appCachePut_(started, objs) {
+  const lock = LockService.getUserLock();
+  if (!lock.tryLock(20000)) { Logger.log('appCachePut_: ロック待ちで保存を見送り'); return; }
   try {
-    CacheService.getScriptCache().putAll(entries, APP_CACHE_TTL_SEC);
+    const cache = CacheService.getScriptCache();
+    const names = Object.keys(objs);
+    const cur = cache.getAll(names.map(nm => 'app:v4:' + nm));
+    if (Object.keys(cur).some(k => Number(String(cur[k]).split(':')[0]) > started)) return;
+    const chunks = {}, pointers = {};
+    names.forEach(nm => {
+      const c = appCacheChunks_(nm, objs[nm], started);
+      Object.assign(chunks, c.entries);
+      pointers['app:v4:' + nm] = c.pointer;
+    });
+    cache.putAll(chunks, APP_CACHE_TTL_SEC);
+    cache.putAll(pointers, APP_CACHE_TTL_SEC);
+    const old = [];
+    Object.keys(cur).forEach(k => {
+      const p = String(cur[k]).split(':');
+      if (Number(p[0]) !== started) for (let i = 0; i < Number(p[1]); i++) old.push(k + ':' + p[0] + ':' + i);
+    });
+    if (old.length) cache.removeAll(old);
   } catch (e) {
     Logger.log('appCachePut_ 失敗: ' + e.message);
+  } finally {
+    lock.releaseLock();
   }
 }
 
-// 欠け・世代不一致なら null（＝呼び出し側で再生成）
+// 完成した一式が無ければ null。appCacheClear_ の後に始まった構築でなければ、古い一式を返しつつ裏の構築を始める
 function appCacheGet_(name) {
   try {
     const cache = CacheService.getScriptCache();
-    const n = Number(cache.get('app:v3:' + name + ':n'));
+    const got0 = cache.getAll(['app:v4:' + name, 'app:v4:dirty', 'app:v4:kick']);
+    const p = String(got0['app:v4:' + name] || '').split(':');
+    const n = Number(p[1]);
     if (!n) return null;
+    if (Number(got0['app:v4:dirty'] || 0) > Number(p[0]) && !got0['app:v4:kick']) appKickBuild_();
     const keys = [];
-    for (let i = 0; i < n; i++) keys.push('app:v3:' + name + ':' + i);
-    const got = cache.getAll(keys.concat(['app:v3:gen', 'app:v3:' + name + ':g']));
-    if (!got['app:v3:gen'] || got['app:v3:gen'] !== got['app:v3:' + name + ':g']) return null;
+    for (let i = 0; i < n; i++) keys.push('app:v4:' + name + ':' + p[0] + ':' + i);
+    const got = cache.getAll(keys);
     let json = '';
     for (let i = 0; i < n; i++) {
       const part = got[keys[i]];
@@ -192,12 +204,11 @@ function appCacheGet_(name) {
   }
 }
 
-// シート更新後に呼ぶ（件数キーを消せば次回は再生成される）
+// シート更新後に呼ばれる（呼び出し側は続けて appBuild_ する）。古い一式は作り直しが終わるまで返し続けるので消さず、
+// 「この時刻より前に始まった構築は古い」印だけ残す（作り直しが時間切れで走らなくても、次の表示で裏の構築が始まる）
 function appCacheClear_() {
   try {
-    const cache = CacheService.getScriptCache();
-    cache.removeAll(['app:v3:data:n', 'app:v3:caps:n']);
-    cache.put('app:v3:gen', Utilities.getUuid(), 21600);
+    CacheService.getScriptCache().put('app:v4:dirty', String(Date.now()), APP_CACHE_TTL_SEC);
   } catch (e) {
     Logger.log('appCacheClear_ 失敗: ' + e.message);
   }

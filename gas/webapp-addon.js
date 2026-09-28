@@ -47,3 +47,36 @@ function appInstallWarm_() {
     lock.releaseLock();
   }
 }
+
+// キャッシュが空のとき（web リクエストから）: 1回限りのトリガーで裏の構築を始めて { building: true } を返す。
+// 構築は1〜2分かかり、web リクエスト内で回すと応答が 404 になるため。二重に始めないよう Lock＋印（10分）で守る
+function appKickBuild_() {
+  const lock = LockService.getScriptLock();
+  if (lock.tryLock(5000)) {
+    try {
+      const cache = CacheService.getScriptCache();
+      const pending = ScriptApp.getProjectTriggers().some(t => t.getHandlerFunction() === 'appCacheBuildOnce');
+      if (!cache.get('app:v4:kick') && !pending) {
+        ScriptApp.newTrigger('appCacheBuildOnce').timeBased().after(1000).create();
+        cache.put('app:v4:kick', '1', 600);
+      }
+    } catch (e) {
+      Logger.log('appKickBuild_ 失敗: ' + e.message);
+    } finally {
+      lock.releaseLock();
+    }
+  }
+  return { building: true };
+}
+
+// appKickBuild_ が作った1回限りのトリガーから。自分のトリガーを消してから構築する
+function appCacheBuildOnce() {
+  ScriptApp.getProjectTriggers().forEach(t => {
+    if (t.getHandlerFunction() === 'appCacheBuildOnce') ScriptApp.deleteTrigger(t);
+  });
+  try {
+    appBuild_();
+  } finally {
+    CacheService.getScriptCache().remove('app:v4:kick');
+  }
+}
