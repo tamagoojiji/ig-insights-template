@@ -3,6 +3,8 @@
  */
 
 const OCR_MODEL = 'gemini-2.5-flash';
+// APIキー経路のフォールバック順（3.x が使えないキーでも 2.5 に切り替わる）
+const OCR_KEY_MODELS = ['gemini-3.8-flash', 'gemini-2.5-flash'];
 const OCR_PROMPT = '画像内に書かれているテキストを忠実に文字起こししてください。装飾文字や手書きも含めて全部。テキスト以外の説明・注釈・前置きは一切不要で、文字起こし結果のみを返答してください。改行は元の見た目どおりに保ってください。テキストが何も無い場合は空文字を返してください。';
 
 /**
@@ -45,7 +47,20 @@ function ocrImage_(imageUrl) {
   // 無ければ共有 Vertex proxy にフォールバック。どちらも OCR_MODEL 単一で統一。
   const apiKey = getConfig('GEMINI_API_KEY');
   if (apiKey) {
-    return geminiGenerateWithKey_(requestBody, OCR_MODEL, apiKey).trim();
+    let lastErr;
+    for (const model of OCR_KEY_MODELS) {
+      const body = JSON.parse(JSON.stringify(requestBody));
+      // 3.x は thinkingLevel（thinkingBudget と併用すると 400）。2.5 は従来どおり
+      if (model.indexOf('gemini-3') === 0) {
+        body.generationConfig.thinkingConfig = { thinkingLevel: 'LOW' };
+      }
+      try {
+        return geminiGenerateWithKey_(body, model, apiKey).trim();
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw lastErr;
   }
   return vertexGenerate_(requestBody, [OCR_MODEL]).trim();
 }
