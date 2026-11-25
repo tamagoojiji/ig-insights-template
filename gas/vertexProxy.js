@@ -26,7 +26,7 @@ function vertexGenerate_(requestBody, models) {
   });
   var code = res.getResponseCode();
   if (code !== 200) {
-    throw new Error('vertex-proxy error ' + code + ': ' + res.getContentText().slice(0, 300));
+    throw new Error('AI中継 error ' + code + ': ' + res.getContentText().slice(0, 300));
   }
   return JSON.parse(res.getContentText()).text;
 }
